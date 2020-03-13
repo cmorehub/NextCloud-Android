@@ -20,7 +20,6 @@
 
 package com.owncloud.android.providers;
 
-import android.accounts.Account;
 import android.app.SearchManager;
 import android.content.ContentProvider;
 import android.content.ContentValues;
