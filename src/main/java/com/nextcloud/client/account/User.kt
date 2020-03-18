@@ -2,8 +2,8 @@
  * Nextcloud Android client application
  *
  * @author Chris Narkiewicz <hello@ezaquarii.com>
- * Copyright (C) 2020 Chris Narkiewicz
- * Copyright (C) 2020 Nextcloud GmbH
+ * Copyright (C) 2019 Chris Narkiewicz
+ * Copyright (C) 2019 Nextcloud GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,10 +21,9 @@
 package com.nextcloud.client.account
 
 import android.accounts.Account
-import android.os.Parcelable
 import com.owncloud.android.lib.common.OwnCloudAccount
 
-interface User : Parcelable {
+interface User {
     val accountName: String
     val server: Server
     val isAnonymous: Boolean
@@ -52,18 +51,4 @@ interface User : Parcelable {
      */
     @Deprecated("Temporary workaround")
     fun toOwnCloudAccount(): OwnCloudAccount
-
-    /**
-     * Compare account names, case insensitive.
-     *
-     * @return true if account names are same, false otherwise
-     */
-    fun nameEquals(user: User?): Boolean
-
-    /**
-     * Compare account names, case insensitive.
-     *
-     * @return true if account names are same, false otherwise
-     */
-    fun nameEquals(accountName: CharSequence?): Boolean
 }

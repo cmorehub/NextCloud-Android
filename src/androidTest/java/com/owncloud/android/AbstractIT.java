@@ -4,29 +4,21 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
-import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 
-import com.facebook.testing.screenshot.Screenshot;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.account.UserAccountManagerImpl;
 import com.owncloud.android.datamodel.FileDataStorageManager;
 import com.owncloud.android.lib.common.OwnCloudClient;
 import com.owncloud.android.lib.common.OwnCloudClientFactory;
 import com.owncloud.android.lib.common.accounts.AccountUtils;
-import com.owncloud.android.lib.common.operations.RemoteOperationResult;
-import com.owncloud.android.lib.resources.files.ReadFolderRemoteOperation;
-import com.owncloud.android.lib.resources.files.RemoveFileRemoteOperation;
-import com.owncloud.android.lib.resources.files.model.RemoteFile;
 import com.owncloud.android.utils.FileStorageUtils;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.io.FileUtils;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -34,20 +26,9 @@ import org.junit.runner.RunWith;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collection;
 
-import androidx.test.espresso.contrib.DrawerActions;
-import androidx.test.espresso.intent.rule.IntentsTestRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
-import androidx.test.runner.lifecycle.Stage;
-
-import static androidx.test.InstrumentationRegistry.getInstrumentation;
-import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -58,10 +39,8 @@ import static org.junit.Assert.assertTrue;
 public abstract class AbstractIT {
 
     protected static OwnCloudClient client;
-    protected static Account account;
+    static Account account;
     protected static Context targetContext;
-
-    private Activity currentActivity;
 
     @BeforeClass
     public static void beforeAll() {
@@ -108,23 +87,7 @@ public abstract class AbstractIT {
         }
     }
 
-    @After
-    public void after() {
-        RemoteOperationResult result = new ReadFolderRemoteOperation("/").execute(client);
-        assertTrue(result.getLogMessage(), result.isSuccess());
-
-        for (Object object : result.getData()) {
-            RemoteFile remoteFile = (RemoteFile) object;
-
-            if (!remoteFile.getRemotePath().equals("/")) {
-                assertTrue(new RemoveFileRemoteOperation(remoteFile.getRemotePath())
-                               .execute(client).isSuccess());
-            }
-        }
-    }
-
-
-    protected FileDataStorageManager getStorageManager() {
+    FileDataStorageManager getStorageManager() {
         return new FileDataStorageManager(account, targetContext.getContentResolver());
     }
 
@@ -169,43 +132,5 @@ public abstract class AbstractIT {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    protected File getFile(String filename) throws IOException {
-        InputStream inputStream = getInstrumentation().getContext().getAssets().open(filename);
-        File temp = File.createTempFile("file", "file");
-        FileUtils.copyInputStreamToFile(inputStream, temp);
-
-        return temp;
-    }
-
-    protected void waitForIdleSync() {
-        InstrumentationRegistry.getInstrumentation().waitForIdleSync();
-    }
-
-    protected void openDrawer(IntentsTestRule activityRule) throws InterruptedException {
-        Activity sut = activityRule.launchActivity(null);
-
-        Thread.sleep(3000);
-
-        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
-
-        waitForIdleSync();
-
-        Screenshot.snapActivity(sut).record();
-    }
-
-    protected Activity getCurrentActivity() {
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
-            Collection<Activity> resumedActivities = ActivityLifecycleMonitorRegistry
-                .getInstance()
-                .getActivitiesInStage(Stage.RESUMED);
-
-            if (resumedActivities.iterator().hasNext()) {
-                currentActivity = resumedActivities.iterator().next();
-            }
-        });
-
-        return currentActivity;
     }
 }

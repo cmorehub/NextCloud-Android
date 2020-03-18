@@ -23,6 +23,7 @@
 
 package com.owncloud.android.jobs;
 
+import android.accounts.Account;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
@@ -32,13 +33,11 @@ import android.text.TextUtils;
 
 import com.evernote.android.job.Job;
 import com.evernote.android.job.util.support.PersistableBundleCompat;
-import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.core.Clock;
 import com.nextcloud.client.device.PowerManagementService;
 import com.nextcloud.client.network.ConnectivityService;
 import com.nextcloud.client.preferences.AppPreferences;
-import com.nextcloud.java.util.Optional;
 import com.owncloud.android.MainApp;
 import com.owncloud.android.R;
 import com.owncloud.android.datamodel.ArbitraryDataProvider;
@@ -131,7 +130,7 @@ public class FilesSyncJob extends Job {
                                             userAccountManager,
                                             connectivityService,
                                             powerManagementService);
-        FilesSyncHelper.insertAllDBEntries(preferences, clock, skipCustom, false);
+        FilesSyncHelper.insertAllDBEntries(preferences, clock, skipCustom);
 
         // Create all the providers we'll need
         final ContentResolver contentResolver = context.getContentResolver();
@@ -141,11 +140,12 @@ public class FilesSyncJob extends Job {
         Locale currentLocale = context.getResources().getConfiguration().locale;
         SimpleDateFormat sFormatter = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss", currentLocale);
         sFormatter.setTimeZone(TimeZone.getTimeZone(TimeZone.getDefault().getID()));
+        FileUploader.UploadRequester requester = new FileUploader.UploadRequester();
 
         for (SyncedFolder syncedFolder : syncedFolderProvider.getSyncedFolders()) {
             if ((syncedFolder.isEnabled()) && (!skipCustom || MediaFolderType.CUSTOM != syncedFolder.getType())) {
                 syncFolder(context, resources, lightVersion, filesystemDataProvider, currentLocale, sFormatter,
-                           syncedFolder);
+                        requester, syncedFolder);
             }
         }
 
@@ -156,15 +156,10 @@ public class FilesSyncJob extends Job {
         return Result.SUCCESS;
     }
 
-    private void syncFolder(
-        Context context,
-        Resources resources,
-        boolean lightVersion,
-        FilesystemDataProvider filesystemDataProvider,
-        Locale currentLocale,
-        SimpleDateFormat sFormatter,
-        SyncedFolder syncedFolder
-    ) {
+    private void syncFolder(Context context, Resources resources, boolean lightVersion,
+                            FilesystemDataProvider filesystemDataProvider, Locale currentLocale,
+                            SimpleDateFormat sFormatter, FileUploader.UploadRequester requester,
+                            SyncedFolder syncedFolder) {
         String remotePath;
         boolean subfolderByDate;
         Integer uploadAction;
@@ -172,12 +167,7 @@ public class FilesSyncJob extends Job {
         boolean needsWifi;
         File file;
         ArbitraryDataProvider arbitraryDataProvider;
-        String accountName = syncedFolder.getAccount();
-        Optional<User> optionalUser = userAccountManager.getUser(accountName);
-        if (!optionalUser.isPresent()) {
-            return;
-        }
-        User user = optionalUser.get();
+        Account account = userAccountManager.getAccountByName(syncedFolder.getAccount());
 
         if (lightVersion) {
             arbitraryDataProvider = new ArbitraryDataProvider(context.getContentResolver());
@@ -193,11 +183,13 @@ public class FilesSyncJob extends Job {
 
             if (lightVersion) {
                 needsCharging = resources.getBoolean(R.bool.syncedFolder_light_on_charging);
-                needsWifi = arbitraryDataProvider.getBooleanValue(accountName,
-                                                                  SettingsActivity.SYNCED_FOLDER_LIGHT_UPLOAD_ON_WIFI);
+                needsWifi = account == null || arbitraryDataProvider.getBooleanValue(account.name,
+                                                                                     SettingsActivity.SYNCED_FOLDER_LIGHT_UPLOAD_ON_WIFI);
                 String uploadActionString = resources.getString(R.string.syncedFolder_light_upload_behaviour);
                 uploadAction = getUploadAction(uploadActionString);
+
                 subfolderByDate = resources.getBoolean(R.bool.syncedFolder_light_use_subfolders);
+
                 remotePath = resources.getString(R.string.syncedFolder_remote_folder);
             } else {
                 needsCharging = syncedFolder.isChargingOnly();
@@ -207,24 +199,24 @@ public class FilesSyncJob extends Job {
                 remotePath = syncedFolder.getRemotePath();
             }
 
-            FileUploader.uploadNewFile(
-                context,
-                user.toPlatformAccount(),
-                file.getAbsolutePath(),
-                FileStorageUtils.getInstantUploadFilePath(
+            requester.uploadFileWithOverwrite(
+                    context,
+                    account,
+                    file.getAbsolutePath(),
+                    FileStorageUtils.getInstantUploadFilePath(
                         file,
                         currentLocale,
                         remotePath,
                         syncedFolder.getLocalPath(),
                         lastModificationTime,
                         subfolderByDate),
-                uploadAction,
-                mimeType,
-                true,           // create parent folder if not existent
-                UploadFileOperation.CREATED_AS_INSTANT_PICTURE,
-                needsWifi,
-                needsCharging,
-                FileUploader.NameCollisionPolicy.ASK_USER
+                    uploadAction,
+                    mimeType,
+                    true,           // create parent folder if not existent
+                    UploadFileOperation.CREATED_AS_INSTANT_PICTURE,
+                    needsWifi,
+                    needsCharging,
+                    true
             );
 
             filesystemDataProvider.updateFilesystemFileAsSentForUpload(path,

@@ -32,6 +32,9 @@ import com.owncloud.android.lib.resources.shares.OCShare;
 import com.owncloud.android.lib.resources.shares.UpdateShareRemoteOperation;
 import com.owncloud.android.operations.common.SyncOperation;
 
+import lombok.Getter;
+import lombok.Setter;
+
 
 /**
  * Updates an existing private share for a given file.
@@ -39,10 +42,10 @@ import com.owncloud.android.operations.common.SyncOperation;
 public class UpdateSharePermissionsOperation extends SyncOperation {
 
     private long shareId;
-    private int permissions;
-    private long expirationDateInMillis;
-    private String password;
-    private String path;
+    @Setter private int permissions;
+    @Setter private long expirationDateInMillis;
+    @Getter @Setter private String password;
+    @Getter private String path;
 
     /**
      * Constructor
@@ -99,26 +102,6 @@ public class UpdateSharePermissionsOperation extends SyncOperation {
 
         share.setPasswordProtected(!TextUtils.isEmpty(password));
         getStorageManager().saveShare(share);
-    }
-
-    public String getPassword() {
-        return this.password;
-    }
-
-    public String getPath() {
-        return this.path;
-    }
-
-    public void setPermissions(int permissions) {
-        this.permissions = permissions;
-    }
-
-    public void setExpirationDateInMillis(long expirationDateInMillis) {
-        this.expirationDateInMillis = expirationDateInMillis;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }
 

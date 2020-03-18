@@ -46,18 +46,20 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import lombok.Getter;
+
 /**
  * Remote DownloadOperation performing the download of a file to an ownCloud server
  */
 public class DownloadFileOperation extends RemoteOperation {
     private static final String TAG = DownloadFileOperation.class.getSimpleName();
 
-    private Account account;
-    private OCFile file;
-    private String behaviour;
-    private String etag = "";
-    private String activityName;
-    private String packageName;
+    @Getter private Account account;
+    @Getter private OCFile file;
+    @Getter private String behaviour;
+    @Getter private String etag = "";
+    @Getter private String activityName;
+    @Getter private String packageName;
 
     private Context context;
     private Set<OnDatatransferProgressListener> dataTransferListeners = new HashSet<>();
@@ -225,29 +227,5 @@ public class DownloadFileOperation extends RemoteOperation {
         synchronized (dataTransferListeners) {
             dataTransferListeners.remove(listener);
         }
-    }
-
-    public Account getAccount() {
-        return this.account;
-    }
-
-    public OCFile getFile() {
-        return this.file;
-    }
-
-    public String getBehaviour() {
-        return this.behaviour;
-    }
-
-    public String getEtag() {
-        return this.etag;
-    }
-
-    public String getActivityName() {
-        return this.activityName;
-    }
-
-    public String getPackageName() {
-        return this.packageName;
     }
 }

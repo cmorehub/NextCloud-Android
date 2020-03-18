@@ -106,7 +106,7 @@ public class ActivitiesServiceApiImpl implements ActivitiesServiceApi {
                     activities = (ArrayList) data.get(0);
 
                     lastGiven = (int) data.get(1);
-                    return Boolean.TRUE;
+                    return true;
                 } else {
                     Log_OC.d(TAG, result.getLogMessage());
                     // show error
@@ -114,7 +114,7 @@ public class ActivitiesServiceApiImpl implements ActivitiesServiceApi {
                     if (result.getHttpCode() == HttpStatus.SC_NOT_MODIFIED) {
                         errorMessage = context.getString(R.string.file_list_empty_headline_server_search);
                     }
-                    return Boolean.FALSE;
+                    return false;
 
                 }
             } catch (com.owncloud.android.lib.common.accounts.AccountUtils.AccountNotFoundException e) {
@@ -131,7 +131,7 @@ public class ActivitiesServiceApiImpl implements ActivitiesServiceApi {
                 errorMessage = "Authentication Exception";
             }
 
-            return Boolean.FALSE;
+            return false;
         }
 
         @Override

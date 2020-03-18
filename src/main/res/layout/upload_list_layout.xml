@@ -54,9 +54,7 @@
 
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-            <include
-                android:id="@+id/empty_list"
-                layout="@layout/empty_list" />
+            <include layout="@layout/empty_list"/>
 
         </FrameLayout>
 

@@ -23,12 +23,16 @@
  */
 package com.owncloud.android.ui.trashbin;
 
+import android.accounts.Account;
+import android.content.Context;
 import android.os.AsyncTask;
 
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.network.ClientFactory;
 import com.owncloud.android.R;
+import com.owncloud.android.lib.common.OwnCloudAccount;
 import com.owncloud.android.lib.common.OwnCloudClient;
+import com.owncloud.android.lib.common.OwnCloudClientManagerFactory;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
 import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.lib.resources.trashbin.EmptyTrashbinRemoteOperation;
@@ -120,7 +124,7 @@ public class RemoteTrashbinRepository implements TrashbinRepository {
                 return result.isSuccess();
             } catch (ClientFactory.CreationException e) {
                 Log_OC.e(this, "Cannot create client", e);
-                return Boolean.FALSE;
+                return false;
             }
         }
 
@@ -202,12 +206,12 @@ public class RemoteTrashbinRepository implements TrashbinRepository {
                 RemoteOperationResult result = new ReadTrashbinFolderRemoteOperation(remotePath).execute(client);
                 if (result.isSuccess()) {
                     trashbinFiles = result.getData();
-                    return Boolean.TRUE;
+                    return true;
                 } else {
-                    return Boolean.FALSE;
+                    return false;
                 }
             } catch (ClientFactory.CreationException e) {
-                return Boolean.FALSE;
+                return false;
             }
         }
 

@@ -23,6 +23,7 @@ package com.nextcloud.client.di;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
+
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import dagger.android.AndroidInjection;
@@ -71,3 +72,4 @@ public class ActivityInjector implements Application.ActivityLifecycleCallbacks 
         // not needed
     }
 }
+

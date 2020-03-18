@@ -27,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nextcloud.common.NextcloudClient;
 import com.owncloud.android.R;
@@ -43,7 +44,6 @@ import com.owncloud.android.ui.adapter.ActivityListAdapter;
 import com.owncloud.android.ui.interfaces.ActivityListInterface;
 import com.owncloud.android.ui.preview.PreviewImageActivity;
 import com.owncloud.android.ui.preview.PreviewImageFragment;
-import com.owncloud.android.utils.DisplayUtils;
 import com.owncloud.android.utils.ThemeUtils;
 
 import java.util.List;
@@ -260,7 +260,7 @@ public class ActivitiesActivity extends FileActivity implements ActivityListInte
 
     @Override
     public void showActivitiesLoadError(String error) {
-        DisplayUtils.showSnackMessage(this, error);
+        Toast.makeText(getBaseContext(), error, Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -279,12 +279,12 @@ public class ActivitiesActivity extends FileActivity implements ActivityListInte
 
     @Override
     public void showActivityDetailUIIsNull() {
-        DisplayUtils.showSnackMessage(this, R.string.file_not_found);
+        Toast.makeText(getBaseContext(), R.string.file_not_found, Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void showActivityDetailError(String error) {
-        DisplayUtils.showSnackMessage(this, error);
+        Toast.makeText(getBaseContext(), error, Toast.LENGTH_LONG).show();
     }
 
     @Override

@@ -143,7 +143,6 @@
     <string name="confirmation_remove_local">فقط محلی</string>
     <string name="conflict_keep_both">نگهداشتن هر دو</string>
     <string name="conflict_message">کدام فایل ها را می خواهید نگه دارید؟ اگر هر دو نسخه را انتخاب کنید ، فایل محلی شماره ای به نام آن اضافه خواهد شد.</string>
-    <string name="conflict_message_headline">کدام فایل ها را می خواهید نگه دارید ؟</string>
     <string name="conflict_title">تضاد در فایل</string>
     <string name="conflict_use_local_version">نسخه‌ی محلی</string>
     <string name="conflict_use_server_version">نسخه سرور</string>
@@ -257,8 +256,6 @@
     <string name="error_retrieving_templates">خطا در بازیابی الگوهای</string>
     <string name="error_starting_direct_camera_upload">خطا در شروع دوربین</string>
     <string name="etm_accounts">حساب‌ها</string>
-    <string name="etm_background_job_progress">پیش رفتن</string>
-    <string name="etm_background_jobs">کارهای پس زمینه</string>
     <string name="etm_preferences">اولویت ها</string>
     <string name="etm_title">حالت تست مهندسی</string>
     <string name="fab_label">اضافه یا بارگذاری کنید</string>
@@ -672,6 +669,7 @@
     <string name="sync_fail_ticker">همگامسازی انجام نشد</string>
     <string name="sync_fail_ticker_unauthorized">همگام‌سازی شکست خورد. دوباره وارد شوید</string>
     <string name="sync_file_nothing_to_do_msg">محتوای فایل قبلا همگام شده</string>
+    <string name="sync_folder_failed_content">همگام سازی %1$s پوشه کامل نشد</string>
     <string name="sync_foreign_files_forgotten_explanation">طبق نسخه 1.3.16 ، فایلهای آپلود شده از این دستگاه در محلی کپی می شوند %1$s پوشه ای برای جلوگیری از از دست رفتن داده ها هنگام همگام سازی یک فایل واحد با چندین حساب.  با توجه به این تغییر ، تمام پرونده های آپلود شده با نسخه های قبلی این برنامه در داخل کپی شدند%2$s پوشه با این حال ، یک خطا مانع از انجام این عمل در حین همگام سازی حساب می شود. شما ممکن است فایل (های) را مانند گذشته ترک کنید و پیوند را حذف کنید %3$s, یا پرونده (ها) را وارد کنید %1$s پوشه را نگهدارید و پیوند را حفظ کنید %4$s..در لیست پرونده های محلی و پرونده (های) از راه دور موجود است %5$s آنها با آنها در ارتباط بودند.</string>
     <string name="sync_foreign_files_forgotten_ticker">بعضی از فایلهای محلی فراموش شده اند</string>
     <string name="sync_in_progress">واکشی جدیدترین نسخه پرونده.</string>
@@ -721,7 +719,6 @@
     <string name="upload_file_dialog_title">نام و نوع فایل را وارد کنید تا بارگذاری شود</string>
     <string name="upload_files">بارگذاری فایل ها</string>
     <string name="upload_item_action_button">دکمه عملکرد مورد را بارگذاری کنید</string>
-    <string name="upload_list_delete">حذف</string>
     <string name="upload_list_empty_headline">هیچ بارگذاری وجود ندارد</string>
     <string name="upload_list_empty_text_auto_upload">تعدادی عکس آپلود کنید یا آپلود خودکار را فعال کنید</string>
     <string name="upload_local_storage_full">فضای محلی پر است</string>

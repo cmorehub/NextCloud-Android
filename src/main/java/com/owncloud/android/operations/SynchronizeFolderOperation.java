@@ -494,7 +494,11 @@ public class SynchronizeFolderOperation extends SyncOperation {
         intent.setAction(OperationsService.ACTION_SYNC_FOLDER);
         intent.putExtra(OperationsService.EXTRA_ACCOUNT, mAccount);
         intent.putExtra(OperationsService.EXTRA_REMOTE_PATH, path);
-        mContext.startService(intent);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            mContext.startForegroundService(intent);
+        } else {
+            mContext.startService(intent);
+        }
     }
 
     public String getRemotePath() {

@@ -1,4 +1,4 @@
-/*
+/**
  * Nextcloud Android client application
  *
  * Copyright (C) 2017 Tobias Kaminsky
@@ -9,12 +9,12 @@
  * modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU AFFERO GENERAL PUBLIC LICENSE for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Affero General Public
  * License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -28,6 +28,8 @@ import android.net.Uri;
 
 import com.owncloud.android.db.ProviderMeta;
 import com.owncloud.android.lib.common.utils.Log_OC;
+
+import java.util.List;
 
 import androidx.annotation.NonNull;
 
@@ -56,6 +58,15 @@ public class ArbitraryDataProvider {
                 ProviderMeta.ProviderTableMeta.ARBITRARY_DATA_CLOUD_ID + " = ? AND " +
                         ProviderMeta.ProviderTableMeta.ARBITRARY_DATA_KEY + "= ?",
                 new String[]{account, key}
+        );
+    }
+
+    public int deleteForKeyWhereAccountNotIn(List<String> accounts, String key) {
+        return contentResolver.delete(
+                ProviderMeta.ProviderTableMeta.CONTENT_URI_ARBITRARY_DATA,
+                ProviderMeta.ProviderTableMeta.ARBITRARY_DATA_CLOUD_ID + " NOT IN (?) AND " +
+                        ProviderMeta.ProviderTableMeta.ARBITRARY_DATA_KEY + "= ?",
+                new String[]{String.valueOf(accounts), key}
         );
     }
 
@@ -101,11 +112,11 @@ public class ArbitraryDataProvider {
         }
     }
 
-    Long getLongValue(String accountName, String key) {
+    public Long getLongValue(String accountName, String key) {
         String value = getValue(accountName, key);
 
         if (value.isEmpty()) {
-            return -1L;
+            return -1l;
         } else {
             return Long.valueOf(value);
         }
@@ -127,9 +138,9 @@ public class ArbitraryDataProvider {
     /**
      * returns integer if found else -1
      *
-     * @param accountName name of account
-     * @param key key to get value for
-     * @return Integer specified by account and key
+     * @param accountName
+     * @param key
+     * @return
      */
     public Integer getIntegerValue(String accountName, String key) {
         String value = getValue(accountName, key);
@@ -139,6 +150,17 @@ public class ArbitraryDataProvider {
         } else {
             return Integer.valueOf(value);
         }
+    }
+
+    /**
+     * returns integer if found else -1
+     *
+     * @param account
+     * @param key
+     * @return
+     */
+    public Integer getIntegerValue(Account account, String key) {
+        return getIntegerValue(account.name, key);
     }
 
     /**
@@ -216,6 +238,34 @@ public class ArbitraryDataProvider {
     }
 
 
+    public class ArbitraryDataSet {
+        private int id;
+        private String cloudId;
+        private String key;
+        private String value;
 
+        public ArbitraryDataSet(int id, String cloudId, String key, String value) {
+            this.id = id;
+            this.cloudId = cloudId;
+            this.key = key;
+            this.value = value;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public String getCloudId() {
+            return cloudId;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
 
 }

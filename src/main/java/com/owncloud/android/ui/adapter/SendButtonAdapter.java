@@ -32,7 +32,6 @@ import com.owncloud.android.ui.components.SendButtonData;
 
 import java.util.List;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class SendButtonAdapter extends RecyclerView.Adapter<SendButtonAdapter.ViewHolder> {
@@ -45,7 +44,6 @@ public class SendButtonAdapter extends RecyclerView.Adapter<SendButtonAdapter.Vi
         this.clickListener = clickListener;
     }
 
-    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.send_button, parent, false));

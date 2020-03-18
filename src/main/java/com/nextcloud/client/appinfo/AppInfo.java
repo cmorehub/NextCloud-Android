@@ -36,8 +36,6 @@ public interface AppInfo {
      */
     String getFormattedVersionCode();
 
-    int getVersionCode();
-
     boolean isDebugBuild();
 
     String getAppVersion(Context context);

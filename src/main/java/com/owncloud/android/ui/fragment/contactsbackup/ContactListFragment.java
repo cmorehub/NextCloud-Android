@@ -535,7 +535,7 @@ public class ContactListFragment extends FileFragment implements Injectable {
 
     }
 
-    private AsyncTask<Void, Void, Boolean> loadContactsTask = new AsyncTask<Void, Void, Boolean>() {
+    private AsyncTask loadContactsTask = new AsyncTask() {
 
         @Override
         protected void onPreExecute() {
@@ -543,7 +543,7 @@ public class ContactListFragment extends FileFragment implements Injectable {
         }
 
         @Override
-        protected Boolean doInBackground(Void... voids) {
+        protected Object doInBackground(Object[] params) {
             if (!isCancelled()) {
                 File file = new File(ocFile.getStoragePath());
                 try {
@@ -551,15 +551,15 @@ public class ContactListFragment extends FileFragment implements Injectable {
                     Collections.sort(vCards, new VCardComparator());
                 } catch (IOException e) {
                     Log_OC.e(TAG, "IO Exception: " + file.getAbsolutePath());
-                    return Boolean.FALSE;
+                    return false;
                 }
-                return Boolean.TRUE;
+                return true;
             }
-            return Boolean.FALSE;
+            return false;
         }
 
         @Override
-        protected void onPostExecute(Boolean bool) {
+        protected void onPostExecute(Object o) {
             if (!isCancelled()) {
                 emptyListContainer.setVisibility(View.GONE);
                 contactListAdapter.replaceVCards(vCards);

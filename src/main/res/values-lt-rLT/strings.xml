@@ -126,11 +126,8 @@
     <string name="confirmation_remove_folder_alert">Ar tikrai norite ištrinti %1$s ir jo turinį?</string>
     <string name="confirmation_remove_folders_alert">Ar tikrai norite ištrinti pažymėtus elementus ir jų turinį?</string>
     <string name="confirmation_remove_local">Tik vietiniai</string>
-    <string name="conflict_already_existing_file">Jau esamas failas</string>
     <string name="conflict_keep_both">Palikti abu</string>
     <string name="conflict_message">Kurį failą renkates? Jeigu renkates abu failus, suteikite kitą vardą (pavadinimą)</string>
-    <string name="conflict_message_headline">Kuriuos failus norite pasilikti?</string>
-    <string name="conflict_new_file">Naujas failas</string>
     <string name="conflict_title">Failų konfliktas</string>
     <string name="conflict_use_local_version">Vietinė versija</string>
     <string name="conflict_use_server_version">Versija serveryje</string>
@@ -230,8 +227,6 @@
     <string name="error_retrieving_templates">Klaida gaunant šablonus</string>
     <string name="error_starting_direct_camera_upload">Klaida paleidžiant kamerą</string>
     <string name="etm_accounts">Paskyros</string>
-    <string name="etm_background_job_progress">Eiga</string>
-    <string name="etm_background_jobs">Foninės užduotys</string>
     <string name="etm_preferences">Nuostatos</string>
     <string name="failed_to_download">Nepavyko perduoti failo į atsiuntimų tvarkytuvę</string>
     <string name="failed_to_print">Nepavyko spausdinti failo</string>
@@ -471,7 +466,6 @@
     <string name="saml_authentication_wrong_pass">Neteisingas slaptažodis</string>
     <string name="scanQR_description">Prisijungti per QR kodą</string>
     <string name="screenshot_02_listView_heading">Naršyti ir bendrinti</string>
-    <string name="screenshot_03_drawer_heading">Veikla, viešiniai, …</string>
     <string name="screenshot_06_davdroid_heading">Kalendorius ir adresatai</string>
     <string name="search_users_and_groups_hint">Ieškoti naudotojų ar grupių</string>
     <string name="select_all">Pažymėti viską</string>
@@ -574,7 +568,6 @@
     <string name="sync_file_nothing_to_do_msg">Failo turinys jau sunchronizuotas</string>
     <string name="sync_foreign_files_forgotten_ticker">Keli vietiniai failai buvo užmiršti</string>
     <string name="sync_in_progress">Gaunama paskiausia failo versija.</string>
-    <string name="sync_not_enough_space_dialog_title">Trūksta vietos</string>
     <string name="sync_string_files">Failai</string>
     <string name="synced_folder_settings_button">Nustatymų mygtukas</string>
     <string name="synced_folders_configure_folders">Konfigūruokite aplankus</string>
@@ -614,7 +607,6 @@
     <string name="upload_file_dialog_filetype_snippet_text">Ištraukos tekstinis failas(.txt)</string>
     <string name="upload_file_dialog_title">Įrašykite failo pavadinimą ir tipą įkėlimui</string>
     <string name="upload_files">Įkelti failus</string>
-    <string name="upload_list_delete">Ištrinti</string>
     <string name="upload_list_empty_headline">Atnaujinimų nerasta</string>
     <string name="upload_list_empty_text_auto_upload">Įkelkite failus arba sinchronizuokite su savo įrenginiais</string>
     <string name="upload_local_storage_full">Vietinė saugykla pilna</string>

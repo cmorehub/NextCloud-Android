@@ -243,8 +243,10 @@
 	<style name="NavigationView_ItemTextAppearance">
 		<item name="android:ellipsize">end</item>
 		<item name="android:listDivider">@color/transparent</item>
-        <!-- Color of text and icon when selected -->
-        <item name="colorPrimary">@color/drawer_active_item_background</item>
+
+        <!-- TODO are these two necessary -->
+<!--		<item name="android:textColor">@color/textColor</item>-->
+<!--		<item name="android:color">@color/textColor</item>-->
 	</style>
 
     <style name="PassCodeStyle">

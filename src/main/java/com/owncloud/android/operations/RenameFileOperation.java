@@ -37,6 +37,8 @@ import com.owncloud.android.utils.MimeTypeUtil;
 import java.io.File;
 import java.io.IOException;
 
+import lombok.Getter;
+
 
 /**
  * Remote operation performing the rename of a remote file (or folder?) in the ownCloud server.
@@ -45,7 +47,7 @@ public class RenameFileOperation extends SyncOperation {
 
     private static final String TAG = RenameFileOperation.class.getSimpleName();
 
-    private OCFile file;
+    @Getter private OCFile file;
     private String remotePath;
     private String newName;
 
@@ -187,9 +189,5 @@ public class RenameFileOperation extends SyncOperation {
         testFile.delete();
 
         return result;
-    }
-
-    public OCFile getFile() {
-        return this.file;
     }
 }

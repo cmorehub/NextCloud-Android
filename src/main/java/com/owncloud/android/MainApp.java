@@ -43,7 +43,6 @@ import android.view.WindowManager;
 
 import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
-import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.appinfo.AppInfo;
 import com.nextcloud.client.core.Clock;
@@ -54,7 +53,6 @@ import com.nextcloud.client.errorhandling.ExceptionHandler;
 import com.nextcloud.client.jobs.BackgroundJobManager;
 import com.nextcloud.client.logger.LegacyLoggerAdapter;
 import com.nextcloud.client.logger.Logger;
-import com.nextcloud.client.migrations.MigrationsManager;
 import com.nextcloud.client.network.ConnectivityService;
 import com.nextcloud.client.onboarding.OnboardingService;
 import com.nextcloud.client.preferences.AppPreferences;
@@ -86,7 +84,6 @@ import com.owncloud.android.utils.ReceiversHelper;
 import com.owncloud.android.utils.SecurityUtils;
 
 import org.conscrypt.Conscrypt;
-import org.greenrobot.eventbus.EventBus;
 
 import java.lang.reflect.Method;
 import java.security.NoSuchAlgorithmException;
@@ -95,7 +92,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -170,12 +166,6 @@ public class MainApp extends MultiDexApplication implements HasAndroidInjector {
     @Inject
     Clock clock;
 
-    @Inject
-    EventBus eventBus;
-
-    @Inject
-    MigrationsManager migrationsManager;
-
     private PassCodeManager passCodeManager;
 
     @SuppressWarnings("unused")
@@ -202,6 +192,14 @@ public class MainApp extends MultiDexApplication implements HasAndroidInjector {
      */
     public PowerManagementService getPowerManagementService() {
         return powerManagementService;
+    }
+
+    /**
+     * Temporary getter enabling intermediate refactoring.
+     * TODO: remove when FileSyncHelper is refactored/removed
+     */
+    public BackgroundJobManager getBackgroundJobManager() {
+        return backgroundJobManager;
     }
 
     private String getAppProcessName() {
@@ -259,8 +257,14 @@ public class MainApp extends MultiDexApplication implements HasAndroidInjector {
 
         registerActivityLifecycleCallbacks(new ActivityInjector());
 
-        int startedMigrationsCount = migrationsManager.startMigration();
-        logger.i(TAG, String.format(Locale.US, "Started %d migrations", startedMigrationsCount));
+        Thread t = new Thread(() -> {
+            // best place, before any access to AccountManager or database
+            if (!preferences.isUserIdMigrated()) {
+                final boolean migrated = accountManager.migrateUserId();
+                preferences.setMigratedUserId(migrated);
+            }
+        });
+        t.start();
 
         JobManager.create(this).addJobCreator(
             new NCJobCreator(
@@ -270,9 +274,7 @@ public class MainApp extends MultiDexApplication implements HasAndroidInjector {
                 uploadsStorageManager,
                 connectivityService,
                 powerManagementService,
-                clock,
-                eventBus,
-                backgroundJobManager
+                clock
             )
         );
 
@@ -310,7 +312,7 @@ public class MainApp extends MultiDexApplication implements HasAndroidInjector {
                            powerManagementService,
                            backgroundJobManager,
                            clock);
-        initContactsBackup(accountManager, backgroundJobManager);
+        initContactsBackup(accountManager);
         notificationChannels();
 
 
@@ -380,13 +382,13 @@ public class MainApp extends MultiDexApplication implements HasAndroidInjector {
         securityKeyManager.init(this, config);
     }
 
-    public static void initContactsBackup(UserAccountManager accountManager, BackgroundJobManager backgroundJobManager) {
+    public static void initContactsBackup(UserAccountManager accountManager) {
         ArbitraryDataProvider arbitraryDataProvider = new ArbitraryDataProvider(mContext.getContentResolver());
-        List<User> users = accountManager.getAllUsers();
-        for (User user : users) {
-            if (arbitraryDataProvider.getBooleanValue(user.toPlatformAccount(), PREFERENCE_CONTACTS_AUTOMATIC_BACKUP)) {
-                backgroundJobManager.schedulePeriodicContactsBackup(user);
+        Account[] accounts = accountManager.getAccounts();
 
+        for (Account account : accounts) {
+            if (arbitraryDataProvider.getBooleanValue(account, PREFERENCE_CONTACTS_AUTOMATIC_BACKUP)) {
+                ContactsPreferenceActivity.startContactBackupJob(account);
             }
         }
     }
@@ -766,7 +768,7 @@ public class MainApp extends MultiDexApplication implements HasAndroidInjector {
 
                 for (SyncedFolder syncedFolder : syncedFolderProvider.getSyncedFolders()) {
                     if (syncedFolder.isEnabled()) {
-                        FilesSyncHelper.insertAllDBEntriesForSyncedFolder(syncedFolder, true);
+                        FilesSyncHelper.insertAllDBEntriesForSyncedFolder(syncedFolder);
                     }
                 }
 

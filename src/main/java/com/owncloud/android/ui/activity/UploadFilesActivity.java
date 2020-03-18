@@ -404,7 +404,7 @@ public class UploadFilesActivity extends FileActivity implements
     }
 
     @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
+    protected void onSaveInstanceState(Bundle outState) {
         // responsibility of restore is preferred in onCreate() before than in
         // onRestoreInstanceState when there are Fragments involved
         Log_OC.d(TAG, "onSaveInstanceState() start");

@@ -39,7 +39,6 @@ import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.ui.activity.FileActivity;
 import com.owncloud.android.utils.MimeTypeUtil;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
 /**
@@ -115,7 +114,7 @@ public class PreviewVideoActivity extends FileActivity implements OnCompletionLi
      * {@inheritDoc}
      */
     @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
+    public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(PreviewVideoActivity.EXTRA_START_POSITION, mVideoPlayer.getCurrentPosition());
         outState.putBoolean(PreviewVideoActivity.EXTRA_AUTOPLAY , mVideoPlayer.isPlaying());

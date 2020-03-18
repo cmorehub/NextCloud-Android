@@ -27,10 +27,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import lombok.Getter;
+
 public class PlainHeader implements Serializable {
     private static final long serialVersionUID = 3284979177401282512L;
 
+    @Getter
     private String name;
+    @Getter
     private String value;
 
     PlainHeader(String name, String value) {
@@ -46,13 +50,5 @@ public class PlainHeader implements Serializable {
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         name = (String) in.readObject();
         value = (String) in.readObject();
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public String getValue() {
-        return this.value;
     }
 }

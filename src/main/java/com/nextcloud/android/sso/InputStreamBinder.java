@@ -50,7 +50,6 @@ import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
@@ -297,10 +296,6 @@ public class InputStreamBinder extends IInputStreamService.Stub {
             case "MKCOL":
                 method = new MkColMethod(requestUrl);
                 break;
-
-            case "HEAD":
-                 method = new HeadMethod(requestUrl);
-                 break;
 
             default:
                 throw new UnsupportedOperationException(EXCEPTION_UNSUPPORTED_METHOD);

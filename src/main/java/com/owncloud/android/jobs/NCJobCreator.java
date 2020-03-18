@@ -6,7 +6,7 @@
  *
  * Copyright (C) 2017 Mario Danic
  * Copyright (C) 2017 Nextcloud GmbH
- * Copyright (C) 2020 Chris Narkiewicz <hello@ezaquarii.com>
+ * Copyright (C) 2019 Chris Narkiewicz <hello@ezaquarii.com>
  *
  * <p>
  * This program is free software: you can redistribute it and/or modify
@@ -31,12 +31,9 @@ import com.evernote.android.job.JobCreator;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.core.Clock;
 import com.nextcloud.client.device.PowerManagementService;
-import com.nextcloud.client.jobs.BackgroundJobManager;
 import com.nextcloud.client.network.ConnectivityService;
 import com.nextcloud.client.preferences.AppPreferences;
 import com.owncloud.android.datamodel.UploadsStorageManager;
-
-import org.greenrobot.eventbus.EventBus;
 
 import androidx.annotation.NonNull;
 
@@ -53,8 +50,6 @@ public class NCJobCreator implements JobCreator {
     private final ConnectivityService connectivityService;
     private final PowerManagementService powerManagementService;
     private final Clock clock;
-    private final EventBus eventBus;
-    private final BackgroundJobManager backgroundJobManager;
 
     public NCJobCreator(
         Context context,
@@ -63,9 +58,7 @@ public class NCJobCreator implements JobCreator {
         UploadsStorageManager uploadsStorageManager,
         ConnectivityService connectivityServices,
         PowerManagementService powerManagementService,
-        Clock clock,
-        EventBus eventBus,
-        BackgroundJobManager backgroundJobManager
+        Clock clock
     ) {
         this.context = context;
         this.accountManager = accountManager;
@@ -74,21 +67,17 @@ public class NCJobCreator implements JobCreator {
         this.connectivityService = connectivityServices;
         this.powerManagementService = powerManagementService;
         this.clock = clock;
-        this.eventBus = eventBus;
-        this.backgroundJobManager = backgroundJobManager;
     }
 
     @Override
     public Job create(@NonNull String tag) {
         switch (tag) {
+            case ContactsBackupJob.TAG:
+                return new ContactsBackupJob(accountManager);
             case ContactsImportJob.TAG:
                 return new ContactsImportJob();
             case AccountRemovalJob.TAG:
-                return new AccountRemovalJob(uploadsStorageManager,
-                                             accountManager,
-                                             backgroundJobManager,
-                                             clock,
-                                             eventBus);
+                return new AccountRemovalJob(uploadsStorageManager, accountManager, clock);
             case FilesSyncJob.TAG:
                 return new FilesSyncJob(accountManager,
                                         preferences,

@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -40,6 +41,7 @@ import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.appinfo.AppInfo;
 import com.nextcloud.client.di.Injectable;
 import com.nextcloud.client.preferences.AppPreferences;
+import com.nextcloud.qbee.ui.login.FirstLoginActivity;
 import com.owncloud.android.BuildConfig;
 import com.owncloud.android.R;
 import com.owncloud.android.authentication.AuthenticatorActivity;
@@ -72,6 +74,8 @@ public class FirstRunActivity extends BaseActivity implements ViewPager.OnPageCh
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        enableAccountHandling = false;
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.first_run_activity);
 
@@ -85,9 +89,10 @@ public class FirstRunActivity extends BaseActivity implements ViewPager.OnPageCh
 
         loginButton.setOnClickListener(v -> {
             if (getIntent().getBooleanExtra(EXTRA_ALLOW_CLOSE, false)) {
-                Intent authenticatorActivityIntent = new Intent(this, AuthenticatorActivity.class);
-                authenticatorActivityIntent.putExtra(AuthenticatorActivity.EXTRA_USE_PROVIDER_AS_WEBLOGIN, false);
-                startActivityForResult(authenticatorActivityIntent, FIRST_RUN_RESULT_CODE);
+//                Intent authenticatorActivityIntent = new Intent(this, AuthenticatorActivity.class);
+                Intent firstLoginIntent = new Intent(this, FirstLoginActivity.class);
+//                authenticatorActivityIntent.putExtra(AuthenticatorActivity.EXTRA_USE_PROVIDER_AS_WEBLOGIN, false);
+                startActivityForResult(firstLoginIntent, FIRST_RUN_RESULT_CODE);
             } else {
                 finish();
             }
@@ -126,6 +131,11 @@ public class FirstRunActivity extends BaseActivity implements ViewPager.OnPageCh
         viewPager.setAdapter(featuresViewAdapter);
 
         viewPager.addOnPageChangeListener(this);
+
+        if (getResources().getBoolean(R.bool.use_alternative_login)) {
+            Intent firstLoginIntent = new Intent(this, FirstLoginActivity.class);
+            startActivityForResult(firstLoginIntent, FIRST_RUN_RESULT_CODE);
+        }
     }
 
     private void setSlideshowSize(boolean isLandscape) {
@@ -205,6 +215,7 @@ public class FirstRunActivity extends BaseActivity implements ViewPager.OnPageCh
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("NCY3k","FirstRunActivity.onActivityResult()");
         super.onActivityResult(requestCode, resultCode, data);
         if (FIRST_RUN_RESULT_CODE == requestCode && RESULT_OK == resultCode) {
 

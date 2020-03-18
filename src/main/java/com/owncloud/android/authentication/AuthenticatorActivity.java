@@ -68,6 +68,7 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AndroidRuntimeException;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -99,6 +100,7 @@ import com.nextcloud.client.di.Injectable;
 import com.nextcloud.client.onboarding.FirstRunActivity;
 import com.nextcloud.client.onboarding.OnboardingService;
 import com.nextcloud.client.preferences.AppPreferences;
+import com.nextcloud.qbee.ui.login.FirstLoginActivity;
 import com.owncloud.android.MainApp;
 import com.owncloud.android.R;
 import com.owncloud.android.lib.common.OwnCloudAccount;
@@ -205,6 +207,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
     private static final int REQUEST_CODE_QR_SCAN = 101;
     public static final int REQUEST_CODE_FIRST_RUN = 102;
 
+    public static final int REQUEST_CODE_ALTERNATIVE_LOGIN = 103;
 
     /// parameters from EXTRAs in starter Intent
     private byte mAction;
@@ -895,6 +898,11 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
             super.finish();
         }
 
+        if(getResources().getBoolean(R.bool.use_alternative_login)){
+            startActivityForResult(new Intent(this,FirstLoginActivity.class),REQUEST_CODE_ALTERNATIVE_LOGIN);
+            return;
+        }
+
         onlyAdd = intent.getBooleanExtra(KEY_ONLY_ADD, false);
 
         // Passcode
@@ -930,6 +938,10 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
     @Override
     protected void onResume() {
         super.onResume();
+
+        if(getResources().getBoolean(R.bool.use_alternative_login)){
+            return;
+        }
 
         if (!webViewLoginMethod) {
             // bound here to avoid spurious changes triggered by Android on device rotations
@@ -971,6 +983,11 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
 
     @Override
     protected void onPause() {
+        super.onPause();
+        if(getResources().getBoolean(R.bool.use_alternative_login)){
+            return;
+        }
+
         if (mOperationsServiceBinder != null) {
             mOperationsServiceBinder.removeOperationListener(this);
         }
@@ -979,8 +996,6 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
             mHostUrlInput.removeTextChangedListener(mHostUrlInputWatcher);
             mHostUrlInput.setOnFocusChangeListener(null);
         }
-
-        super.onPause();
     }
 
     @Override
@@ -2077,7 +2092,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+        Log.d("NCY3K","AuthenticatorActivity.onActivityResult "+requestCode);
         if (requestCode == REQUEST_CODE_QR_SCAN) {
             if (data == null) {
                 return;
@@ -2098,6 +2113,13 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
             } else {
                 parseAndLoginFromWebView(result);
             }
+        } else if(requestCode==REQUEST_CODE_ALTERNATIVE_LOGIN){
+            Intent i = new Intent(this, FileDisplayActivity.class);
+            i.setAction(FileDisplayActivity.RESTART);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(i);
+        } else{
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 

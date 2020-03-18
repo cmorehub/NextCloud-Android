@@ -171,7 +171,6 @@
     <string name="uploads_view_upload_status_unknown_fail">Unknown error</string>
     <string name="uploads_view_upload_status_waiting_for_wifi">Waiting for Wi-Fi</string>
     <string name="uploads_view_upload_status_waiting_exit_power_save_mode">Waiting to exit power save mode</string>
-    <string name="uploads_view_upload_status_fetching_server_version">Fetching server version…</string>
     <string name="uploads_view_later_waiting_to_upload">Waiting to upload</string>
     <string name="uploads_view_group_header" translatable="false">%1$s (%2$d)</string>
     <string name="downloader_download_in_progress_ticker">Downloading…</string>
@@ -324,9 +323,13 @@
 
     <string name="auto_upload_on_wifi">Only upload on unmetered Wi-Fi</string>
     <string name="instant_upload_on_charging">Only upload when charging</string>
-    <string name="instant_upload_existing">Also upload existing files</string>
     <string name="instant_upload_path">/InstantUpload</string>
     <string name="auto_upload_path">/AutoUpload</string>
+    <string name="conflict_title">File conflict</string>
+    <string name="conflict_message">Which files do you want to keep? If you select both versions, the local file will have a number appended to its name.</string>
+    <string name="conflict_keep_both">Keep both</string>
+    <string name="conflict_use_local_version">local version</string>
+    <string name="conflict_use_server_version">server version</string>
 
     <string name="preview_sorry">Sorry</string>
     <string name="preview_image_description">Image preview</string>
@@ -431,7 +434,7 @@
 
     <string name="prefs_category_details">Details</string>
 
-    <string name="sync_folder_failed_content">Sync of folder %1$s could not be completed</string>
+    <string name="sync_folder_failed_content">Sync of %1$s folder could not be completed</string>
 
     <string name="subject_user_shared_with_you">%1$s shared \"%2$s\" with you</string>
     <string name="subject_shared_with_you">\"%1$s\" has been shared with you</string>
@@ -882,20 +885,7 @@
     <string name="autoupload_disable_power_save_check">Disable power save check</string>
     <string name="power_save_check_dialog_message">Disabling power save check might result in uploading files when in low battery state!</string>
     <string name="etm_title">Engineering Test Mode</string>
-    <string name="etm_accounts">Accounts</string>
     <string name="etm_preferences">Preferences</string>
-    <string name="etm_background_jobs">Background jobs</string>
-    <string name="etm_background_jobs_cancel_all">Cancel all jobs</string>
-    <string name="etm_background_jobs_prune">Prune inactive jobs</string>
-    <string name="etm_background_jobs_start_test_job">Start test job</string>
-    <string name="etm_background_jobs_stop_test_job">Stop test job</string>
-    <string name="etm_background_job_uuid">UUID</string>
-    <string name="etm_background_job_name">Job name</string>
-    <string name="etm_background_job_user">@string/user_icon</string>
-    <string name="etm_background_job_state">State</string>
-    <string name="etm_background_job_started">Started</string>
-    <string name="etm_background_job_progress">Progress</string>
-    <string name="etm_migrations">Migrations (app upgrade)</string>
 
     <string name="logs_status_loading">Loading…</string>
     <string name="logs_status_filtered">Logs: %1$d kB, query matched %2$d / %3$d in %4$d ms</string>
@@ -912,30 +902,22 @@
     <string name="file_detail_activity_error">Error retrieving activities for file</string>
     <string name="no_mutliple_accounts_allowed">Only one account allowed</string>
     <string name="remote_file_fetch_failed">Failed to find file!</string>
-    <string name="share_internal_link_to_folder_text">Internal share link only works for users with access to this folder</string>
-    <string name="share_internal_link_to_file_text">Internal share link only works for users with access to this file</string>
+    <string name="share_internal_link_text">Only works for users with access to this %1$s</string>
+    <string name="folder">folder</string>
+    <string name="file">file</string>
     <string name="share_internal_link">Share internal link</string>
     <string name="action_edit">Edit</string>
     <string name="failed_to_start_editor">Failed to start editor</string>
     <string name="create_rich_workspace">Add folder info</string>
     <string name="creates_rich_workspace">creates folder info</string>
     <string name="edit_rich_workspace">edit folder info</string>
-    <string name="uploader_upload_failed_sync_conflict_error">File upload conflict</string>
-    <string name="uploader_upload_failed_sync_conflict_error_content">Pick which version to keep of %1$s</string>
-    <string name="upload_list_resolve_conflict">Resolve conflict</string>
-    <string name="upload_list_delete">Delete</string>
-    <string name="create_new">Create new</string>
-    <string name="editor_placeholder" translatable="false">%1$s %2$s</string>
-
-    <string name="sync_not_enough_space_dialog_action_choose">Choose what to sync</string>
-    <string name="sync_not_enough_space_dialog_action_free_space">Free up space</string>
-    <string name="sync_not_enough_space_dialog_placeholder">%1$s is %2$s, but there is only %3$s available on device.</string>
-    <string name="sync_not_enough_space_dialog_title">Not enough space</string>
-    <string name="conflict_message_headline">Which files do you want to keep?</string>
-    <string name="conflict_message_description">If you select both versions, the local file will have a number appended to its name.</string>
-    <string name="conflict_new_file">New file</string>
-    <string name="conflict_already_existing_file">Already existing file</string>
-    <string name="thumbnail_for_new_file_desc">Thumbnail for new file</string>
-    <string name="thumbnail_for_existing_file_description">Thumbnail for existing file</string>
-    <string name="invalid_url">Invalid URL</string>
+    <string name="title_activity_login">Fake Login</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
 </resources>

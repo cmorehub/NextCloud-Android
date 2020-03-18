@@ -160,7 +160,7 @@ public class LocalFileListAdapter extends RecyclerView.Adapter<RecyclerView.View
                 }
 
                 gridViewHolder.thumbnail.setTag(file.hashCode());
-                setThumbnail(file, gridViewHolder.thumbnail, mContext);
+                setThumbnail(file, gridViewHolder.thumbnail);
 
                 if (file.isDirectory()) {
                     gridViewHolder.checkbox.setVisibility(View.GONE);
@@ -203,17 +203,16 @@ public class LocalFileListAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
     }
 
-    public static void setThumbnail(File file, ImageView thumbnailView, Context context) {
+    private void setThumbnail(File file, ImageView thumbnailView) {
         if (file.isDirectory()) {
-            thumbnailView.setImageDrawable(MimeTypeUtil.getDefaultFolderIcon(context));
+            thumbnailView.setImageDrawable(MimeTypeUtil.getDefaultFolderIcon(mContext));
         } else {
             thumbnailView.setImageResource(R.drawable.file);
 
             /* Cancellation needs do be checked and done before changing the drawable in fileIcon, or
              * {@link ThumbnailsCacheManager#cancelPotentialThumbnailWork} will NEVER cancel any task.
              */
-            boolean allowedToCreateNewThumbnail = ThumbnailsCacheManager.cancelPotentialThumbnailWork(file,
-                                                                                                      thumbnailView);
+            boolean allowedToCreateNewThumbnail = ThumbnailsCacheManager.cancelPotentialThumbnailWork(file, thumbnailView);
 
 
             // get Thumbnail if file is image
@@ -237,9 +236,9 @@ public class LocalFileListAdapter extends RecyclerView.Adapter<RecyclerView.View
                         }
                         final ThumbnailsCacheManager.AsyncThumbnailDrawable asyncDrawable =
                                 new ThumbnailsCacheManager.AsyncThumbnailDrawable(
-                                    context.getResources(),
-                                    thumbnail,
-                                    task
+                                        mContext.getResources(),
+                                        thumbnail,
+                                        task
                                 );
                         thumbnailView.setImageDrawable(asyncDrawable);
                         task.execute(new ThumbnailsCacheManager.ThumbnailGenerationTaskObject(file, null));
@@ -248,7 +247,7 @@ public class LocalFileListAdapter extends RecyclerView.Adapter<RecyclerView.View
                     } // else, already being generated, don't restart it
                 }
             } else {
-                thumbnailView.setImageDrawable(MimeTypeUtil.getFileTypeIcon(null, file.getName(), context));
+                thumbnailView.setImageDrawable(MimeTypeUtil.getFileTypeIcon(null, file.getName(), mContext));
             }
         }
     }

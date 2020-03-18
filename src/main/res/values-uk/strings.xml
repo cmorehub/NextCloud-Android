@@ -133,7 +133,6 @@
     <string name="confirmation_remove_folder_alert">Ви справді бажаєте вилучити %1$s та його вміст?</string>
     <string name="confirmation_remove_local">Лише локально</string>
     <string name="conflict_keep_both">Залишити обидва</string>
-    <string name="conflict_message_headline">Які файли ви хочете залишити?</string>
     <string name="conflict_title">Конфлікт файлу</string>
     <string name="conflict_use_local_version">Локальна версія</string>
     <string name="conflict_use_server_version">Версія сервера</string>
@@ -209,7 +208,6 @@
     <string name="error__upload__local_file_not_copied">%1$s неможливо скопіювати до %2$s</string>
     <string name="error_cant_bind_to_operations_service">Критична помилка: неможливо виконати дії</string>
     <string name="etm_accounts">Облікові записи</string>
-    <string name="etm_background_jobs">Фонові завдання</string>
     <string name="fallback_weblogin_back">Назад</string>
     <string name="favorite">Додати до обраного</string>
     <string name="favorite_icon">Улюблений</string>
@@ -434,7 +432,6 @@
     <string name="upload_file_dialog_filename">Ім\'я файлу</string>
     <string name="upload_file_dialog_filetype">Тип файлу</string>
     <string name="upload_files">Завантажити файли</string>
-    <string name="upload_list_delete">Видалити</string>
     <string name="upload_list_empty_headline">Немає доступних вивантажень.</string>
     <string name="upload_query_move_foreign_files">Нестача місця не дозволяє скопіювати файли до каталогу%1$s. Чи бажаєте перемістити їх замість копіювання?</string>
     <string name="upload_unknown_error">Невідома помилка</string>

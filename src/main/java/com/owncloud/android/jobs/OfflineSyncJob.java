@@ -21,6 +21,7 @@
  */
 package com.owncloud.android.jobs;
 
+import android.accounts.Account;
 import android.content.Context;
 import android.os.Build;
 import android.os.PowerManager;
@@ -28,7 +29,6 @@ import android.os.PowerManager;
 import com.evernote.android.job.Job;
 import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
-import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.device.PowerManagementService;
 import com.nextcloud.client.network.ConnectivityService;
@@ -42,7 +42,6 @@ import com.owncloud.android.operations.SynchronizeFileOperation;
 import com.owncloud.android.utils.FileStorageUtils;
 
 import java.io.File;
-import java.util.List;
 import java.util.Set;
 
 import androidx.annotation.NonNull;
@@ -90,10 +89,10 @@ public class OfflineSyncJob extends Job {
                 }
             }
 
-            List<User> users = userAccountManager.getAllUsers();
+            Account[] accounts = userAccountManager.getAccounts();
 
-            for (User user : users) {
-                FileDataStorageManager storageManager = new FileDataStorageManager(user.toPlatformAccount(),
+            for (Account account : accounts) {
+                FileDataStorageManager storageManager = new FileDataStorageManager(account,
                         getContext().getContentResolver());
 
                 OCFile ocRoot = storageManager.getFileByPath(ROOT_PATH);
@@ -102,7 +101,7 @@ public class OfflineSyncJob extends Job {
                     break;
                 }
 
-                recursive(new File(ocRoot.getStoragePath()), storageManager, user);
+                recursive(new File(ocRoot.getStoragePath()), storageManager, account);
             }
 
             if (wakeLock != null) {
@@ -113,8 +112,8 @@ public class OfflineSyncJob extends Job {
         return Result.SUCCESS;
     }
 
-    private void recursive(File folder, FileDataStorageManager storageManager, User user) {
-        String downloadFolder = FileStorageUtils.getSavePath(user.getAccountName());
+    private void recursive(File folder, FileDataStorageManager storageManager, Account account) {
+        String downloadFolder = FileStorageUtils.getSavePath(account.name);
         String folderName = folder.getAbsolutePath().replaceFirst(downloadFolder, "") + PATH_SEPARATOR;
         Log_OC.d(TAG, folderName + ": enter");
 
@@ -129,7 +128,7 @@ public class OfflineSyncJob extends Job {
         // check for etag change, if false, skip
         CheckEtagRemoteOperation checkEtagOperation = new CheckEtagRemoteOperation(ocFolder.getRemotePath(),
                                                                                    ocFolder.getEtagOnServer());
-        RemoteOperationResult result = checkEtagOperation.execute(user.toPlatformAccount(), getContext());
+        RemoteOperationResult result = checkEtagOperation.execute(account, getContext());
 
         // eTag changed, sync file
         switch (result.getCode()) {
@@ -157,7 +156,7 @@ public class OfflineSyncJob extends Job {
             for (File file : files) {
                 OCFile ocFile = storageManager.getFileByLocalPath(file.getPath());
                 SynchronizeFileOperation synchronizeFileOperation = new SynchronizeFileOperation(ocFile.getRemotePath(),
-                        user.toPlatformAccount(), true, getContext());
+                        account, true, getContext());
 
                 synchronizeFileOperation.execute(storageManager, getContext());
             }
@@ -168,7 +167,7 @@ public class OfflineSyncJob extends Job {
 
         if (subfolders != null) {
             for (File subfolder : subfolders) {
-                recursive(subfolder, storageManager, user);
+                recursive(subfolder, storageManager, account);
             }
         }
 

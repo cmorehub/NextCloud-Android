@@ -51,7 +51,7 @@ public class CheckRemoteWipeTask extends AsyncTask<Void, Void, Boolean> {
 
         if (fileActivity == null) {
             Log_OC.e(this, "Check for remote wipe: no context available");
-            return Boolean.FALSE;
+            return false;
         }
 
         RemoteOperationResult checkWipeResult = new CheckRemoteWipeRemoteOperation().execute(account, fileActivity);
@@ -75,6 +75,6 @@ public class CheckRemoteWipeTask extends AsyncTask<Void, Void, Boolean> {
 
         }
 
-        return Boolean.TRUE;
+        return true;
     }
 }

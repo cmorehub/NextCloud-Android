@@ -34,11 +34,6 @@ class AppInfoImpl implements AppInfo {
     }
 
     @Override
-    public int getVersionCode() {
-        return BuildConfig.VERSION_CODE;
-    }
-
-    @Override
     public boolean isDebugBuild() {
         return BuildConfig.DEBUG;
     }

@@ -21,6 +21,7 @@
 
 package com.owncloud.android.jobs;
 
+import android.accounts.Account;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -28,14 +29,11 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.IBinder;
 import android.provider.ContactsContract;
-import android.text.TextUtils;
 import android.text.format.DateFormat;
 
 import com.evernote.android.job.Job;
 import com.evernote.android.job.util.support.PersistableBundleCompat;
-import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
-import com.nextcloud.java.util.Optional;
 import com.owncloud.android.R;
 import com.owncloud.android.datamodel.ArbitraryDataProvider;
 import com.owncloud.android.datamodel.FileDataStorageManager;
@@ -82,20 +80,14 @@ public class ContactsBackupJob extends Job {
     protected Result onRunJob(@NonNull Params params) {
         PersistableBundleCompat bundle = params.getExtras();
 
-        final String accountName = bundle.getString(ACCOUNT, "");
-        if (TextUtils.isEmpty(accountName)) {
-            // no account provided
+        final Account account = accountManager.getAccountByName(bundle.getString(ACCOUNT, ""));
+
+        if (account == null) {
             return Result.FAILURE;
         }
-        final Optional<User> optionalUser = accountManager.getUser(accountName);
-        if (!optionalUser.isPresent()) {
-            return Result.FAILURE;
-        }
-        User user = optionalUser.get();
 
         ArbitraryDataProvider arbitraryDataProvider = new ArbitraryDataProvider(getContext().getContentResolver());
-        Long lastExecution = arbitraryDataProvider.getLongValue(user.toPlatformAccount(),
-                                                                PREFERENCE_CONTACTS_LAST_BACKUP);
+        Long lastExecution = arbitraryDataProvider.getLongValue(account, PREFERENCE_CONTACTS_LAST_BACKUP);
 
         boolean force = bundle.getBoolean(FORCE, false);
         if (force || (lastExecution + 24 * 60 * 60 * 1000) < Calendar.getInstance().getTimeInMillis()) {
@@ -105,18 +97,16 @@ public class ContactsBackupJob extends Job {
                     OCFile.PATH_SEPARATOR;
             Integer daysToExpire = getContext().getResources().getInteger(R.integer.contacts_backup_expire);
 
-            backupContact(user, backupFolder);
+            backupContact(account, backupFolder);
 
             // bind to Operations Service
-            operationsServiceConnection = new OperationsServiceConnection(daysToExpire,
-                                                                          backupFolder,
-                                                                          user);
+            operationsServiceConnection = new OperationsServiceConnection(daysToExpire, backupFolder, account);
 
             getContext().bindService(new Intent(getContext(), OperationsService.class), operationsServiceConnection,
                     OperationsService.BIND_AUTO_CREATE);
 
             // store execution date
-            arbitraryDataProvider.storeOrUpdateKeyValue(user.getAccountName(),
+            arbitraryDataProvider.storeOrUpdateKeyValue(account.name,
                                                         PREFERENCE_CONTACTS_LAST_BACKUP,
                                                         Calendar.getInstance().getTimeInMillis());
         } else {
@@ -126,7 +116,7 @@ public class ContactsBackupJob extends Job {
         return Result.SUCCESS;
     }
 
-    private void backupContact(User user, String backupFolder) {
+    private void backupContact(Account account, String backupFolder) {
         ArrayList<String> vCard = new ArrayList<>();
 
         Cursor cursor = getContext().getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null,
@@ -169,26 +159,25 @@ public class ContactsBackupJob extends Job {
             }
         }
 
-        FileUploader.uploadNewFile(
-            getContext(),
-            user.toPlatformAccount(),
-            file.getAbsolutePath(),
-            backupFolder + filename,
-            FileUploader.LOCAL_BEHAVIOUR_MOVE,
-            null,
-            true,
-            UploadFileOperation.CREATED_BY_USER,
-            false,
-            false,
-            FileUploader.NameCollisionPolicy.ASK_USER
+        FileUploader.UploadRequester requester = new FileUploader.UploadRequester();
+        requester.uploadNewFile(
+                getContext(),
+                account,
+                file.getAbsolutePath(),
+                backupFolder + filename,
+                FileUploader.LOCAL_BEHAVIOUR_MOVE,
+                null,
+                true,
+                UploadFileOperation.CREATED_BY_USER,
+                false,
+                false
         );
     }
 
-    private void expireFiles(Integer daysToExpire, String backupFolderString, User account) {
+    private void expireFiles(Integer daysToExpire, String backupFolderString, Account account) {
         // -1 disables expiration
         if (daysToExpire > -1) {
-            FileDataStorageManager storageManager = new FileDataStorageManager(account.toPlatformAccount(),
-                                                                               getContext().getContentResolver());
+            FileDataStorageManager storageManager = new FileDataStorageManager(account, getContext().getContentResolver());
             OCFile backupFolder = storageManager.getFileByPath(backupFolderString);
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.DAY_OF_YEAR, -daysToExpire);
@@ -272,12 +261,12 @@ public class ContactsBackupJob extends Job {
     private class OperationsServiceConnection implements ServiceConnection {
         private Integer daysToExpire;
         private String backupFolder;
-        private User user;
+        private Account account;
 
-        OperationsServiceConnection(Integer daysToExpire, String backupFolder, User user) {
+        OperationsServiceConnection(Integer daysToExpire, String backupFolder, Account account) {
             this.daysToExpire = daysToExpire;
             this.backupFolder = backupFolder;
-            this.user = user;
+            this.account = account;
         }
 
         @Override
@@ -287,7 +276,7 @@ public class ContactsBackupJob extends Job {
 
             if (component.equals(new ComponentName(getContext(), OperationsService.class))) {
                 operationsServiceBinder = (OperationsService.OperationsServiceBinder) service;
-                expireFiles(daysToExpire, backupFolder, user);
+                expireFiles(daysToExpire, backupFolder, account);
             }
         }
 

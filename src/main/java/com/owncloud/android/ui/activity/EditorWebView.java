@@ -23,11 +23,8 @@
 package com.owncloud.android.ui.activity;
 
 import android.annotation.SuppressLint;
-import android.app.DownloadManager;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -48,9 +45,11 @@ import com.owncloud.android.utils.ThemeUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import lombok.Getter;
+import lombok.Setter;
 
 public abstract class EditorWebView extends ExternalSiteWebView {
-    protected Snackbar loadingSnackbar;
+    @Getter @Setter protected Snackbar loadingSnackbar;
 
     protected String fileName;
     protected String mimeType;
@@ -191,29 +190,6 @@ public abstract class EditorWebView extends ExternalSiteWebView {
                                                                             getAccount(), this));
             }
         }
-    }
-
-    protected void downloadFile(Uri url) {
-        DownloadManager downloadmanager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-
-        if (downloadmanager == null) {
-            DisplayUtils.showSnackMessage(webview, getString(R.string.failed_to_download));
-            return;
-        }
-
-        DownloadManager.Request request = new DownloadManager.Request(url);
-        request.allowScanningByMediaScanner();
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-
-        downloadmanager.enqueue(request);
-    }
-
-    public Snackbar getLoadingSnackbar() {
-        return this.loadingSnackbar;
-    }
-
-    public void setLoadingSnackbar(Snackbar loadingSnackbar) {
-        this.loadingSnackbar = loadingSnackbar;
     }
 
     public class MobileInterface {

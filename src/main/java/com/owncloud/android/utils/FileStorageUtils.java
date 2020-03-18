@@ -491,17 +491,20 @@ public final class FileStorageUtils {
             // Device has emulated storage; external storage paths should have
             // userId burned into them.
             final String rawUserId;
-            final String path = Environment.getExternalStorageDirectory().getAbsolutePath();
-            final String[] folders = OCFile.PATH_SEPARATOR.split(path);
-            final String lastFolder = folders[folders.length - 1];
-            boolean isDigit = false;
-            try {
-                Integer.valueOf(lastFolder);
-                isDigit = true;
-            } catch (NumberFormatException ignored) {
+            if (SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                rawUserId = "";
+            } else {
+                final String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+                final String[] folders = OCFile.PATH_SEPARATOR.split(path);
+                final String lastFolder = folders[folders.length - 1];
+                boolean isDigit = false;
+                try {
+                    Integer.valueOf(lastFolder);
+                    isDigit = true;
+                } catch (NumberFormatException ignored) {
+                }
+                rawUserId = isDigit ? lastFolder : "";
             }
-            rawUserId = isDigit ? lastFolder : "";
-
             // /storage/emulated/0[1,2,...]
             if (TextUtils.isEmpty(rawUserId)) {
                 rv.add(rawEmulatedStorageTarget);
