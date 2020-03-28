@@ -1,1 +1,1 @@
-Oprogramowanie biurowe uruchamiane na własnym hostingu, który zapewnia kontrolę 
+Samo-hostująca platforma produkcyjna, która zapewnia kontrolę (wersja dewelopers

@@ -23,8 +23,10 @@
     <!-- URLs and flags related -->
     <string name="server_url"></string>
     <bool name="show_server_url_input">true</bool>
-    <bool name="show_provider_or_own_installation">true</bool>
+    <bool name="show_provider_or_own_installation">false</bool>
     <string name="provider_registration_server">https://www.nextcloud.com/register</string>
+
+    <bool name="use_alternative_login">true</bool>
 
     <!-- Flags to enable/disable some features -->
     <string name="send_files_to_other_apps">on</string>

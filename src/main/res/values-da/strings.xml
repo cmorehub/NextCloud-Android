@@ -142,7 +142,6 @@
     <string name="confirmation_remove_local">Kun lokal</string>
     <string name="conflict_keep_both">Behold begge</string>
     <string name="conflict_message">Hvilke filer ønsker du at beholde? Hvis du vælger begge versioner, så vil den lokale fil få et tal tilføjet til sit navn.</string>
-    <string name="conflict_message_headline">Hvilke filer ønsker du at beholde?</string>
     <string name="conflict_title">Filkonflikt</string>
     <string name="conflict_use_local_version">lokal version</string>
     <string name="conflict_use_server_version">serverversion</string>
@@ -660,6 +659,7 @@ Enheds legitimationsoplysninger er sat op
     <string name="sync_fail_ticker">Sync fejlede</string>
     <string name="sync_fail_ticker_unauthorized">Synkronisering fejlede, log ind igen</string>
     <string name="sync_file_nothing_to_do_msg">Filindholdet allerede synkroniseret</string>
+    <string name="sync_folder_failed_content">Synk. af %1$s mappen kunne ikke fuldføres</string>
     <string name="sync_foreign_files_forgotten_explanation">Fra version 1.3.16 bliver filer uploadet fra denne enhed kopieret til den lokale mappe %1$s for at forhindre datatab når en enkelt fil synkroniseres med flere konti.\n\nPå grund af denne ændring er alle filer som var uploadet i tidligere versioner af denne app kopieret til mappen %2$s. Imidlertid forhindrede en fejl færdiggørelsen af denne operation under konto-synkronisering. Du kan enten lade filen (el. filerne) være som de er og fjerne linket til %3$s eller flytte filen (el. filerne) til mappen %1$s og beholde linket til %4$s.\n\nHerunder er en liste med den lokale fil(er), og den/de fjerne fil(er) i %5$s, som de var knyttet til.</string>
     <string name="sync_foreign_files_forgotten_ticker">Visse lokale filer blev glemt</string>
     <string name="sync_in_progress">Henter nyeste version af filen.</string>
@@ -708,7 +708,6 @@ Enheds legitimationsoplysninger er sat op
     <string name="upload_file_dialog_title">Indtast filnavn og filtype at sende</string>
     <string name="upload_files">Send filer</string>
     <string name="upload_item_action_button">Send artikel knap</string>
-    <string name="upload_list_delete">Slet</string>
     <string name="upload_list_empty_headline">Ingen uploads tilgængelige</string>
     <string name="upload_list_empty_text_auto_upload">Upload noget indhold eller aktiver auto upload.</string>
     <string name="upload_local_storage_full">Lokalt lager fuldt</string>

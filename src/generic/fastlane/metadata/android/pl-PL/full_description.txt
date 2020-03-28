@@ -1,4 +1,4 @@
-Oprogramowanie biurowe uruchamiane na własnym hostingu, który zapewnia kontrolę.
+Samo-hostująca platforma produkcyjna, która zapewnia kontrolę.
 
 Funkcje:
 * Łatwy, nowoczesny interfejs, dostosowany do wyglądu Twojego serwera

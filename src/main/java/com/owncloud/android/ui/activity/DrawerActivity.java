@@ -44,6 +44,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -112,6 +113,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
@@ -153,11 +155,13 @@ public abstract class DrawerActivity extends ToolbarActivity
     /**
      * Reference to the drawer layout.
      */
+    @Nullable
     protected DrawerLayout mDrawerLayout;
 
     /**
      * Reference to the drawer toggle.
      */
+    @Nullable
     protected ActionBarDrawerToggle mDrawerToggle;
 
     /**
@@ -244,6 +248,8 @@ public abstract class DrawerActivity extends ToolbarActivity
         mDrawerLayout = findViewById(R.id.drawer_layout);
 
         mNavigationView = findViewById(R.id.nav_view);
+
+        Log.d("NCY3K", "setupDrawer() mNavigationView==null = "+(mNavigationView==null));
         if (mNavigationView != null) {
             setupDrawerHeader();
 
@@ -291,10 +297,12 @@ public abstract class DrawerActivity extends ToolbarActivity
             }
         };
 
-        // Set the drawer toggle as the DrawerListener
-        mDrawerLayout.addDrawerListener(mDrawerToggle);
-        mDrawerToggle.setDrawerIndicatorEnabled(true);
-        mDrawerToggle.getDrawerArrowDrawable().setColor(ThemeUtils.fontColor(this, true));
+        if(mDrawerLayout!=null){
+            // Set the drawer toggle as the DrawerListener
+            mDrawerLayout.addDrawerListener(mDrawerToggle);
+            mDrawerToggle.setDrawerIndicatorEnabled(true);
+            mDrawerToggle.getDrawerArrowDrawable().setColor(ThemeUtils.fontColor(this, true));
+        }
     }
 
     /**
@@ -346,7 +354,9 @@ public abstract class DrawerActivity extends ToolbarActivity
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull final MenuItem menuItem) {
-                        mDrawerLayout.closeDrawers();
+                        if(mDrawerLayout!=null) {
+                            mDrawerLayout.closeDrawers();
+                        }
                         // pending runnable will be executed after the drawer has been closed
                         pendingRunnable = new Runnable() {
                             @Override
@@ -354,6 +364,10 @@ public abstract class DrawerActivity extends ToolbarActivity
                                 selectNavigationItem(menuItem);
                             }
                         };
+                        if(mDrawerLayout==null){
+                            pendingRunnable.run();
+                            pendingRunnable = null;
+                        }
                         return true;
                     }
                 });
@@ -400,6 +414,8 @@ public abstract class DrawerActivity extends ToolbarActivity
     private void selectNavigationItem(final MenuItem menuItem) {
 
         setDrawerMenuItemChecked(menuItem.getItemId());
+
+        Log.d("NCY3K", "selectNavigationItem("+getResources().getResourceName(menuItem.getItemId())+")");
 
         if (menuItem.getGroupId() == R.id.drawer_menu_accounts) {
             handleAccountItemClick(menuItem);
@@ -535,6 +551,7 @@ public abstract class DrawerActivity extends ToolbarActivity
         SearchEvent searchEvent = new SearchEvent("image/%",
                                                   SearchRemoteOperation.SearchType.PHOTO_SEARCH,
                                                   SearchEvent.UnsetType.NO_UNSET);
+
 
         Intent intent = new Intent(getApplicationContext(), FileDisplayActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -790,7 +807,7 @@ public abstract class DrawerActivity extends ToolbarActivity
             mDrawerToggle.setDrawerIndicatorEnabled(false);
         }
 
-        if (mDrawerToggle != null) {
+        if (mDrawerToggle != null && mDrawerLayout!=null) {
             DrawerArrowDrawable icon = mDrawerToggle.getDrawerArrowDrawable();
             icon.setColorFilter(ThemeUtils.fontColor(this), PorterDuff.Mode.SRC_ATOP);
             mDrawerToggle.setDrawerArrowDrawable(icon);
@@ -804,7 +821,7 @@ public abstract class DrawerActivity extends ToolbarActivity
      * @param user the account to be set in the drawer
      */
     protected void setAccountInDrawer(User user) {
-        if (mDrawerLayout != null && user != null) {
+        if (user != null) {
             TextView username = (TextView) findNavigationViewChildById(R.id.drawer_username);
             TextView usernameFull = (TextView) findNavigationViewChildById(R.id.drawer_username_full);
 
@@ -1250,7 +1267,7 @@ public abstract class DrawerActivity extends ToolbarActivity
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         // Sync the toggle state after onRestoreInstanceState has occurred.
-        if (mDrawerToggle != null) {
+        if (mDrawerToggle != null && mDrawerLayout!= null) {
             mDrawerToggle.syncState();
             if (isDrawerOpen()) {
                 mDrawerToggle.setDrawerIndicatorEnabled(true);

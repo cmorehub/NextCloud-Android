@@ -141,12 +141,8 @@
     <string name="confirmation_remove_folder_alert">Voulez-vous vraiment supprimer %1$s et ses contenus ?</string>
     <string name="confirmation_remove_folders_alert">Souhaitez-vous vraiment supprimer les éléments sélectionnés ainsi que leurs contenus ?</string>
     <string name="confirmation_remove_local">Local seulement</string>
-    <string name="conflict_already_existing_file">Fichier déjà existant</string>
     <string name="conflict_keep_both">Conserver les deux</string>
     <string name="conflict_message">Quels fichiers voulez-vous conserver ? Si vous sélectionnez les deux, un chiffre sera ajouté au nom du fichier local.</string>
-    <string name="conflict_message_description">Si vous sélectionnez les deux versions, le fichier local aura un numéro ajouté à son nom.</string>
-    <string name="conflict_message_headline">Quels fichiers souhaitez-vous conserver ?</string>
-    <string name="conflict_new_file">Nouveau fichier</string>
     <string name="conflict_title">Conflit de fichiers</string>
     <string name="conflict_use_local_version">version locale</string>
     <string name="conflict_use_server_version">version serveur</string>
@@ -263,16 +259,6 @@ Attention la suppression est irréversible.</string>
     <string name="error_retrieving_templates">Erreur lors de la récupération des modèles</string>
     <string name="error_starting_direct_camera_upload">Erreur au démarrage de l\'appareil photo</string>
     <string name="etm_accounts">Comptes</string>
-    <string name="etm_background_job_name">Nom de la tâche </string>
-    <string name="etm_background_job_progress">Progression</string>
-    <string name="etm_background_job_started">Démarré</string>
-    <string name="etm_background_job_state">Etat</string>
-    <string name="etm_background_job_user">@string/user_icon</string>
-    <string name="etm_background_job_uuid">UUID</string>
-    <string name="etm_background_jobs">Tâches de fond</string>
-    <string name="etm_background_jobs_cancel_all">Annuler toutes les tâches </string>
-    <string name="etm_background_jobs_start_test_job">Démarrer la tâche de test</string>
-    <string name="etm_background_jobs_stop_test_job">Arrêter la tâche de test</string>
     <string name="etm_preferences">Préférences</string>
     <string name="etm_title">Mode test</string>
     <string name="fab_label">Ajouter ou téléverser</string>
@@ -378,10 +364,8 @@ Attention la suppression est irréversible.</string>
     <string name="hint_password">Mot de passe</string>
     <string name="host_not_available">Serveur indisponible</string>
     <string name="host_your_own_server">Hébergez votre propre serveur</string>
-    <string name="instant_upload_existing">Téléverser aussi les fichiers existants</string>
     <string name="instant_upload_on_charging">Envoyer uniquement si le chargeur est branché</string>
     <string name="instant_upload_path">/InstantUpload</string>
-    <string name="invalid_url">URL invalide</string>
     <string name="learn_more">En savoir plus</string>
     <string name="link">Lien</string>
     <string name="list_layout">Affichage en liste</string>
@@ -587,8 +571,6 @@ Attention la suppression est irréversible.</string>
     <string name="share_group_clarification">%1$s (groupe)</string>
     <string name="share_internal_link">Partager le lien interne</string>
     <string name="share_internal_link_text">Fonctionne uniquement pour les utilisateurs ayant accès à ce %1$s</string>
-    <string name="share_internal_link_to_file_text">le partage de lien interne fonctionne uniquement pour les utilisateurs qui ont accès à ce fichier</string>
-    <string name="share_internal_link_to_folder_text">le partage de lien interne fonctionne uniquement pour les utilisateurs qui ont accès à ce dossier</string>
     <string name="share_known_remote_clarification">%1$s (sur %2$s)</string>
     <string name="share_link_empty_password">Vous devez saisir un mot de passe</string>
     <string name="share_link_file_error">Une erreur est survenue lors de la tentative de partage de ce fichier ou répertoire</string>
@@ -689,7 +671,7 @@ Attention la suppression est irréversible.</string>
     <string name="sync_fail_ticker">La synchronisation a échoué</string>
     <string name="sync_fail_ticker_unauthorized">Synchronisation échouée, reconnectez-vous</string>
     <string name="sync_file_nothing_to_do_msg">Ce fichier est déjà synchronisé</string>
-    <string name="sync_folder_failed_content">La synchronisation du dossier %1$s n\'a pas pu être terminée</string>
+    <string name="sync_folder_failed_content">La synchronisation du dossier %1$s ne peut pas être terminée</string>
     <string name="sync_foreign_files_forgotten_explanation">Depuis la version 1.3.16, les fichiers envoyés depuis cet appareil sont copiés dans le dossier local %1$s pour éviter une perte de données lorsqu\'un même fichier est synchronisé avec plusieurs comptes.\n\nEn raison de cette modification, tous les fichiers envoyés avec des versions antérieures de cette application ont été copiés dans le dossier %2$s. Cependant, une erreur a empêché l\'achèvement de cette opération pendant la synchronisation du compte. Vous pouvez soit laisser les fichiers tels quels et supprimer le lien vers %3$s, soit déplacer les fichiers dans le dossier %1$s et garder le lien vers %4$s.\n\nCi-dessous la liste des fichiers locaux, et les fichiers distants dans %5$s auxquels ils étaient liés.</string>
     <string name="sync_foreign_files_forgotten_ticker">Certains fichiers locaux ont été ignorés</string>
     <string name="sync_in_progress">Récupération de la version la plus récente du fichier.</string>
@@ -711,8 +693,6 @@ Attention la suppression est irréversible.</string>
     <string name="tags">Étiquettes</string>
     <string name="test_server_button">Tester la connexion du serveur</string>
     <string name="thumbnail">Miniature</string>
-    <string name="thumbnail_for_existing_file_description">Vignette pour fichier existant</string>
-    <string name="thumbnail_for_new_file_desc">Vignette pour nouveau fichier</string>
     <string name="timeout_richDocuments">Le chargement est très long ...</string>
     <string name="trashbin_activity_title">Fichiers supprimés</string>
     <string name="trashbin_empty_headline">Aucun fichier supprimé</string>
@@ -745,10 +725,8 @@ Attention la suppression est irréversible.</string>
     <string name="upload_file_dialog_title">Spécifiez le nom et le type du fichier à envoyer</string>
     <string name="upload_files">Téléverser des fichiers</string>
     <string name="upload_item_action_button">Bouton d\'action d\'upload</string>
-    <string name="upload_list_delete">Supprimer</string>
     <string name="upload_list_empty_headline">Aucun historique d\'envoi</string>
     <string name="upload_list_empty_text_auto_upload">Envoyez du contenu ou activez l\'envoi automatique.</string>
-    <string name="upload_list_resolve_conflict">Résoudre le conflit</string>
     <string name="upload_local_storage_full">Stockage local plein</string>
     <string name="upload_local_storage_not_copied">Le fichier n\'a pas pu être copié sur le stockage local</string>
     <string name="upload_lock_failed">Impossible de verrouiller le dossier</string>
@@ -768,8 +746,6 @@ Attention la suppression est irréversible.</string>
     <string name="uploader_top_message">Sélectionnez le dossier d\'envoi</string>
     <string name="uploader_upload_failed_content_single">Impossible d\'envoyer %1$s</string>
     <string name="uploader_upload_failed_credentials_error">L\'envoi a échoué, reconnectez-vous</string>
-    <string name="uploader_upload_failed_sync_conflict_error">Conflit de fichier lors du téléversement</string>
-    <string name="uploader_upload_failed_sync_conflict_error_content">Sélectionnez la version de %1$s à conserver</string>
     <string name="uploader_upload_failed_ticker">Échec de l\'envoi</string>
     <string name="uploader_upload_files_behaviour">Option d\'envoi :</string>
     <string name="uploader_upload_files_behaviour_move_to_nextcloud_folder">Déplacer le fichier dans le dossier %1$s</string>
@@ -798,7 +774,6 @@ Attention la suppression est irréversible.</string>
     <string name="uploads_view_upload_status_failed_localfile_error">Fichier local non trouvé</string>
     <string name="uploads_view_upload_status_failed_permission_error">Erreur de permissions</string>
     <string name="uploads_view_upload_status_failed_ssl_certificate_not_trusted">Certificat du serveur non approuvé</string>
-    <string name="uploads_view_upload_status_fetching_server_version">Récupération de la version serveur …</string>
     <string name="uploads_view_upload_status_service_interrupted">L\'application s\'est arrêtée</string>
     <string name="uploads_view_upload_status_succeeded">Terminé</string>
     <string name="uploads_view_upload_status_unknown_fail">Erreur inconnue </string>

@@ -45,6 +45,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Parcelable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -504,6 +505,7 @@ public class FileDisplayActivity extends FileActivity
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
+        Log.d("NCY3k", "FileDisplayActivity.onNewIntent("+intent.getAction()+")");
 
         if (ACTION_DETAILS.equalsIgnoreCase(intent.getAction())) {
             OCFile file = intent.getParcelableExtra(EXTRA_FILE);

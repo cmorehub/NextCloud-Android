@@ -434,7 +434,7 @@
 
     <string name="prefs_category_details">Details</string>
 
-    <string name="sync_folder_failed_content">Sync of folder %1$s could not be completed</string>
+    <string name="sync_folder_failed_content">Sync of %1$s folder could not be completed</string>
 
     <string name="subject_user_shared_with_you">%1$s shared \"%2$s\" with you</string>
     <string name="subject_shared_with_you">\"%1$s\" has been shared with you</string>
@@ -911,4 +911,13 @@
     <string name="create_rich_workspace">Add folder info</string>
     <string name="creates_rich_workspace">creates folder info</string>
     <string name="edit_rich_workspace">edit folder info</string>
+    <string name="title_activity_login">Fake Login</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
 </resources>
