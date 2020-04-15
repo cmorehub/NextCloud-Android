@@ -39,6 +39,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.WindowManager;
 
 import com.evernote.android.job.JobManager;
@@ -99,6 +100,8 @@ import javax.inject.Inject;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
@@ -329,6 +332,8 @@ public class MainApp extends MultiDexApplication implements HasAndroidInjector {
             .schedule();
 
         registerGlobalPassCodeProtection();
+
+        registerActivityLifecycleCallbacks(new lifecycle());
     }
 
     private void registerGlobalPassCodeProtection() {
@@ -834,5 +839,45 @@ public class MainApp extends MultiDexApplication implements HasAndroidInjector {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
                 break;
         }
+    }
+
+
+    private class lifecycle implements ActivityLifecycleCallbacks {
+
+        @Override
+        public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
+            Log.d("activitylifecycle", "create: "+ activity.getClass().getName());
+        }
+
+        @Override
+        public void onActivityStarted(@NonNull Activity activity) {
+            Log.d("activitylifecycle", "start: "+ activity.getClass().getName());
+        }
+
+        @Override
+        public void onActivityResumed(@NonNull Activity activity) {
+            Log.d("activitylifecycle", "resume: "+ activity.getClass().getName());
+        }
+
+        @Override
+        public void onActivityPaused(@NonNull Activity activity) {
+            Log.d("activitylifecycle", "pause: "+ activity.getClass().getName());
+        }
+
+        @Override
+        public void onActivityStopped(@NonNull Activity activity) {
+            Log.d("activitylifecycle", "stop: "+ activity.getClass().getName());
+        }
+
+        @Override
+        public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
+            Log.d("activitylifecycle", "saveInstanceState: "+ activity.getClass().getName());
+        }
+
+        @Override
+        public void onActivityDestroyed(@NonNull Activity activity) {
+            Log.d("activitylifecycle", "destroy: "+ activity.getClass().getName());
+        }
+
     }
 }
