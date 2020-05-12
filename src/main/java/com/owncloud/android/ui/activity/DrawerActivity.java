@@ -246,13 +246,11 @@ public abstract class DrawerActivity extends ToolbarActivity
      */
     protected void setupDrawer() {
         mDrawerLayout = findViewById(R.id.drawer_layout);
-
         mNavigationView = findViewById(R.id.nav_view);
 
         Log.d("NCY3K", "setupDrawer() mNavigationView==null = "+(mNavigationView==null));
+        setupDrawerHeader();
         if (mNavigationView != null) {
-            setupDrawerHeader();
-
             setupDrawerMenu(mNavigationView);
 
             setupQuotaElement();
@@ -681,7 +679,7 @@ public abstract class DrawerActivity extends ToolbarActivity
      * @param enable true to enable, false to disable
      */
     public void setDrawerIndicatorEnabled(boolean enable) {
-        if (mDrawerToggle != null) {
+        if (mDrawerToggle != null && mDrawerLayout!=null) {
             mDrawerToggle.setDrawerIndicatorEnabled(enable);
         }
     }
@@ -703,45 +701,43 @@ public abstract class DrawerActivity extends ToolbarActivity
             }
         }
 
-        if (mNavigationView != null && mDrawerLayout != null) {
-            if (persistingAccounts.size() > 0) {
-                repopulateAccountList(persistingAccounts);
-                setAccountInDrawer(accountManager.getUser());
-                mAvatars = getUserAvatars();
+        if (persistingAccounts.size() > 0) {
+            repopulateAccountList(persistingAccounts);
+            setAccountInDrawer(accountManager.getUser());
+            mAvatars = getUserAvatars();
 
-                // activate second/end account avatar
-                final User secondUser = mAvatars.size() > 1 ? mAvatars.get(1) : null;
-                if (secondUser != null) {
-                    mAccountEndAccountAvatar.setTag(secondUser.getAccountName());
-                    DisplayUtils.setAvatar(secondUser.toPlatformAccount(),
-                                           this,
-                                           mOtherAccountAvatarRadiusDimension,
-                                           getResources(),
-                                           mAccountEndAccountAvatar,
-                                           this);
-                    mAccountEndAccountAvatar.setVisibility(View.VISIBLE);
-                } else {
-                    mAccountEndAccountAvatar.setVisibility(View.GONE);
-                }
-
-                // activate third/middle account avatar
-                final User thirdUser = mAvatars.size() > 2 ? mAvatars.get(2) : null;
-                if (thirdUser != null) {
-                    mAccountMiddleAccountAvatar.setTag(thirdUser.getAccountName());
-                    DisplayUtils.setAvatar(thirdUser.toPlatformAccount(),
-                                           this,
-                                           mOtherAccountAvatarRadiusDimension,
-                                           getResources(),
-                                           mAccountMiddleAccountAvatar,
-                                           this);
-                    mAccountMiddleAccountAvatar.setVisibility(View.VISIBLE);
-                } else {
-                    mAccountMiddleAccountAvatar.setVisibility(View.GONE);
-                }
+            // activate second/end account avatar
+            final User secondUser = mAvatars.size() > 1 ? mAvatars.get(1) : null;
+            if (secondUser != null) {
+                mAccountEndAccountAvatar.setTag(secondUser.getAccountName());
+                DisplayUtils.setAvatar(secondUser.toPlatformAccount(),
+                                       this,
+                                       mOtherAccountAvatarRadiusDimension,
+                                       getResources(),
+                                       mAccountEndAccountAvatar,
+                                       this);
+                mAccountEndAccountAvatar.setVisibility(View.VISIBLE);
             } else {
                 mAccountEndAccountAvatar.setVisibility(View.GONE);
+            }
+
+            // activate third/middle account avatar
+            final User thirdUser = mAvatars.size() > 2 ? mAvatars.get(2) : null;
+            if (thirdUser != null) {
+                mAccountMiddleAccountAvatar.setTag(thirdUser.getAccountName());
+                DisplayUtils.setAvatar(thirdUser.toPlatformAccount(),
+                                       this,
+                                       mOtherAccountAvatarRadiusDimension,
+                                       getResources(),
+                                       mAccountMiddleAccountAvatar,
+                                       this);
+                mAccountMiddleAccountAvatar.setVisibility(View.VISIBLE);
+            } else {
                 mAccountMiddleAccountAvatar.setVisibility(View.GONE);
             }
+        } else {
+            mAccountEndAccountAvatar.setVisibility(View.GONE);
+            mAccountMiddleAccountAvatar.setVisibility(View.GONE);
         }
     }
 
@@ -801,9 +797,9 @@ public abstract class DrawerActivity extends ToolbarActivity
         super.updateActionBarTitleAndHomeButton(chosenFile);
 
         // set home button properties
-        if (mDrawerToggle != null && chosenFile != null) {
+        if (mDrawerToggle != null && mDrawerLayout!=null && chosenFile != null) {
             mDrawerToggle.setDrawerIndicatorEnabled(isRoot(chosenFile));
-        } else if (mDrawerToggle != null){
+        } else if (mDrawerToggle != null && mDrawerLayout!=null){
             mDrawerToggle.setDrawerIndicatorEnabled(false);
         }
 
@@ -861,7 +857,7 @@ public abstract class DrawerActivity extends ToolbarActivity
                 if (mAccountChooserToggle != null) {
                     mAccountChooserToggle.setImageResource(R.drawable.ic_up);
                 }
-                mNavigationView.getMenu().setGroupVisible(R.id.drawer_menu_accounts, true);
+                mNavigationView.getMenu().setGroupVisible(R.id.drawer_menu_accounts, false);
 
                 if (!getResources().getBoolean(R.bool.multiaccount_support) &&
                         mNavigationView.getMenu().findItem(R.id.drawer_menu_account_add) != null) {

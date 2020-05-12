@@ -445,6 +445,7 @@ public class FileDisplayActivity extends FileActivity
             OCFileListFragment listOfFiles = new OCFileListFragment();
             Bundle args = new Bundle();
             args.putBoolean(OCFileListFragment.ARG_ALLOW_CONTEXTUAL_ACTIONS, true);
+            args.putBoolean(OCFileListFragment.ARG_HIDE_FAB, true);
             listOfFiles.setArguments(args);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.add(R.id.left_fragment_container, listOfFiles, TAG_LIST_OF_FILES);

@@ -5,7 +5,7 @@
     <bool name="dev_version_direct_download_enabled">false</bool>
 
     <!-- App name  and other strings-->
-    <string name="app_name">Nextcloud</string>
+    <string name="app_name">QBee</string>
     <string name="account_type">nextcloud</string>     <!-- better if was a domain name; but changing it now would require migrate accounts when the app is updated -->
     <string name="authority">org.nextcloud</string>    <!-- better if was the app package with ".provider" appended ; it identifies the provider -->
     <string name="users_and_groups_search_authority">com.nextcloud.android.providers.UsersAndGroupsSearchProvider</string>
@@ -30,18 +30,18 @@
 
     <!-- Flags to enable/disable some features -->
     <string name="send_files_to_other_apps">on</string>
-    <bool name="share_via_link_feature">true</bool>
-    <bool name="share_with_users_feature">true</bool>
-    <bool name="show_external_links">true</bool>
+    <bool name="share_via_link_feature">false</bool>
+    <bool name="share_with_users_feature">false</bool>
+    <bool name="show_external_links">false</bool>
     <bool name="show_outdated_server_warning">true</bool>
 
     <!-- Contacts backup -->
-    <bool name="contacts_backup">true</bool>
+    <bool name="contacts_backup">false</bool>
     <string name="contacts_backup_folder">/.Contacts-Backup</string>
     <integer name="contacts_backup_expire">-1</integer>
 
     <!-- What's new -->
-    <bool name="show_whats_new">true</bool>
+    <bool name="show_whats_new">false</bool>
     <!-- To fill if you want to show webviews instead of regular welcome views -->
     <array name="whatsnew_urls"></array>
 
@@ -53,22 +53,22 @@
     <color name="login_text_hint_color">#7fC0E3</color>
 
     <!-- Multiaccount support -->
-    <bool name="multiaccount_support">true</bool>
+    <bool name="multiaccount_support">false</bool>
 
     <!-- Drawer options -->
     <bool name="recently_added_enabled">false</bool>
     <bool name="recently_modified_enabled">false</bool>
-    <bool name="shared_enabled">true</bool>
+    <bool name="shared_enabled">false</bool>
     <bool name="videos_enabled">false</bool>
-    <bool name="show_drawer_logout">false</bool>
+    <bool name="show_drawer_logout">true</bool>
     <bool name="show_drawer_contacts_backup">false</bool> <!-- if false it will shown in settings -->
 
     <!-- Various other options -->
-    <bool name="allow_profile_click">true</bool>
+    <bool name="allow_profile_click">false</bool>
 
     <!-- Help, imprint and feedback, and other things -->
     <bool name="passcode_enabled">true</bool>
-    <bool name="device_credentials_enabled">true</bool>
+    <bool name="device_credentials_enabled">false</bool>
     <bool name="show_hidden_files_enabled">true</bool>
     <bool name="davdroid_integration_enabled">true</bool>
     <bool name="help_enabled">true</bool>
@@ -76,11 +76,11 @@
     <bool name="privacy_enabled">true</bool>
     <string name="privacy_url">https://nextcloud.com/privacy</string>
     <bool name="imprint_enabled">false</bool>
-    <bool name="recommend_enabled">true</bool>
+    <bool name="recommend_enabled">false</bool>
     <bool name="logger_enabled">false</bool>
-    <bool name="sourcecode_enabled">true</bool>
+    <bool name="sourcecode_enabled">false</bool>
     <string name="sourcecode_url" translatable="false">https://github.com/nextcloud/android</string>
-    <bool name="license_enabled">true</bool>
+    <bool name="license_enabled">false</bool>
     <string name="license_url" translatable="false">https://www.gnu.org/licenses/gpl-2.0.html</string>
     <string name="url_imprint"></string>
     <string name="url_app_download">"https://play.google.com/store/apps/details?id=com.nextcloud.client"</string>
@@ -97,7 +97,7 @@
     <string name="mail_logger"></string>
 
     <!-- Determine is participate enabled -->
-    <bool name="participate_enabled">true</bool>
+    <bool name="participate_enabled">false</bool>
     <!-- Participate links -->
     <string name="fdroid_beta_link" translatable="false">https://f-droid.org/repository/browse/?fdid=com.nextcloud.android.beta</string>
     <string name="beta_apk_link" translatable="false">https://download.nextcloud.com/android/dev/latest.apk</string>
