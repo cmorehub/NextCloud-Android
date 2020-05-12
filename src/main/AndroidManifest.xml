@@ -69,7 +69,7 @@
 
     <application
         android:name=".MainApp"
-        android:banner="@mipmap/ic_qbee_launcher"
+        android:banner="@drawable/qbee_atv_banner"
         android:fullBackupContent="@xml/backup_config"
         android:icon="@mipmap/ic_qbee_launcher"
         android:installLocation="internalOnly"
