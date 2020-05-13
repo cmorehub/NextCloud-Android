@@ -782,6 +782,10 @@ public class FileDisplayActivity extends FileActivity
         searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
         searchMenuItem.setVisible(false);
 
+        searchView.setOnFocusChangeListener((v,focus)->{
+            // TODO : iconized didn't work?
+        });
+
         ThemeUtils.themeSearchView(searchView, true, this);
 
         // populate list of menu items to show/hide when drawer is opened/closed
