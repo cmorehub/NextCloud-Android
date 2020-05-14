@@ -130,7 +130,7 @@
     <string name="buildNumber" translatable="false"></string>
 
     <!-- QBee variant settings -->
-    <bool name="isTVBuild">true</bool>
+    <bool name="is_tv_build">true</bool>
 </resources>
 
 

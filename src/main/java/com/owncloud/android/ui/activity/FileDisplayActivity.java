@@ -29,6 +29,7 @@ import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AuthenticatorException;
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentResolver;
@@ -782,9 +783,18 @@ public class FileDisplayActivity extends FileActivity
         searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
         searchMenuItem.setVisible(false);
 
-        searchView.setOnFocusChangeListener((v,focus)->{
-            // TODO : iconized didn't work?
-        });
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(false);
+
+//        searchView.setOnFocusChangeListener((v,focus)->{
+//            // TODO : iconized didn't work?
+//            if(focus){
+//                searchMenuItem.expandActionView();
+//            }else{
+//                searchMenuItem.collapseActionView();
+//            }
+//        });
 
         ThemeUtils.themeSearchView(searchView, true, this);
 

@@ -1293,8 +1293,9 @@ public class OCFileListFragment extends ExtendedListFragment implements
         }
 
         // FAB
-        setFabEnabled(mFile.canWrite());
-
+        if(!getResources().getBoolean(R.bool.is_tv_build)) {
+            setFabEnabled(mFile.canWrite());
+        }
         invalidateActionMode();
     }
 

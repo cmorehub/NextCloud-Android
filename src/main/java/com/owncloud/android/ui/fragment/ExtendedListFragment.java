@@ -387,6 +387,11 @@ public class ExtendedListFragment extends Fragment implements
 
         mFabMain = v.findViewById(R.id.fab_main);
         ThemeUtils.tintFloatingActionButton(mFabMain, R.drawable.ic_plus, getContext());
+        if(getResources().getBoolean(R.bool.is_tv_build)){
+            mFabMain.setVisibility(View.GONE);
+            mFabMain.setEnabled(false);
+            mFabMain.setFocusable(false);
+        }
 
         return v;
     }
