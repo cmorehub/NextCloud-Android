@@ -590,7 +590,7 @@ public class ExtendedListFragment extends Fragment implements
      * @param visible Desired visibility for the FAB.
      */
     public void setFabVisible(final boolean visible) {
-        if (getActivity() != null) {
+        if (getActivity() != null&&!getResources().getBoolean(R.bool.is_tv_build)) {
             getActivity().runOnUiThread(() -> {
                 if (visible) {
                     mFabMain.show();
@@ -610,7 +610,7 @@ public class ExtendedListFragment extends Fragment implements
      * @param enabled Desired visibility for the FAB.
      */
     public void setFabEnabled(final boolean enabled) {
-        if (getActivity() != null) {
+        if (getActivity() != null&&!getResources().getBoolean(R.bool.is_tv_build)) {
             getActivity().runOnUiThread(() -> {
                 if (enabled) {
                     mFabMain.setEnabled(true);

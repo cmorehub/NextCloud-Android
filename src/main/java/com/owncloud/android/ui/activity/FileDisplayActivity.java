@@ -52,6 +52,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.nextcloud.client.account.User;
@@ -786,15 +787,28 @@ public class FileDisplayActivity extends FileActivity
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);
+        searchView.setIconified(true);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Toast.makeText(FileDisplayActivity.this,"Submit "+query,Toast.LENGTH_LONG).show();
+                return false;
+            }
 
-//        searchView.setOnFocusChangeListener((v,focus)->{
-//            // TODO : iconized didn't work?
-//            if(focus){
-//                searchMenuItem.expandActionView();
-//            }else{
-//                searchMenuItem.collapseActionView();
-//            }
-//        });
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+        searchView.setOnFocusChangeListener((v,focus)->{
+            // TODO : iconized didn't work?
+            if(focus){
+//                searchView.setIconified(false);
+            }else{
+//                searchView.setIconified(true);
+            }
+        });
 
         ThemeUtils.themeSearchView(searchView, true, this);
 
@@ -885,7 +899,6 @@ public class FileDisplayActivity extends FileActivity
                 } else if ((currentDir != null && currentDir.getParentId() != 0) ||
                         (second != null && second.getFile() != null) || isSearchOpen()) {
                     onBackPressed();
-
                 } else {
                     openDrawer();
                 }

@@ -30,6 +30,7 @@
     <string name="drawer_item_uploads_list">Uploads</string>
     <string name="drawer_item_activities">Activities</string>
     <string name="drawer_item_notifications">Notifications</string>
+    <string name="drawer_item_cmore_media">CmoreMedia</string>
     <string name="drawer_quota">%1$s of %2$s used</string>
     <string name="drawer_quota_unlimited">%1$s used</string>
     <string name="drawer_close">Close sidebar</string>
