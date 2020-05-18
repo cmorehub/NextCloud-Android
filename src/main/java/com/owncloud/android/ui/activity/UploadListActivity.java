@@ -37,14 +37,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.evernote.android.job.Job;
-import com.evernote.android.job.JobManager;
-import com.evernote.android.job.JobRequest;
-import com.evernote.android.job.util.support.PersistableBundleCompat;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.core.Clock;
 import com.nextcloud.client.device.PowerManagementService;
+import com.nextcloud.client.jobs.BackgroundJobManager;
 import com.nextcloud.client.network.ConnectivityService;
 import com.nextcloud.java.util.Optional;
 import com.owncloud.android.R;
@@ -52,7 +49,6 @@ import com.owncloud.android.databinding.UploadListLayoutBinding;
 import com.owncloud.android.datamodel.UploadsStorageManager;
 import com.owncloud.android.files.services.FileUploader;
 import com.owncloud.android.files.services.FileUploader.FileUploaderBinder;
-import com.owncloud.android.jobs.FilesSyncJob;
 import com.owncloud.android.lib.common.operations.RemoteOperation;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
 import com.owncloud.android.lib.common.utils.Log_OC;
@@ -61,8 +57,6 @@ import com.owncloud.android.ui.adapter.UploadListAdapter;
 import com.owncloud.android.ui.decoration.MediaGridItemDecoration;
 import com.owncloud.android.utils.FilesSyncHelper;
 import com.owncloud.android.utils.ThemeUtils;
-
-import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -99,6 +93,9 @@ public class UploadListActivity extends FileActivity {
     @Inject
     Clock clock;
 
+    @Inject
+    BackgroundJobManager backgroundJobManager;
+
     private UploadListLayoutBinding binding;
 
     @Override
@@ -126,14 +123,12 @@ public class UploadListActivity extends FileActivity {
         // setup toolbar
         setupToolbar();
 
+        updateActionBarTitleAndHomeButtonByString(getString(R.string.uploads_view_title));
+
         // setup drawer
         setupDrawer(R.id.nav_uploads);
 
         setupContent();
-
-        if (getSupportActionBar() != null) {
-            ThemeUtils.setColoredTitle(getSupportActionBar(), R.string.uploads_view_title, this);
-        }
     }
 
     private void setupContent() {
@@ -164,6 +159,7 @@ public class UploadListActivity extends FileActivity {
         binding.list.setLayoutManager(lm);
         binding.list.setAdapter(uploadListAdapter);
 
+        ThemeUtils.colorSwipeRefreshLayout(this, swipeListRefreshLayout);
         swipeListRefreshLayout.setOnRefreshListener(this::refresh);
 
         loadItems();
@@ -181,19 +177,7 @@ public class UploadListActivity extends FileActivity {
     }
 
     private void refresh() {
-        // scan for missing auto uploads files
-        Set<Job> jobs = JobManager.instance().getAllJobsForTag(FilesSyncJob.TAG);
-
-        if (jobs.isEmpty()) {
-            PersistableBundleCompat persistableBundleCompat = new PersistableBundleCompat();
-            persistableBundleCompat.putBoolean(FilesSyncJob.OVERRIDE_POWER_SAVING, true);
-            new JobRequest.Builder(FilesSyncJob.TAG)
-                .setExact(1_000L)
-                .setUpdateCurrent(false)
-                .setExtras(persistableBundleCompat)
-                .build()
-                .schedule();
-        }
+        backgroundJobManager.startImmediateFilesSyncJob(false, true);
 
         // retry failed uploads
         new Thread(() -> FileUploader.retryFailedUploads(
@@ -214,7 +198,6 @@ public class UploadListActivity extends FileActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        ThemeUtils.setColoredTitle(getSupportActionBar(), R.string.uploads_view_title, this);
         final Optional<User> optionalUser = getUser();
         if (optionalUser.isPresent()) {
             setAccountInDrawer(optionalUser.get());

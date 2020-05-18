@@ -19,6 +19,7 @@
  */
 package com.nextcloud.client.jobs
 
+import android.app.NotificationManager
 import android.content.ContentResolver
 import android.content.Context
 import android.content.res.Resources
@@ -31,28 +32,38 @@ import com.nextcloud.client.account.UserAccountManager
 import com.nextcloud.client.core.Clock
 import com.nextcloud.client.device.DeviceInfo
 import com.nextcloud.client.device.PowerManagementService
+import com.nextcloud.client.logger.Logger
+import com.nextcloud.client.network.ConnectivityService
 import com.nextcloud.client.preferences.AppPreferences
 import com.owncloud.android.datamodel.ArbitraryDataProvider
 import com.owncloud.android.datamodel.SyncedFolderProvider
+import com.owncloud.android.datamodel.UploadsStorageManager
+import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
 import javax.inject.Provider
 
 /**
- * This factory is responsible for creating all background jobs and for injecting
- * all jobs dependencies.
+ * This factory is responsible for creating all background jobs and for injecting worker dependencies.
  */
+@Suppress("LongParameterList") // satisfied by DI
 class BackgroundJobFactory @Inject constructor(
+    private val logger: Logger,
     private val preferences: AppPreferences,
     private val contentResolver: ContentResolver,
     private val clock: Clock,
-    private val powerManagerService: PowerManagementService,
+    private val powerManagementService: PowerManagementService,
     private val backgroundJobManager: Provider<BackgroundJobManager>,
     private val deviceInfo: DeviceInfo,
     private val accountManager: UserAccountManager,
     private val resources: Resources,
-    private val dataProvider: ArbitraryDataProvider
+    private val dataProvider: ArbitraryDataProvider,
+    private val uploadsStorageManager: UploadsStorageManager,
+    private val connectivityService: ConnectivityService,
+    private val notificationManager: NotificationManager,
+    private val eventBus: EventBus
 ) : WorkerFactory() {
 
+    @Suppress("ComplexMethod") // it's just a trivial dispatch
     override fun createWorker(
         context: Context,
         workerClassName: String,
@@ -68,7 +79,13 @@ class BackgroundJobFactory @Inject constructor(
         return when (workerClass) {
             ContentObserverWork::class -> createContentObserverJob(context, workerParameters, clock)
             ContactsBackupWork::class -> createContactsBackupWork(context, workerParameters)
-            else -> null // falls back to default factory
+            ContactsImportWork::class -> createContactsImportWork(context, workerParameters)
+            FilesSyncWork::class -> createFilesSyncWork(context, workerParameters)
+            OfflineSyncWork::class -> createOfflineSyncWork(context, workerParameters)
+            MediaFoldersDetectionWork::class -> createMediaFoldersDetectionWork(context, workerParameters)
+            NotificationWork::class -> createNotificationWork(context, workerParameters)
+            AccountRemovalWork::class -> createAccountRemovalWork(context, workerParameters)
+            else -> null // caller falls back to default factory
         }
     }
 
@@ -84,7 +101,7 @@ class BackgroundJobFactory @Inject constructor(
                 context,
                 workerParameters,
                 folderResolver,
-                powerManagerService,
+                powerManagementService,
                 backgroundJobManager.get()
             )
         } else {
@@ -100,6 +117,75 @@ class BackgroundJobFactory @Inject constructor(
             dataProvider,
             contentResolver,
             accountManager
+        )
+    }
+
+    private fun createContactsImportWork(context: Context, params: WorkerParameters): ContactsImportWork {
+        return ContactsImportWork(
+            context,
+            params,
+            logger,
+            contentResolver
+        )
+    }
+
+    private fun createFilesSyncWork(context: Context, params: WorkerParameters): FilesSyncWork {
+        return FilesSyncWork(
+            context = context,
+            params = params,
+            resources = resources,
+            contentResolver = contentResolver,
+            userAccountManager = accountManager,
+            preferences = preferences,
+            uploadsStorageManager = uploadsStorageManager,
+            connectivityService = connectivityService,
+            powerManagementService = powerManagementService,
+            clock = clock,
+            backgroundJobManager = backgroundJobManager.get()
+        )
+    }
+
+    private fun createOfflineSyncWork(context: Context, params: WorkerParameters): OfflineSyncWork {
+        return OfflineSyncWork(
+            context = context,
+            params = params,
+            contentResolver = contentResolver,
+            userAccountManager = accountManager,
+            connectivityService = connectivityService,
+            powerManagementService = powerManagementService
+        )
+    }
+
+    private fun createMediaFoldersDetectionWork(context: Context, params: WorkerParameters): MediaFoldersDetectionWork {
+        return MediaFoldersDetectionWork(
+            context,
+            params,
+            resources,
+            contentResolver,
+            accountManager,
+            preferences,
+            clock
+        )
+    }
+
+    private fun createNotificationWork(context: Context, params: WorkerParameters): NotificationWork {
+        return NotificationWork(
+            context,
+            params,
+            notificationManager,
+            accountManager
+        )
+    }
+
+    private fun createAccountRemovalWork(context: Context, params: WorkerParameters): AccountRemovalWork {
+        return AccountRemovalWork(
+            context,
+            params,
+            uploadsStorageManager,
+            accountManager,
+            backgroundJobManager.get(),
+            clock,
+            eventBus
         )
     }
 }

@@ -19,6 +19,7 @@
  */
 package com.nextcloud.client.jobs
 
+import android.app.NotificationManager
 import android.content.ContentResolver
 import android.content.Context
 import android.content.res.Resources
@@ -28,9 +29,13 @@ import com.nextcloud.client.account.UserAccountManager
 import com.nextcloud.client.core.Clock
 import com.nextcloud.client.device.DeviceInfo
 import com.nextcloud.client.device.PowerManagementService
+import com.nextcloud.client.logger.Logger
+import com.nextcloud.client.network.ConnectivityService
 import com.nextcloud.client.preferences.AppPreferences
 import com.nhaarman.mockitokotlin2.whenever
 import com.owncloud.android.datamodel.ArbitraryDataProvider
+import com.owncloud.android.datamodel.UploadsStorageManager
+import org.greenrobot.eventbus.EventBus
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
@@ -74,12 +79,28 @@ class BackgroundJobFactoryTest {
     @Mock
     private lateinit var dataProvider: ArbitraryDataProvider
 
+    @Mock
+    private lateinit var logger: Logger
+
+    @Mock
+    private lateinit var uploadsStorageManager: UploadsStorageManager
+
+    @Mock
+    private lateinit var connectivityService: ConnectivityService
+
+    @Mock
+    private lateinit var notificationManager: NotificationManager
+
+    @Mock
+    private lateinit var eventBus: EventBus
+
     private lateinit var factory: BackgroundJobFactory
 
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
         factory = BackgroundJobFactory(
+            logger,
             preferences,
             contentResolver,
             clock,
@@ -88,12 +109,16 @@ class BackgroundJobFactoryTest {
             deviceInfo,
             accountManager,
             resources,
-            dataProvider
+            dataProvider,
+            uploadsStorageManager,
+            connectivityService,
+            notificationManager,
+            eventBus
         )
     }
 
     @Test
-    fun worker_is_created_on_api_level_24() {
+    fun content_observer_worker_is_created_on_api_level_24() {
         // GIVEN
         //      api level is > 24
         //      content URI trigger is supported
@@ -109,7 +134,7 @@ class BackgroundJobFactoryTest {
     }
 
     @Test
-    fun worker_is_not_created_below_api_level_24() {
+    fun content_observer_worker_is_not_created_below_api_level_24() {
         // GIVEN
         //      api level is < 24
         //      content URI trigger is not supported

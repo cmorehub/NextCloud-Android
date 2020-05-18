@@ -3,8 +3,10 @@
  *
  * @author Andy Scherzinger
  * @author Chris Narkiewicz  <hello@ezaquarii.com>
+ * @author Chawki Chouib  <chouibc@gmail.com>
  * Copyright (C) 2016 ownCloud Inc.
  * Copyright (C) 2020 Chris Narkiewicz <hello@ezaquarii.com>
+ * Copyright (C) 2020 Chawki Chouib  <chouibc@gmail.com>
  * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -35,11 +37,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 
-import com.evernote.android.job.JobRequest;
-import com.evernote.android.job.util.support.PersistableBundleCompat;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
+import com.nextcloud.client.jobs.BackgroundJobManager;
 import com.nextcloud.client.onboarding.FirstRunActivity;
 import com.nextcloud.java.util.Optional;
 import com.owncloud.android.MainApp;
@@ -48,12 +51,12 @@ import com.owncloud.android.datamodel.ArbitraryDataProvider;
 import com.owncloud.android.datamodel.FileDataStorageManager;
 import com.owncloud.android.files.services.FileDownloader;
 import com.owncloud.android.files.services.FileUploader;
-import com.owncloud.android.jobs.AccountRemovalJob;
 import com.owncloud.android.lib.common.OwnCloudAccount;
 import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.services.OperationsService;
 import com.owncloud.android.ui.adapter.UserListAdapter;
 import com.owncloud.android.ui.adapter.UserListItem;
+import com.owncloud.android.ui.dialog.AccountRemovalConfirmationDialog;
 import com.owncloud.android.ui.events.AccountRemovedEvent;
 import com.owncloud.android.ui.helpers.FileOperationsHelper;
 import com.owncloud.android.utils.ThemeUtils;
@@ -70,8 +73,11 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -108,6 +114,7 @@ public class ManageAccountsActivity extends FileActivity implements UserListAdap
     private ArbitraryDataProvider arbitraryDataProvider;
     private boolean multipleAccountsSupported;
 
+    @Inject BackgroundJobManager backgroundJobManager;
     @Inject UserAccountManager accountManager;
 
     @Override
@@ -123,7 +130,19 @@ public class ManageAccountsActivity extends FileActivity implements UserListAdap
         recyclerView = findViewById(R.id.account_list);
 
         setupToolbar();
+
+        // set the back button from action bar
+        ActionBar actionBar = getSupportActionBar();
+
+        // check if is not null
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
+
+        // set title Action bar
         updateActionBarTitleAndHomeButtonByString(getResources().getString(R.string.prefs_manage_accounts));
+        ThemeUtils.tintBackButton(actionBar, this);
 
         List<User> users = accountManager.getAllUsers();
         originalUsers = toAccountNames(users);
@@ -148,6 +167,7 @@ public class ManageAccountsActivity extends FileActivity implements UserListAdap
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         initializeComponentGetters();
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -365,7 +385,9 @@ public class ManageAccountsActivity extends FileActivity implements UserListAdap
         super.onDestroy();
     }
 
-    public Handler getHandler() { return handler; }
+    public Handler getHandler() {
+        return handler;
+    }
 
     @Override
     public FileUploader.FileUploaderBinder getFileUploaderBinder() {
@@ -416,16 +438,7 @@ public class ManageAccountsActivity extends FileActivity implements UserListAdap
             mDownloaderBinder.cancel(user.toPlatformAccount());
         }
 
-        // schedule job
-        PersistableBundleCompat bundle = new PersistableBundleCompat();
-        bundle.putString(AccountRemovalJob.ACCOUNT, user.getAccountName());
-
-        new JobRequest.Builder(AccountRemovalJob.TAG)
-                .startNow()
-                .setExtras(bundle)
-                .setUpdateCurrent(false)
-                .build()
-                .schedule();
+        backgroundJobManager.startAccountRemovalJob(user.getAccountName(), false);
 
         // immediately select a new account
         List<User> users = accountManager.getAllUsers();
@@ -457,13 +470,44 @@ public class ManageAccountsActivity extends FileActivity implements UserListAdap
         }
     }
 
-    @Override
-    public void onClick(User user) {
+    public static void openAccountRemovalConfirmationDialog(User user, FragmentManager fragmentManager) {
+        AccountRemovalConfirmationDialog dialog =
+            AccountRemovalConfirmationDialog.newInstance(user);
+        dialog.show(fragmentManager, "dialog");
+    }
+
+    private void openAccount(User user) {
         final Intent intent = new Intent(this, UserInfoActivity.class);
         intent.putExtra(UserInfoActivity.KEY_ACCOUNT, user);
         OwnCloudAccount oca = user.toOwnCloudAccount();
         intent.putExtra(KEY_DISPLAY_NAME, oca.getDisplayName());
         startActivityForResult(intent, KEY_USER_INFO_REQUEST_CODE);
+    }
+
+    @Override
+    public void onOptionItemClicked(User user, View view) {
+        if (view.getId() == R.id.account_menu) {
+            ImageView menuButton = findViewById(R.id.account_menu);
+
+            PopupMenu popup = new PopupMenu(view.getContext(), menuButton);
+            popup.getMenuInflater().inflate(R.menu.item_account, popup.getMenu());
+            popup.show();
+            popup.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == R.id.action_delete_account) {
+                    openAccountRemovalConfirmationDialog(user, getSupportFragmentManager());
+                } else {
+                    openAccount(user);
+                }
+                return true;
+            });
+        } else {
+            openAccount(user);
+        }
+    }
+
+    @Override
+    public void onAccountClicked(User user) {
+        openAccount(user);
     }
 
     /**

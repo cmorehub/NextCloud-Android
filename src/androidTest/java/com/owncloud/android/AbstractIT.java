@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import com.facebook.testing.screenshot.Screenshot;
+import com.nextcloud.client.RetryTestRule;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.account.UserAccountManagerImpl;
 import com.owncloud.android.datamodel.FileDataStorageManager;
@@ -29,7 +30,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
+import org.junit.Rule;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -39,7 +40,6 @@ import java.util.Collection;
 
 import androidx.test.espresso.contrib.DrawerActions;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import androidx.test.runner.lifecycle.Stage;
@@ -54,8 +54,9 @@ import static org.junit.Assert.assertTrue;
  * Common base for all integration tests
  */
 
-@RunWith(AndroidJUnit4.class)
+//@RunWith(AndroidJUnit4.class)
 public abstract class AbstractIT {
+    @Rule public RetryTestRule retryTestRule = new RetryTestRule();
 
     protected static OwnCloudClient client;
     protected static Account account;
@@ -97,6 +98,8 @@ public abstract class AbstractIT {
             createDummyFiles();
 
             waitForServer(client, baseUrl);
+
+            deleteAllFiles(); // makes sure that no file/folder is in root
         } catch (OperationCanceledException e) {
             e.printStackTrace();
         } catch (AuthenticatorException e) {
@@ -110,6 +113,10 @@ public abstract class AbstractIT {
 
     @After
     public void after() {
+        deleteAllFiles();
+    }
+
+    public static void deleteAllFiles() {
         RemoteOperationResult result = new ReadFolderRemoteOperation("/").execute(client);
         assertTrue(result.getLogMessage(), result.isSuccess());
 
@@ -126,6 +133,10 @@ public abstract class AbstractIT {
 
     protected FileDataStorageManager getStorageManager() {
         return new FileDataStorageManager(account, targetContext.getContentResolver());
+    }
+
+    protected Account[] getAllAccounts() {
+        return AccountManager.get(targetContext).getAccounts();
     }
 
     private static void createDummyFiles() throws IOException {
@@ -186,7 +197,7 @@ public abstract class AbstractIT {
     protected void openDrawer(IntentsTestRule activityRule) throws InterruptedException {
         Activity sut = activityRule.launchActivity(null);
 
-        Thread.sleep(3000);
+        shortSleep();
 
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open());
 
@@ -207,5 +218,21 @@ public abstract class AbstractIT {
         });
 
         return currentActivity;
+    }
+
+    protected void shortSleep() {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void longSleep() {
+        try {
+            Thread.sleep(20000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

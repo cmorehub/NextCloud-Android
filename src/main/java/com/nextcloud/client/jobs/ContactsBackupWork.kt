@@ -55,6 +55,7 @@ import java.io.InputStreamReader
 import java.util.ArrayList
 import java.util.Calendar
 
+@Suppress("LongParameterList") // legacy code
 class ContactsBackupWork(
     appContext: Context,
     params: WorkerParameters,
@@ -165,9 +166,9 @@ class ContactsBackupWork(
         )
     }
 
-    private fun expireFiles(daysToExpire: Int, backupFolderString: String, account: User) { // -1 disables expiration
+    private fun expireFiles(daysToExpire: Int, backupFolderString: String, user: User) { // -1 disables expiration
         if (daysToExpire > -1) {
-            val storageManager = FileDataStorageManager(account.toPlatformAccount(),
+            val storageManager = FileDataStorageManager(user.toPlatformAccount(),
                 applicationContext.getContentResolver())
             val backupFolder: OCFile = storageManager.getFileByPath(backupFolderString)
             val cal = Calendar.getInstance()
@@ -183,7 +184,7 @@ class ContactsBackupWork(
                     // delete backups
                     val service = Intent(applicationContext, OperationsService::class.java)
                     service.action = OperationsService.ACTION_REMOVE
-                    service.putExtra(OperationsService.EXTRA_ACCOUNT, account)
+                    service.putExtra(OperationsService.EXTRA_ACCOUNT, user.toPlatformAccount())
                     service.putExtra(OperationsService.EXTRA_REMOTE_PATH, backup.remotePath)
                     service.putExtra(OperationsService.EXTRA_REMOVE_ONLY_LOCAL, false)
                     operationsServiceBinder!!.queueNewOperation(service)

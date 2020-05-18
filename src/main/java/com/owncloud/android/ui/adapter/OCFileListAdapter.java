@@ -30,8 +30,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.LinearGradient;
+import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
@@ -41,7 +41,9 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Filter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -50,6 +52,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.elyeproj.loaderviewlibrary.LoaderImageView;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.preferences.AppPreferences;
@@ -94,6 +97,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.recyclerview.widget.RecyclerView;
@@ -202,7 +206,13 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     public int getItemPosition(OCFile file) {
-        return mFiles.indexOf(file);
+        int position = mFiles.indexOf(file);
+
+        if (shouldShowHeader()) {
+            position = position + 1;
+        }
+
+        return position;
     }
 
     public void setFavoriteAttributeForItemID(String fileId, boolean favorite) {
@@ -359,7 +369,8 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                          mStorageManager,
                          asyncTasks,
                          gridView,
-                         activity);
+                         activity,
+                         gridViewHolder.shimmerThumbnail, preferences);
 
             if (highlightedItem != null && file.getFileId() == highlightedItem.getFileId()) {
                 gridViewHolder.itemLayout.setBackgroundColor(activity.getResources()
@@ -407,7 +418,9 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
                     // use fileOwner if not oneself, then add at first
                     ShareeUser fileOwnerSharee = new ShareeUser(fileOwner, file.getOwnerDisplayName(), ShareType.USER);
-                    if (fileOwner != null && !fileOwner.equals(userId) && !sharees.contains(fileOwnerSharee)) {
+                    if (!TextUtils.isEmpty(fileOwner) &&
+                        !fileOwner.equals(userId) &&
+                        !sharees.contains(fileOwnerSharee)) {
                         sharees.add(fileOwnerSharee);
                     }
 
@@ -421,12 +434,13 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                     int size = 60 * (shareeSize - 1) + w;
 
                     for (int i = 0; i < shareeSize; i++) {
-                        ShareeUser sharee = file.getSharees().get(i);
+                        ShareeUser sharee = sharees.get(i);
 
                         ImageView avatar = new ImageView(activity);
 
                         if (i == 0 && sharees.size() > 3) {
                             avatar.setImageResource(R.drawable.ic_people);
+                            ThemeUtils.setIconColor(avatar.getDrawable());
                         } else {
                             if (sharee.getShareType().equals(ShareType.GROUP)) {
                                 try {
@@ -435,7 +449,11 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                                 } catch (Exception e) {
                                     Log_OC.e(TAG, "Error calculating RGB value for active account icon.", e);
                                     avatar.setImageResource(R.drawable.ic_people);
+                                    ThemeUtils.setIconColor(avatar.getDrawable());
                                 }
+                            } else if (sharee.getShareType().equals(ShareType.CIRCLE)) {
+                                avatar.setImageResource(R.drawable.ic_circles);
+                                ThemeUtils.setIconColor(avatar.getDrawable());
                             } else if (sharee.getUserId().contains("@")) {
                                 showFederatedShareAvatar(sharee.getUserId(), avatarRadius, resources, avatar);
                             } else {
@@ -598,6 +616,18 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                                     List<ThumbnailsCacheManager.ThumbnailGenerationTask> asyncTasks,
                                     boolean gridView,
                                     Context context) {
+        setThumbnail(file, thumbnailView, user, storageManager, asyncTasks, gridView, context, null, null);
+    }
+
+    private static void setThumbnail(OCFile file,
+                                     ImageView thumbnailView,
+                                     User user,
+                                     FileDataStorageManager storageManager,
+                                     List<ThumbnailsCacheManager.ThumbnailGenerationTask> asyncTasks,
+                                     boolean gridView,
+                                     Context context,
+                                     LoaderImageView shimmerThumbnail,
+                                     AppPreferences preferences) {
         if (file.isFolder()) {
             thumbnailView.setImageDrawable(MimeTypeUtil
                                                .getFolderTypeIcon(file.isSharedWithMe() || file.isSharedWithSharee(),
@@ -616,7 +646,7 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                         thumbnailView.setImageBitmap(withOverlay);
                     } else {
                         if (gridView) {
-                            thumbnailView.setImageBitmap(thumbnail);
+                            BitmapUtils.setRoundedBitmapForGridMode(thumbnail, thumbnailView);
                         } else {
                             BitmapUtils.setRoundedBitmap(thumbnail, thumbnailView);
                         }
@@ -630,8 +660,7 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                                                                                    storageManager,
                                                                                    user.toPlatformAccount(),
                                                                                    asyncTasks,
-                                                                                   !gridView);
-
+                                                                                   gridView);
                             if (thumbnail == null) {
                                 thumbnail = BitmapUtils.drawableToBitmap(
                                     MimeTypeUtil.getFileTypeIcon(file.getMimeType(),
@@ -642,6 +671,26 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                             final ThumbnailsCacheManager.AsyncThumbnailDrawable asyncDrawable =
                                 new ThumbnailsCacheManager.AsyncThumbnailDrawable(context.getResources(),
                                                                                   thumbnail, task);
+
+                            if (shimmerThumbnail != null && shimmerThumbnail.getVisibility() == View.GONE) {
+                                if (gridView) {
+                                    configShimmerGridImageSize(shimmerThumbnail, preferences.getGridColumns());
+                                }
+                                startShimmer(shimmerThumbnail, thumbnailView);
+                            }
+
+                            task.setListener(new ThumbnailsCacheManager.ThumbnailGenerationTask.Listener() {
+                                @Override
+                                public void onSuccess() {
+                                    stopShimmer(shimmerThumbnail, thumbnailView);
+                                }
+
+                                @Override
+                                public void onError() {
+                                    stopShimmer(shimmerThumbnail, thumbnailView);
+                                }
+                            });
+
                             thumbnailView.setImageDrawable(asyncDrawable);
                             asyncTasks.add(task);
                             task.execute(new ThumbnailsCacheManager.ThumbnailGenerationTaskObject(file,
@@ -661,6 +710,61 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                                                                             user.toPlatformAccount(),
                                                                             context));
             }
+        }
+    }
+
+    @Override
+    public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
+        if (holder instanceof OCFileListGridImageViewHolder) {
+            LoaderImageView thumbnailShimmer = ((OCFileListGridImageViewHolder) holder).shimmerThumbnail;
+            if (thumbnailShimmer.getVisibility() == View.VISIBLE){
+                thumbnailShimmer.setImageResource(R.drawable.background);
+                thumbnailShimmer.resetLoader();
+            }
+        }
+    }
+
+    private static Point getScreenSize(Context context) throws Exception {
+        final WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        if (windowManager != null) {
+            final Point displaySize = new Point();
+            windowManager.getDefaultDisplay().getSize(displaySize);
+            return displaySize;
+        } else {
+            throw new Exception("WindowManager not found");
+        }
+    }
+
+    private static void configShimmerGridImageSize(LoaderImageView thumbnailShimmer, float gridColumns) {
+        FrameLayout.LayoutParams targetLayoutParams = (FrameLayout.LayoutParams) thumbnailShimmer.getLayoutParams();
+
+        try {
+            final Point screenSize = getScreenSize(thumbnailShimmer.getContext());
+            final int marginLeftAndRight = targetLayoutParams.leftMargin + targetLayoutParams.rightMargin;
+            final int size = Math.round(screenSize.x / gridColumns - marginLeftAndRight);
+
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(size, size);
+            params.setMargins(targetLayoutParams.leftMargin,
+                              targetLayoutParams.topMargin,
+                              targetLayoutParams.rightMargin,
+                              targetLayoutParams.bottomMargin);
+            thumbnailShimmer.setLayoutParams(params);
+        } catch (Exception exception) {
+            Log_OC.e("ConfigShimmer", exception.getMessage());
+        }
+    }
+
+    private static void startShimmer(LoaderImageView thumbnailShimmer, ImageView thumbnailView) {
+        thumbnailShimmer.setImageResource(R.drawable.background);
+        thumbnailShimmer.resetLoader();
+        thumbnailView.setVisibility(View.GONE);
+        thumbnailShimmer.setVisibility(View.VISIBLE);
+    }
+
+    private static void stopShimmer(@Nullable LoaderImageView thumbnailShimmer, ImageView thumbnailView) {
+        if (thumbnailShimmer != null){
+            thumbnailShimmer.setVisibility(View.GONE);
+            thumbnailView.setVisibility(View.VISIBLE);
         }
     }
 
@@ -719,6 +823,10 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
 
         return !TextUtils.isEmpty(currentDirectory.getRichWorkspace());
+    }
+
+    public boolean isHeader(OCFile file) {
+        return VIEWTYPE_HEADER == getItemViewType(getItemPosition(file));
     }
 
     @Override
@@ -899,8 +1007,12 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                     ShareType newShareType = ocShare.getShareType();
                     if (newShareType == ShareType.PUBLIC_LINK) {
                         file.setSharedViaLink(true);
-                    } else if (newShareType == ShareType.USER || newShareType == ShareType.GROUP ||
-                        newShareType == ShareType.EMAIL || newShareType == ShareType.FEDERATED) {
+                    } else if (newShareType == ShareType.USER ||
+                        newShareType == ShareType.GROUP ||
+                        newShareType == ShareType.EMAIL ||
+                        newShareType == ShareType.FEDERATED ||
+                        newShareType == ShareType.ROOM ||
+                        newShareType == ShareType.CIRCLE) {
                         file.setSharedWithSharee(true);
                     }
 
@@ -1176,6 +1288,9 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     static class OCFileListGridImageViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.thumbnail)
         public ImageView thumbnail;
+
+        @BindView(R.id.thumbnail_shimmer)
+        public LoaderImageView shimmerThumbnail;
 
         @BindView(R.id.favorite_action)
         public ImageView favorite;

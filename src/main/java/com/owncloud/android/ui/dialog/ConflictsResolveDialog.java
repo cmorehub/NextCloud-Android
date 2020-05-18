@@ -27,7 +27,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,7 +36,6 @@ import com.owncloud.android.R;
 import com.owncloud.android.datamodel.FileDataStorageManager;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.datamodel.ThumbnailsCacheManager;
-import com.owncloud.android.db.OCUpload;
 import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.ui.adapter.LocalFileListAdapter;
 import com.owncloud.android.ui.adapter.OCFileListAdapter;
@@ -52,6 +50,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatCheckBox;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -79,12 +78,12 @@ public class ConflictsResolveDialog extends DialogFragment {
         KEEP_SERVER,
     }
 
-    public static ConflictsResolveDialog newInstance(OCFile existingFile, OCUpload conflictUpload, User user) {
+    public static ConflictsResolveDialog newInstance(OCFile existingFile, OCFile newFile, User user) {
         ConflictsResolveDialog dialog = new ConflictsResolveDialog();
 
         Bundle args = new Bundle();
         args.putParcelable(KEY_EXISTING_FILE, existingFile);
-        args.putSerializable(KEY_NEW_FILE, new File(conflictUpload.getLocalPath()));
+        args.putSerializable(KEY_NEW_FILE, new File(newFile.getStoragePath()));
         args.putParcelable(KEY_USER, user);
         dialog.setArguments(args);
 
@@ -152,17 +151,20 @@ public class ConflictsResolveDialog extends DialogFragment {
         View view = inflater.inflate(R.layout.conflict_resolve_dialog, null);
         int accentColor = ThemeUtils.primaryAccentColor(getContext());
 
+        AppCompatCheckBox newFileCheckbox = view.findViewById(R.id.new_checkbox);
+        AppCompatCheckBox existingFileCheckbox = view.findViewById(R.id.existing_checkbox);
+
+        ThemeUtils.tintCheckbox(newFileCheckbox, ThemeUtils.primaryColor(getContext()));
+        ThemeUtils.tintCheckbox(existingFileCheckbox, ThemeUtils.primaryColor(getContext()));
+
         // Build the dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(view)
             .setPositiveButton(R.string.common_ok, (dialog, which) -> {
                 if (listener != null) {
-                    CheckBox newFile = view.findViewById(R.id.new_checkbox);
-                    CheckBox existingFile = view.findViewById(R.id.existing_checkbox);
-
-                    if (newFile.isSelected() && existingFile.isSelected()) {
+                    if (newFileCheckbox.isChecked() && existingFileCheckbox.isChecked()) {
                         listener.conflictDecisionMade(Decision.KEEP_BOTH);
-                    } else if (newFile.isSelected()) {
+                    } else if (newFileCheckbox.isChecked()) {
                         listener.conflictDecisionMade(Decision.KEEP_LOCAL);
                     } else {
                         listener.conflictDecisionMade(Decision.KEEP_SERVER);
@@ -206,6 +208,12 @@ public class ConflictsResolveDialog extends DialogFragment {
                                        asyncTasks,
                                        false,
                                        getContext());
+
+        view.findViewById(R.id.newFileContainer)
+            .setOnClickListener(v -> newFileCheckbox.setChecked(!newFileCheckbox.isChecked()));
+
+        view.findViewById(R.id.existingFileContainer)
+            .setOnClickListener(v -> existingFileCheckbox.setChecked(!existingFileCheckbox.isChecked()));
 
         return builder.create();
     }

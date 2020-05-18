@@ -30,7 +30,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
@@ -54,6 +53,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.di.Injectable;
@@ -292,6 +292,9 @@ public abstract class DrawerActivity extends ToolbarActivity
         mDrawerLayout.addDrawerListener(mDrawerToggle);
         mDrawerToggle.setDrawerIndicatorEnabled(true);
         mDrawerToggle.setDrawerSlideAnimationEnabled(true);
+        Drawable backArrow = getResources().getDrawable(R.drawable.ic_arrow_back);
+        mDrawerToggle.setHomeAsUpIndicator(ThemeUtils.tintDrawable(backArrow, ThemeUtils.appBarPrimaryFontColor(this)));
+        mDrawerToggle.getDrawerArrowDrawable().setColor(ThemeUtils.appBarPrimaryFontColor(this));
     }
 
     /**
@@ -302,7 +305,6 @@ public abstract class DrawerActivity extends ToolbarActivity
         mAccountEndAccountAvatar = (ImageView) findNavigationViewChildById(R.id.drawer_account_end);
 
         mAccountChooserToggle = (ImageView) findNavigationViewChildById(R.id.drawer_account_chooser_toggle);
-        mAccountChooserToggle.setColorFilter(ThemeUtils.fontColor(this, true));
 
         if (getResources().getBoolean(R.bool.allow_profile_click)) {
             mAccountChooserToggle.setImageResource(R.drawable.ic_down);
@@ -348,7 +350,7 @@ public abstract class DrawerActivity extends ToolbarActivity
                         pendingRunnable = new Runnable() {
                             @Override
                             public void run() {
-                                selectNavigationItem(menuItem);
+                                onNavigationItemClicked(menuItem);
                             }
                         };
                         return true;
@@ -394,8 +396,7 @@ public abstract class DrawerActivity extends ToolbarActivity
     }
 
 
-    private void selectNavigationItem(final MenuItem menuItem) {
-
+    private void onNavigationItemClicked(final MenuItem menuItem) {
         setDrawerMenuItemChecked(menuItem.getItemId());
 
         if (menuItem.getGroupId() == R.id.drawer_menu_accounts) {
@@ -405,25 +406,18 @@ public abstract class DrawerActivity extends ToolbarActivity
 
         switch (menuItem.getItemId()) {
             case R.id.nav_all_files:
-                if (this instanceof FileDisplayActivity) {
-                    if (((FileDisplayActivity) this).getListOfFilesFragment() instanceof PhotoFragment) {
-                        Intent intent = new Intent(getApplicationContext(), FileDisplayActivity.class);
-                        intent.putExtra(FileDisplayActivity.DRAWER_MENU_ID, menuItem.getItemId());
-                        intent.setAction(FileDisplayActivity.ALL_FILES);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(intent);
-                    } else {
-                        ((FileDisplayActivity) this).browseToRoot();
-                        EventBus.getDefault().post(new ChangeMenuEvent());
-                    }
+                showFiles(false);
+                if ((this instanceof FileDisplayActivity) &&
+                    !(((FileDisplayActivity) this).getListOfFilesFragment() instanceof PhotoFragment)) {
+                    ((FileDisplayActivity) this).browseToRoot();
+                    EventBus.getDefault().post(new ChangeMenuEvent());
                 } else {
-                    showFiles(false);
                     Intent intent = new Intent(getApplicationContext(), FileDisplayActivity.class);
-                    intent.putExtra(FileDisplayActivity.DRAWER_MENU_ID, menuItem.getItemId());
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.setAction(FileDisplayActivity.ALL_FILES);
+                    intent.putExtra(FileDisplayActivity.DRAWER_MENU_ID, menuItem.getItemId());
                     startActivity(intent);
                 }
-
                 break;
             case R.id.nav_favorites:
                 handleSearchEvents(new SearchEvent("", SearchRemoteOperation.SearchType.FAVORITE_SEARCH),
@@ -514,14 +508,18 @@ public abstract class DrawerActivity extends ToolbarActivity
                 break;
 
             case R.id.drawer_menu_account_manage:
-                Intent manageAccountsIntent = new Intent(getApplicationContext(), ManageAccountsActivity.class);
-                startActivityForResult(manageAccountsIntent, ACTION_MANAGE_ACCOUNTS);
+                openManageAccounts();
                 break;
 
             default:
                 accountClicked(menuItem.getItemId());
                 break;
         }
+    }
+
+    public void openManageAccounts() {
+        Intent manageAccountsIntent = new Intent(getApplicationContext(), ManageAccountsActivity.class);
+        startActivityForResult(manageAccountsIntent, ACTION_MANAGE_ACCOUNTS);
     }
 
     private void startPhotoSearch(MenuItem menuItem) {
@@ -773,17 +771,12 @@ public abstract class DrawerActivity extends ToolbarActivity
         super.updateActionBarTitleAndHomeButton(chosenFile);
 
         // set home button properties
-        if (mDrawerToggle != null && chosenFile != null) {
-            if (isRoot(chosenFile)) {
+        if (mDrawerToggle != null) {
+            if (chosenFile != null && isRoot(chosenFile)) {
                 mDrawerToggle.setDrawerIndicatorEnabled(true);
             } else {
                 mDrawerToggle.setDrawerIndicatorEnabled(false);
-                Drawable upArrow = getResources().getDrawable(R.drawable.ic_arrow_back);
-                upArrow.setColorFilter(ThemeUtils.fontColor(this), PorterDuff.Mode.SRC_ATOP);
-                mDrawerToggle.setHomeAsUpIndicator(upArrow);
             }
-        } else if (mDrawerToggle != null) {
-            mDrawerToggle.setDrawerIndicatorEnabled(false);
         }
     }
 
@@ -995,7 +988,7 @@ public abstract class DrawerActivity extends ToolbarActivity
                     }
                     menuItem.setTitle(Html.fromHtml(
                         "<font color='"
-                            + ThemeUtils.colorToHexString(ContextCompat.getColor(this, R.color.text_color))
+                            + ThemeUtils.colorToHexString(ContextCompat.getColor(this, R.color.drawer_text_color))
                             + "'>" + menuItem.getTitle()
                             + "</font>"));
                 }
@@ -1371,22 +1364,28 @@ public abstract class DrawerActivity extends ToolbarActivity
     @Override
     public void avatarGenerated(Drawable avatarDrawable, Object callContext) {
         if (callContext instanceof MenuItem) {
-            MenuItem mi = (MenuItem) callContext;
-            mi.setIcon(avatarDrawable);
+            MenuItem menuItem = (MenuItem) callContext;
+            menuItem.setIcon(avatarDrawable);
         } else if (callContext instanceof ImageView) {
-            ImageView iv = (ImageView) callContext;
-            iv.setImageDrawable(avatarDrawable);
+            ImageView imageView = (ImageView) callContext;
+            imageView.setImageDrawable(avatarDrawable);
+        } else if (callContext instanceof MaterialButton) {
+            MaterialButton materialButton = (MaterialButton) callContext;
+            materialButton.setIcon(avatarDrawable);
         }
     }
 
     @Override
     public boolean shouldCallGeneratedCallback(String tag, Object callContext) {
         if (callContext instanceof MenuItem) {
-            MenuItem mi = (MenuItem) callContext;
-            return String.valueOf(mi.getTitle()).equals(tag);
+            MenuItem menuItem = (MenuItem) callContext;
+            return String.valueOf(menuItem.getTitle()).equals(tag);
         } else if (callContext instanceof ImageView) {
-            ImageView iv = (ImageView) callContext;
-            return String.valueOf(iv.getTag()).equals(tag);
+            ImageView imageView = (ImageView) callContext;
+            return String.valueOf(imageView.getTag()).equals(tag);
+        } else if (callContext instanceof MaterialButton) {
+            MaterialButton materialButton = (MaterialButton) callContext;
+            return String.valueOf(materialButton.getTag()).equals(tag);
         }
         return false;
     }

@@ -5,6 +5,7 @@
  * @author Tobias Kaminsky
  * Copyright (C) 2020 Tobias Kaminsky
  * Copyright (C) 2020 Nextcloud GmbH
+ * Copyright (C) 2020 Chris Narkiewicz <hello@ezaquarii.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,10 +22,11 @@
  */
 package com.owncloud.android.files.services
 
-import com.evernote.android.job.JobRequest
 import com.nextcloud.client.account.UserAccountManager
 import com.nextcloud.client.account.UserAccountManagerImpl
+import com.nextcloud.client.device.BatteryStatus
 import com.nextcloud.client.device.PowerManagementService
+import com.nextcloud.client.network.Connectivity
 import com.nextcloud.client.network.ConnectivityService
 import com.owncloud.android.AbstractIT
 import com.owncloud.android.datamodel.OCFile
@@ -42,23 +44,11 @@ import org.junit.Test
 import java.io.File
 
 class FileUploaderIT : AbstractIT() {
-    val SHORT_WAIT: Long = 5000
-    val LONG_WAIT: Long = 20000
-
     var uploadsStorageManager: UploadsStorageManager? = null
 
     val connectivityServiceMock: ConnectivityService = object : ConnectivityService {
-        override fun isInternetWalled(): Boolean {
-            return false
-        }
-
-        override fun isOnlineWithWifi(): Boolean {
-            return true
-        }
-
-        override fun getActiveNetworkType(): JobRequest.NetworkType {
-            return JobRequest.NetworkType.ANY
-        }
+        override fun isInternetWalled(): Boolean = false
+        override fun getConnectivity(): Connectivity = Connectivity.CONNECTED_WIFI
     }
 
     private val powerManagementServiceMock: PowerManagementService = object : PowerManagementService {
@@ -68,8 +58,8 @@ class FileUploaderIT : AbstractIT() {
         override val isPowerSavingExclusionAvailable: Boolean
             get() = false
 
-        override val isBatteryCharging: Boolean
-            get() = false
+        override val battery: BatteryStatus
+            get() = BatteryStatus()
     }
 
     @Before
@@ -149,7 +139,7 @@ class FileUploaderIT : AbstractIT() {
             false,
             FileUploader.NameCollisionPolicy.DEFAULT)
 
-        Thread.sleep(LONG_WAIT)
+        longSleep()
 
         val result = ReadFileRemoteOperation("/testFile.txt").execute(client)
         assertTrue(result.isSuccess)
@@ -166,7 +156,7 @@ class FileUploaderIT : AbstractIT() {
             FileUploader.LOCAL_BEHAVIOUR_COPY,
             FileUploader.NameCollisionPolicy.OVERWRITE)
 
-        Thread.sleep(SHORT_WAIT)
+        shortSleep()
 
         val result2 = ReadFileRemoteOperation("/testFile.txt").execute(client)
         assertTrue(result2.isSuccess)
@@ -256,7 +246,7 @@ class FileUploaderIT : AbstractIT() {
             false,
             FileUploader.NameCollisionPolicy.DEFAULT)
 
-        Thread.sleep(LONG_WAIT)
+        longSleep()
 
         val result = ReadFileRemoteOperation("/testFile.txt").execute(client)
         assertTrue(result.isSuccess)
@@ -273,7 +263,7 @@ class FileUploaderIT : AbstractIT() {
             FileUploader.LOCAL_BEHAVIOUR_COPY,
             FileUploader.NameCollisionPolicy.RENAME)
 
-        Thread.sleep(SHORT_WAIT)
+        shortSleep()
 
         val result2 = ReadFileRemoteOperation("/testFile.txt").execute(client)
         assertTrue(result2.isSuccess)
@@ -356,7 +346,7 @@ class FileUploaderIT : AbstractIT() {
             false,
             FileUploader.NameCollisionPolicy.DEFAULT)
 
-        Thread.sleep(LONG_WAIT)
+        longSleep()
 
         val result = ReadFileRemoteOperation("/testFile.txt").execute(client)
         assertTrue(result.isSuccess)
@@ -373,7 +363,7 @@ class FileUploaderIT : AbstractIT() {
             FileUploader.LOCAL_BEHAVIOUR_COPY,
             FileUploader.NameCollisionPolicy.CANCEL)
 
-        Thread.sleep(SHORT_WAIT)
+        shortSleep()
 
         val result2 = ReadFileRemoteOperation("/testFile.txt").execute(client)
         assertTrue(result2.isSuccess)

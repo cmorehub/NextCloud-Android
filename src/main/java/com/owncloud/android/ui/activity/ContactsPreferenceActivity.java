@@ -22,28 +22,18 @@
  */
 package com.owncloud.android.ui.activity;
 
-import android.accounts.Account;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.evernote.android.job.JobManager;
-import com.evernote.android.job.JobRequest;
-import com.evernote.android.job.util.support.PersistableBundleCompat;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.jobs.BackgroundJobManager;
-import com.owncloud.android.MainApp;
 import com.owncloud.android.R;
 import com.owncloud.android.datamodel.OCFile;
-import com.owncloud.android.jobs.ContactsBackupJob;
-import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.ui.fragment.FileFragment;
 import com.owncloud.android.ui.fragment.contactsbackup.ContactListFragment;
 import com.owncloud.android.ui.fragment.contactsbackup.ContactsBackupFragment;
 
 import org.parceler.Parcels;
-
-import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -56,6 +46,7 @@ import androidx.fragment.app.FragmentTransaction;
  */
 public class ContactsPreferenceActivity extends FileActivity implements FileFragment.ContainerActivity {
     public static final String TAG = ContactsPreferenceActivity.class.getSimpleName();
+
 
     public static final String PREFERENCE_CONTACTS_AUTOMATIC_BACKUP = "PREFERENCE_CONTACTS_AUTOMATIC_BACKUP";
     public static final String PREFERENCE_CONTACTS_LAST_BACKUP = "PREFERENCE_CONTACTS_LAST_BACKUP";
@@ -94,7 +85,7 @@ public class ContactsPreferenceActivity extends FileActivity implements FileFrag
         if (savedInstanceState == null) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             if (intent == null || intent.getParcelableExtra(ContactListFragment.FILE_NAME) == null ||
-                    intent.getParcelableExtra(ContactListFragment.ACCOUNT) == null) {
+                    intent.getParcelableExtra(ContactListFragment.USER) == null) {
                 ContactsBackupFragment fragment = new ContactsBackupFragment();
                 Bundle bundle = new Bundle();
                 bundle.putBoolean(EXTRA_SHOW_SIDEBAR, showSidebar);
@@ -102,8 +93,8 @@ public class ContactsPreferenceActivity extends FileActivity implements FileFrag
                 transaction.add(R.id.frame_container, fragment);
             } else {
                 OCFile file = Parcels.unwrap(intent.getParcelableExtra(ContactListFragment.FILE_NAME));
-                Account account = Parcels.unwrap(intent.getParcelableExtra(ContactListFragment.ACCOUNT));
-                ContactListFragment contactListFragment = ContactListFragment.newInstance(file, account);
+                User user = Parcels.unwrap(intent.getParcelableExtra(ContactListFragment.USER));
+                ContactListFragment contactListFragment = ContactListFragment.newInstance(file, user);
                 transaction.add(R.id.frame_container, contactListFragment);
             }
             transaction.commit();

@@ -28,7 +28,6 @@ import android.content.IntentFilter;
 import android.content.res.ColorStateList;
 import android.content.res.Resources.NotFoundException;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -69,8 +68,9 @@ import javax.inject.Inject;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
+import static com.owncloud.android.utils.DisplayUtils.openSortingOrderDialogFragment;
 
 public class FolderPickerActivity extends FileActivity implements FileFragment.ContainerActivity,
     OnClickListener,
@@ -147,12 +147,8 @@ public class FolderPickerActivity extends FileActivity implements FileFragment.C
             createFragments();
         }
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayShowTitleEnabled(true);
-            ThemeUtils.setColoredTitle(getSupportActionBar(), caption, this);
-        }
+        updateActionBarTitleAndHomeButtonByString(caption);
 
-        setIndeterminate(mSyncInProgress);
         // always AFTER setContentView(...) ; to work around bug in its implementation
 
         // sets message for empty list of folders
@@ -263,7 +259,7 @@ public class FolderPickerActivity extends FileActivity implements FileFragment.C
                                                                             getApplicationContext());
 
         refreshFolderOperation.execute(getAccount(), this, null, null);
-        setIndeterminate(true);
+        getListOfFilesFragment().setLoading(true);
         setBackgroundText();
     }
 
@@ -271,6 +267,8 @@ public class FolderPickerActivity extends FileActivity implements FileFragment.C
     protected void onResume() {
         super.onResume();
         Log_OC.e(TAG, "onResume() start");
+        getListOfFilesFragment().setLoading(mSyncInProgress);
+
 
         // refresh list of files
         refreshListOfFilesFragment(false);
@@ -324,14 +322,8 @@ public class FolderPickerActivity extends FileActivity implements FileFragment.C
                 break;
             }
             case R.id.action_sort: {
-                FragmentManager fm = getSupportFragmentManager();
-                FragmentTransaction ft = fm.beginTransaction();
-                ft.addToBackStack(null);
-
-                SortingOrderDialogFragment mSortingOrderDialogFragment = SortingOrderDialogFragment.newInstance(
-                    preferences.getSortOrderByFolder(getListOfFilesFragment().getCurrentFile()));
-                mSortingOrderDialogFragment.show(ft, SortingOrderDialogFragment.SORTING_ORDER_FRAGMENT);
-
+                openSortingOrderDialogFragment(getSupportFragmentManager(),
+                                               preferences.getSortOrderByFolder(getListOfFilesFragment().getCurrentFile()));
                 break;
             }
             default:
@@ -402,9 +394,7 @@ public class FolderPickerActivity extends FileActivity implements FileFragment.C
             actionBar.setDisplayHomeAsUpEnabled(!atRoot);
             actionBar.setHomeButtonEnabled(!atRoot);
 
-            Drawable backArrow = getResources().getDrawable(R.drawable.ic_arrow_back);
-
-            actionBar.setHomeAsUpIndicator(ThemeUtils.tintDrawable(backArrow, ThemeUtils.fontColor(this)));
+            ThemeUtils.tintBackButton(actionBar, this);
 
             ThemeUtils.setColoredTitle(getSupportActionBar(), atRoot ? caption : currentDir.getFileName(), this);
         }
@@ -550,7 +540,7 @@ public class FolderPickerActivity extends FileActivity implements FileFragment.C
                     DataHolderUtil.getInstance().delete(intent.getStringExtra(FileSyncAdapter.EXTRA_RESULT));
                     Log_OC.d(TAG, "Setting progress visibility to " + mSyncInProgress);
 
-                    setIndeterminate(mSyncInProgress);
+                    getListOfFilesFragment().setLoading(mSyncInProgress);
 
                     setBackgroundText();
                 }

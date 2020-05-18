@@ -59,10 +59,11 @@ public class ConflictsResolveActivityIT extends AbstractIT {
     private boolean returnCode;
 
     @Test
-    public void screenshotTextFiles() throws InterruptedException {
-        OCUpload newUpload = new OCUpload(FileStorageUtils.getSavePath(account.name) + "/nonEmpty.txt",
-                                          "/newFile.txt",
-                                          account.name);
+    public void screenshotTextFiles() {
+        OCFile newFile = new OCFile("/newFile.txt");
+        newFile.setFileLength(56000);
+        newFile.setModificationTimestamp(1522019340);
+        newFile.setStoragePath(FileStorageUtils.getSavePath(account.name) + "/nonEmpty.txt");
 
         OCFile existingFile = new OCFile("/newFile.txt");
         existingFile.setFileLength(1024000);
@@ -72,13 +73,13 @@ public class ConflictsResolveActivityIT extends AbstractIT {
         storageManager.saveNewFile(existingFile);
 
         Intent intent = new Intent(targetContext, ConflictsResolveActivity.class);
-        intent.putExtra(ConflictsResolveActivity.EXTRA_FILE, existingFile);
-        intent.putExtra(ConflictsResolveActivity.EXTRA_CONFLICT_UPLOAD, newUpload);
+        intent.putExtra(ConflictsResolveActivity.EXTRA_FILE, newFile);
+        intent.putExtra(ConflictsResolveActivity.EXTRA_EXISTING_FILE, existingFile);
 
         ConflictsResolveActivity sut = activityRule.launchActivity(intent);
 
         ConflictsResolveDialog dialog = ConflictsResolveDialog.newInstance(existingFile,
-                                                                           newUpload,
+                                                                           newFile,
                                                                            UserAccountManagerImpl
                                                                                .fromContext(targetContext)
                                                                                .getUser()
@@ -87,18 +88,20 @@ public class ConflictsResolveActivityIT extends AbstractIT {
 
         getInstrumentation().waitForIdleSync();
 
-        Thread.sleep(2000);
+        shortSleep();
 
         Screenshot.snap(dialog.getDialog().getWindow().getDecorView()).record();
     }
 
     @Test
-    public void screenshotImages() throws InterruptedException, IOException {
+    public void screenshotImages() throws IOException {
         FileDataStorageManager storageManager = new FileDataStorageManager(account,
                                                                            targetContext.getContentResolver());
 
-        OCUpload newUpload = new OCUpload(FileStorageUtils.getSavePath(account.name) + "/nonEmpty.txt",
-                                          "/newFile.txt", account.name);
+        OCFile newFile = new OCFile("/newFile.txt");
+        newFile.setFileLength(56000);
+        newFile.setModificationTimestamp(1522019340);
+        newFile.setStoragePath(FileStorageUtils.getSavePath(account.name) + "/nonEmpty.txt");
 
         File image = getFile("image.jpg");
 
@@ -119,8 +122,8 @@ public class ConflictsResolveActivityIT extends AbstractIT {
         OCFile existingFile = storageManager.getFileByPath("/image.jpg");
 
         Intent intent = new Intent(targetContext, ConflictsResolveActivity.class);
-        intent.putExtra(ConflictsResolveActivity.EXTRA_FILE, existingFile);
-        intent.putExtra(ConflictsResolveActivity.EXTRA_CONFLICT_UPLOAD, newUpload);
+        intent.putExtra(ConflictsResolveActivity.EXTRA_FILE, newFile);
+        intent.putExtra(ConflictsResolveActivity.EXTRA_EXISTING_FILE, existingFile);
 
         ConflictsResolveActivity sut = activityRule.launchActivity(intent);
 
@@ -129,7 +132,7 @@ public class ConflictsResolveActivityIT extends AbstractIT {
         };
 
         ConflictsResolveDialog dialog = ConflictsResolveDialog.newInstance(existingFile,
-                                                                           newUpload,
+                                                                           newFile,
                                                                            UserAccountManagerImpl
                                                                                .fromContext(targetContext)
                                                                                .getUser()
@@ -138,27 +141,34 @@ public class ConflictsResolveActivityIT extends AbstractIT {
         dialog.listener = listener;
 
         getInstrumentation().waitForIdleSync();
-        Thread.sleep(2000);
+        shortSleep();
 
         Screenshot.snap(dialog.getDialog().getWindow().getDecorView()).record();
     }
 
     @Test
-    public void cancel() throws InterruptedException {
+    public void cancel() {
         returnCode = false;
 
         OCUpload newUpload = new OCUpload(FileStorageUtils.getSavePath(account.name) + "/nonEmpty.txt",
                                           "/newFile.txt",
                                           account.name);
+
         OCFile existingFile = new OCFile("/newFile.txt");
         existingFile.setFileLength(1024000);
         existingFile.setModificationTimestamp(1582019340);
+
+        OCFile newFile = new OCFile("/newFile.txt");
+        newFile.setFileLength(56000);
+        newFile.setModificationTimestamp(1522019340);
+        newFile.setStoragePath(FileStorageUtils.getSavePath(account.name) + "/nonEmpty.txt");
 
         FileDataStorageManager storageManager = new FileDataStorageManager(account, targetContext.getContentResolver());
         storageManager.saveNewFile(existingFile);
 
         Intent intent = new Intent(targetContext, ConflictsResolveActivity.class);
-        intent.putExtra(ConflictsResolveActivity.EXTRA_FILE, existingFile);
+        intent.putExtra(ConflictsResolveActivity.EXTRA_FILE, newFile);
+        intent.putExtra(ConflictsResolveActivity.EXTRA_EXISTING_FILE, existingFile);
         intent.putExtra(ConflictsResolveActivity.EXTRA_CONFLICT_UPLOAD, newUpload);
 
         ConflictsResolveActivity sut = activityRule.launchActivity(intent);
@@ -169,7 +179,7 @@ public class ConflictsResolveActivityIT extends AbstractIT {
         };
 
         getInstrumentation().waitForIdleSync();
-        Thread.sleep(2000);
+        shortSleep();
 
         onView(withText("Cancel")).perform(click());
 
@@ -183,15 +193,22 @@ public class ConflictsResolveActivityIT extends AbstractIT {
         OCUpload newUpload = new OCUpload(FileStorageUtils.getSavePath(account.name) + "/nonEmpty.txt",
                                           "/newFile.txt",
                                           account.name);
+
         OCFile existingFile = new OCFile("/newFile.txt");
         existingFile.setFileLength(1024000);
         existingFile.setModificationTimestamp(1582019340);
+
+        OCFile newFile = new OCFile("/newFile.txt");
+        newFile.setFileLength(56000);
+        newFile.setModificationTimestamp(1522019340);
+        newFile.setStoragePath(FileStorageUtils.getSavePath(account.name) + "/nonEmpty.txt");
 
         FileDataStorageManager storageManager = new FileDataStorageManager(account, targetContext.getContentResolver());
         storageManager.saveNewFile(existingFile);
 
         Intent intent = new Intent(targetContext, ConflictsResolveActivity.class);
-        intent.putExtra(ConflictsResolveActivity.EXTRA_FILE, existingFile);
+        intent.putExtra(ConflictsResolveActivity.EXTRA_FILE, newFile);
+        intent.putExtra(ConflictsResolveActivity.EXTRA_EXISTING_FILE, existingFile);
         intent.putExtra(ConflictsResolveActivity.EXTRA_CONFLICT_UPLOAD, newUpload);
 
         ConflictsResolveActivity sut = activityRule.launchActivity(intent);
@@ -220,21 +237,28 @@ public class ConflictsResolveActivityIT extends AbstractIT {
         OCUpload newUpload = new OCUpload(FileStorageUtils.getSavePath(account.name) + "/nonEmpty.txt",
                                           "/newFile.txt",
                                           account.name);
+
         OCFile existingFile = new OCFile("/newFile.txt");
         existingFile.setFileLength(1024000);
         existingFile.setModificationTimestamp(1582019340);
+
+        OCFile newFile = new OCFile("/newFile.txt");
+        newFile.setFileLength(56000);
+        newFile.setModificationTimestamp(1522019340);
+        newFile.setStoragePath(FileStorageUtils.getSavePath(account.name) + "/nonEmpty.txt");
 
         FileDataStorageManager storageManager = new FileDataStorageManager(account, targetContext.getContentResolver());
         storageManager.saveNewFile(existingFile);
 
         Intent intent = new Intent(targetContext, ConflictsResolveActivity.class);
-        intent.putExtra(ConflictsResolveActivity.EXTRA_FILE, existingFile);
+        intent.putExtra(ConflictsResolveActivity.EXTRA_FILE, newFile);
+        intent.putExtra(ConflictsResolveActivity.EXTRA_EXISTING_FILE, existingFile);
         intent.putExtra(ConflictsResolveActivity.EXTRA_CONFLICT_UPLOAD, newUpload);
 
         ConflictsResolveActivity sut = activityRule.launchActivity(intent);
 
         sut.listener = decision -> {
-            assertEquals(decision, ConflictsResolveDialog.Decision.KEEP_SERVER);
+            assertEquals(decision, ConflictsResolveDialog.Decision.KEEP_LOCAL);
             returnCode = true;
         };
 
@@ -257,21 +281,28 @@ public class ConflictsResolveActivityIT extends AbstractIT {
         OCUpload newUpload = new OCUpload(FileStorageUtils.getSavePath(account.name) + "/nonEmpty.txt",
                                           "/newFile.txt",
                                           account.name);
+
         OCFile existingFile = new OCFile("/newFile.txt");
         existingFile.setFileLength(1024000);
         existingFile.setModificationTimestamp(1582019340);
+
+        OCFile newFile = new OCFile("/newFile.txt");
+        newFile.setFileLength(56000);
+        newFile.setModificationTimestamp(1522019340);
+        newFile.setStoragePath(FileStorageUtils.getSavePath(account.name) + "/nonEmpty.txt");
 
         FileDataStorageManager storageManager = new FileDataStorageManager(account, targetContext.getContentResolver());
         storageManager.saveNewFile(existingFile);
 
         Intent intent = new Intent(targetContext, ConflictsResolveActivity.class);
-        intent.putExtra(ConflictsResolveActivity.EXTRA_FILE, existingFile);
+        intent.putExtra(ConflictsResolveActivity.EXTRA_FILE, newFile);
+        intent.putExtra(ConflictsResolveActivity.EXTRA_EXISTING_FILE, existingFile);
         intent.putExtra(ConflictsResolveActivity.EXTRA_CONFLICT_UPLOAD, newUpload);
 
         ConflictsResolveActivity sut = activityRule.launchActivity(intent);
 
         sut.listener = decision -> {
-            assertEquals(decision, ConflictsResolveDialog.Decision.KEEP_SERVER);
+            assertEquals(decision, ConflictsResolveDialog.Decision.KEEP_BOTH);
             returnCode = true;
         };
 

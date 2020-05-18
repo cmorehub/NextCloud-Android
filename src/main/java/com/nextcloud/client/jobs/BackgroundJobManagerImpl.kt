@@ -29,6 +29,7 @@ import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.ListenableWorker
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.Operation
 import androidx.work.PeriodicWorkRequest
@@ -66,6 +67,15 @@ internal class BackgroundJobManagerImpl(
         const val JOB_CONTENT_OBSERVER = "content_observer"
         const val JOB_PERIODIC_CONTACTS_BACKUP = "periodic_contacts_backup"
         const val JOB_IMMEDIATE_CONTACTS_BACKUP = "immediate_contacts_backup"
+        const val JOB_IMMEDIATE_CONTACTS_IMPORT = "immediate_contacts_import"
+        const val JOB_PERIODIC_FILES_SYNC = "periodic_files_sync"
+        const val JOB_IMMEDIATE_FILES_SYNC = "immediate_files_sync"
+        const val JOB_PERIODIC_OFFLINE_SYNC = "periodic_offline_sync"
+        const val JOB_PERIODIC_MEDIA_FOLDER_DETECTION = "periodic_media_folder_detection"
+        const val JOB_IMMEDIATE_MEDIA_FOLDER_DETECTION = "immediate_media_folder_detection"
+        const val JOB_NOTIFICATION = "notification"
+        const val JOB_ACCOUNT_REMOVAL = "account_removal"
+
         const val JOB_TEST = "test_job"
 
         const val MAX_CONTENT_TRIGGER_DELAY_MS = 1500L
@@ -80,6 +90,7 @@ internal class BackgroundJobManagerImpl(
         const val INTERVAL_MINUTE = 60L * INTERVAL_SECOND
         const val INTERVAL_HOUR = 60 * INTERVAL_MINUTE
         const val INTERVAL_24H = 24L * INTERVAL_HOUR
+        const val DEFAULT_IMMEDIATE_JOB_DELAY_SEC = 3L
 
         fun formatNameTag(name: String, user: User? = null): String {
             return if (user == null) {
@@ -156,9 +167,16 @@ internal class BackgroundJobManagerImpl(
         jobClass: KClass<out ListenableWorker>,
         jobName: String,
         intervalMins: Long = DEFAULT_PERIODIC_JOB_INTERVAL_MINUTES,
+        flexIntervalMins: Long = DEFAULT_PERIODIC_JOB_INTERVAL_MINUTES,
         user: User? = null
     ): PeriodicWorkRequest.Builder {
-        val builder = PeriodicWorkRequest.Builder(jobClass.java, intervalMins, TimeUnit.MINUTES)
+        val builder = PeriodicWorkRequest.Builder(
+            jobClass.java,
+            intervalMins,
+            TimeUnit.MINUTES,
+            flexIntervalMins,
+            TimeUnit.MINUTES
+        )
             .addTag(TAG_ALL)
             .addTag(formatNameTag(jobName, user))
             .addTag(formatTimeTag(clock.currentTime))
@@ -202,7 +220,7 @@ internal class BackgroundJobManagerImpl(
             .setConstraints(constrains)
             .build()
 
-        workManager.enqueueUniqueWork(JOB_CONTENT_OBSERVER, ExistingWorkPolicy.KEEP, request)
+        workManager.enqueueUniqueWork(JOB_CONTENT_OBSERVER, ExistingWorkPolicy.REPLACE, request)
     }
 
     override fun schedulePeriodicContactsBackup(user: User) {
@@ -210,12 +228,11 @@ internal class BackgroundJobManagerImpl(
             .putString(ContactsBackupWork.ACCOUNT, user.accountName)
             .putBoolean(ContactsBackupWork.FORCE, true)
             .build()
-
         val request = periodicRequestBuilder(
-            ContactsBackupWork::class,
-            JOB_PERIODIC_CONTACTS_BACKUP,
-            INTERVAL_24H,
-            user
+            jobClass = ContactsBackupWork::class,
+            jobName = JOB_PERIODIC_CONTACTS_BACKUP,
+            intervalMins = INTERVAL_24H,
+            user = user
         ).setInputData(data).build()
 
         workManager.enqueueUniquePeriodicWork(JOB_PERIODIC_CONTACTS_BACKUP, ExistingPeriodicWorkPolicy.KEEP, request)
@@ -223,6 +240,34 @@ internal class BackgroundJobManagerImpl(
 
     override fun cancelPeriodicContactsBackup(user: User) {
         workManager.cancelJob(JOB_PERIODIC_CONTACTS_BACKUP, user)
+    }
+
+    override fun startImmediateContactsImport(
+        contactsAccountName: String?,
+        contactsAccountType: String?,
+        vCardFilePath: String,
+        selectedContacts: IntArray
+    ): LiveData<JobInfo?> {
+
+        val data = Data.Builder()
+            .putString(ContactsImportWork.ACCOUNT_NAME, contactsAccountName)
+            .putString(ContactsImportWork.ACCOUNT_TYPE, contactsAccountType)
+            .putString(ContactsImportWork.VCARD_FILE_PATH, vCardFilePath)
+            .putIntArray(ContactsImportWork.SELECTED_CONTACTS_INDICES, selectedContacts)
+            .build()
+
+        val constraints = Constraints.Builder()
+            .setRequiresCharging(false)
+            .build()
+
+        val request = oneTimeRequestBuilder(ContactsImportWork::class, JOB_IMMEDIATE_CONTACTS_IMPORT)
+            .setInputData(data)
+            .setConstraints(constraints)
+            .build()
+
+        workManager.enqueueUniqueWork(JOB_IMMEDIATE_CONTACTS_IMPORT, ExistingWorkPolicy.KEEP, request)
+
+        return workManager.getJobInfo(request.id)
     }
 
     override fun startImmediateContactsBackup(user: User): LiveData<JobInfo?> {
@@ -239,10 +284,100 @@ internal class BackgroundJobManagerImpl(
         return workManager.getJobInfo(request.id)
     }
 
+    override fun schedulePeriodicFilesSyncJob() {
+        val request = periodicRequestBuilder(
+            jobClass = FilesSyncWork::class,
+            jobName = JOB_PERIODIC_FILES_SYNC,
+            intervalMins = DEFAULT_PERIODIC_JOB_INTERVAL_MINUTES).build()
+        workManager.enqueueUniquePeriodicWork(JOB_PERIODIC_FILES_SYNC, ExistingPeriodicWorkPolicy.REPLACE, request)
+    }
+
+    override fun startImmediateFilesSyncJob(skipCustomFolders: Boolean, overridePowerSaving: Boolean) {
+        val arguments = Data.Builder()
+            .putBoolean(FilesSyncWork.SKIP_CUSTOM, skipCustomFolders)
+            .putBoolean(FilesSyncWork.OVERRIDE_POWER_SAVING, overridePowerSaving)
+            .build()
+
+        val request = oneTimeRequestBuilder(
+            jobClass = FilesSyncWork::class,
+            jobName = JOB_IMMEDIATE_FILES_SYNC)
+            .setInputData(arguments)
+            .build()
+
+        workManager.enqueueUniqueWork(JOB_IMMEDIATE_FILES_SYNC, ExistingWorkPolicy.KEEP, request)
+    }
+
+    override fun scheduleOfflineSync() {
+        val constrains = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.UNMETERED)
+            .build()
+
+        val request = periodicRequestBuilder(OfflineSyncWork::class, JOB_PERIODIC_OFFLINE_SYNC)
+            .setConstraints(constrains)
+            .build()
+
+        workManager.enqueueUniquePeriodicWork(JOB_PERIODIC_OFFLINE_SYNC, ExistingPeriodicWorkPolicy.KEEP, request)
+    }
+
+    override fun scheduleMediaFoldersDetectionJob() {
+        val request = periodicRequestBuilder(MediaFoldersDetectionWork::class, JOB_PERIODIC_MEDIA_FOLDER_DETECTION)
+            .build()
+
+        workManager.enqueueUniquePeriodicWork(
+            JOB_PERIODIC_MEDIA_FOLDER_DETECTION,
+            ExistingPeriodicWorkPolicy.KEEP,
+            request
+        )
+    }
+
+    override fun startMediaFoldersDetectionJob() {
+        val request = oneTimeRequestBuilder(MediaFoldersDetectionWork::class, JOB_IMMEDIATE_MEDIA_FOLDER_DETECTION)
+            .build()
+
+        workManager.enqueueUniqueWork(
+            JOB_IMMEDIATE_MEDIA_FOLDER_DETECTION,
+            ExistingWorkPolicy.KEEP,
+            request
+        )
+    }
+
+    override fun startNotificationJob(subject: String, signature: String) {
+        val data = Data.Builder()
+            .putString(NotificationWork.KEY_NOTIFICATION_SUBJECT, subject)
+            .putString(NotificationWork.KEY_NOTIFICATION_SIGNATURE, signature)
+            .build()
+
+        val request = oneTimeRequestBuilder(NotificationWork::class, JOB_NOTIFICATION)
+            .setInputData(data)
+            .build()
+
+        workManager.enqueue(request)
+    }
+
+    override fun startAccountRemovalJob(accountName: String, remoteWipe: Boolean) {
+        val data = Data.Builder()
+            .putString(AccountRemovalWork.ACCOUNT, accountName)
+            .putBoolean(AccountRemovalWork.REMOTE_WIPE, remoteWipe)
+            .build()
+
+        val request = oneTimeRequestBuilder(AccountRemovalWork::class, JOB_ACCOUNT_REMOVAL)
+            .setInputData(data)
+            .build()
+
+        workManager.enqueue(request)
+    }
+
     override fun scheduleTestJob() {
         val request = periodicRequestBuilder(TestJob::class, JOB_TEST)
+            .setInitialDelay(DEFAULT_IMMEDIATE_JOB_DELAY_SEC, TimeUnit.SECONDS)
             .build()
-        workManager.enqueueUniquePeriodicWork(JOB_TEST, ExistingPeriodicWorkPolicy.KEEP, request)
+        workManager.enqueueUniquePeriodicWork(JOB_TEST, ExistingPeriodicWorkPolicy.REPLACE, request)
+    }
+
+    override fun startImmediateTestJob() {
+        val request = oneTimeRequestBuilder(TestJob::class, JOB_TEST)
+            .build()
+        workManager.enqueueUniqueWork(JOB_TEST, ExistingWorkPolicy.REPLACE, request)
     }
 
     override fun cancelTestJob() {

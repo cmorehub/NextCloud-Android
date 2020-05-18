@@ -5,6 +5,7 @@
  * @author Tobias Kaminsky
  * Copyright (C) 2020 Tobias Kaminsky
  * Copyright (C) 2020 Nextcloud GmbH
+ * Copyright (C) 2020 Chris Narkiewicz <hello@ezaquarii.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -23,10 +24,14 @@ package com.owncloud.android.ui.fragment
 
 import android.Manifest
 import androidx.test.core.app.ActivityScenario
+import androidx.test.espresso.intent.rule.IntentsTestRule
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
-import com.evernote.android.job.JobRequest
+import com.facebook.testing.screenshot.Screenshot
 import com.nextcloud.client.account.UserAccountManagerImpl
+import com.nextcloud.client.device.BatteryStatus
 import com.nextcloud.client.device.PowerManagementService
+import com.nextcloud.client.network.Connectivity
 import com.nextcloud.client.network.ConnectivityService
 import com.nextcloud.client.preferences.AppPreferences
 import com.nextcloud.client.preferences.AppPreferencesImpl
@@ -36,16 +41,30 @@ import com.owncloud.android.MainApp
 import com.owncloud.android.datamodel.UploadsStorageManager
 import com.owncloud.android.db.OCUpload
 import com.owncloud.android.files.services.FileUploader
+import com.owncloud.android.lib.resources.shares.CreateShareRemoteOperation
+import com.owncloud.android.lib.resources.shares.GetShareesRemoteOperation
+import com.owncloud.android.lib.resources.shares.OCShare
+import com.owncloud.android.lib.resources.shares.ShareType
 import com.owncloud.android.operations.CreateFolderOperation
 import com.owncloud.android.operations.RefreshFolderOperation
 import com.owncloud.android.operations.UploadFileOperation
 import com.owncloud.android.ui.activity.FileDisplayActivity
 import com.owncloud.android.utils.FileStorageUtils
-import junit.framework.Assert.assertTrue
+import junit.framework.TestCase
+import org.json.JSONObject
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
 class OCFileListFragmentIT : AbstractIT() {
+    companion object {
+        val SECOND_IN_MILLIS = 1000L
+        val RESULT_PER_PAGE = 50
+    }
+
+    @get:Rule
+    val activityRule = IntentsTestRule(FileDisplayActivity::class.java, true, false)
+
     @get:Rule
     val permissionRule = GrantPermissionRule.grant(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
@@ -54,12 +73,8 @@ class OCFileListFragmentIT : AbstractIT() {
             return false
         }
 
-        override fun isOnlineWithWifi(): Boolean {
-            return true
-        }
-
-        override fun getActiveNetworkType(): JobRequest.NetworkType {
-            return JobRequest.NetworkType.ANY
+        override fun getConnectivity(): Connectivity {
+            return Connectivity.CONNECTED_WIFI
         }
     }
 
@@ -70,8 +85,8 @@ class OCFileListFragmentIT : AbstractIT() {
         override val isPowerSavingExclusionAvailable: Boolean
             get() = false
 
-        override val isBatteryCharging: Boolean
-            get() = false
+        override val battery: BatteryStatus
+            get() = BatteryStatus()
     }
 
     @Test
@@ -92,16 +107,15 @@ class OCFileListFragmentIT : AbstractIT() {
             FileUploader.LOCAL_BEHAVIOUR_COPY,
             targetContext,
             false,
-            false
-        )
-        newUpload.addRenameUploadListener {}
+            false)
 
+        newUpload.addRenameUploadListener {}
         newUpload.setRemoteFolderToBeCreated()
 
         assertTrue(newUpload.execute(client, storageManager).isSuccess)
 
         assertTrue(RefreshFolderOperation(storageManager.getFileByPath("/test/"),
-            System.currentTimeMillis() / 1000,
+            System.currentTimeMillis() / SECOND_IN_MILLIS,
             false,
             true,
             storageManager,
@@ -111,10 +125,10 @@ class OCFileListFragmentIT : AbstractIT() {
         val sut = ActivityScenario.launch(FileDisplayActivity::class.java)
         sut.onActivity { activity -> activity.onBrowsedDownTo(storageManager.getFileByPath("/test/")) }
 
-        Thread.sleep(2000)
+        shortSleep()
 
         sut.onActivity { activity ->
-            com.facebook.testing.screenshot.Screenshot.snapActivity(activity).setName("richworkspaces_light").record()
+            Screenshot.snapActivity(activity).setName("richworkspaces_light").record()
         }
 
         val preferences: AppPreferences = AppPreferencesImpl.fromContext(targetContext)
@@ -127,10 +141,10 @@ class OCFileListFragmentIT : AbstractIT() {
 
         sut.onActivity { activity -> activity.onBrowsedDownTo(storageManager.getFileByPath("/test/")) }
 
-        Thread.sleep(2000)
+        shortSleep()
 
         sut.onActivity { activity ->
-            com.facebook.testing.screenshot.Screenshot.snapActivity(activity).setName("richworkspaces_dark").record()
+            Screenshot.snapActivity(activity).setName("richworkspaces_dark").record()
         }
 
         // switch back to light mode
@@ -140,5 +154,100 @@ class OCFileListFragmentIT : AbstractIT() {
         sut.onActivity { activity -> activity.onBackPressed() }
 
         sut.recreate()
+    }
+
+    @Test
+    fun createAndShowShareToUser() {
+        val path = "/shareToAdmin/"
+        TestCase.assertTrue(CreateFolderOperation(path, true).execute(client, storageManager).isSuccess)
+
+        // share folder to user "admin"
+        TestCase.assertTrue(CreateShareRemoteOperation(path,
+            ShareType.USER,
+            "admin",
+            false,
+            "",
+            OCShare.MAXIMUM_PERMISSIONS_FOR_FOLDER)
+            .execute(client).isSuccess)
+
+        val sut: FileDisplayActivity = activityRule.launchActivity(null)
+        sut.startSyncFolderOperation(storageManager.getFileByPath("/"), true)
+
+        shortSleep()
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+        Screenshot.snapActivity(sut).record()
+    }
+
+    @Test
+    fun createAndShowShareToGroup() {
+        val path = "/shareToGroup/"
+        TestCase.assertTrue(CreateFolderOperation(path, true).execute(client, storageManager).isSuccess)
+
+        // share folder to group
+        assertTrue(CreateShareRemoteOperation("/shareToGroup/",
+            ShareType.GROUP,
+            "users",
+            false,
+            "",
+            OCShare.DEFAULT_PERMISSION)
+            .execute(client).isSuccess)
+
+        val sut: FileDisplayActivity = activityRule.launchActivity(null)
+        sut.startSyncFolderOperation(storageManager.getFileByPath("/"), true)
+
+        shortSleep()
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+        Screenshot.snapActivity(sut).record()
+    }
+
+    @Test
+    fun createAndShowShareToCircle() {
+        val path = "/shareToCircle/"
+        TestCase.assertTrue(CreateFolderOperation(path, true).execute(client, storageManager).isSuccess)
+
+        // share folder to circle
+        // get circleId
+        val searchResult = GetShareesRemoteOperation("publicCircle", 1, RESULT_PER_PAGE).execute(client)
+        assertTrue(searchResult.logMessage, searchResult.isSuccess)
+
+        val resultJson: JSONObject = searchResult.data[0] as JSONObject
+        val circleId: String = resultJson.getJSONObject("value").getString("shareWith")
+
+        assertTrue(CreateShareRemoteOperation("/shareToCircle/",
+            ShareType.CIRCLE,
+            circleId,
+            false,
+            "",
+            OCShare.DEFAULT_PERMISSION)
+            .execute(client).isSuccess)
+
+        val sut: FileDisplayActivity = activityRule.launchActivity(null)
+        sut.startSyncFolderOperation(storageManager.getFileByPath("/"), true)
+
+        shortSleep()
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+        Screenshot.snapActivity(sut).record()
+    }
+
+    @Test
+    fun createAndShowShareViaLink() {
+        val path = "/shareViaLink/"
+        TestCase.assertTrue(CreateFolderOperation(path, true).execute(client, storageManager).isSuccess)
+
+        // share folder via public link
+        TestCase.assertTrue(CreateShareRemoteOperation("/shareViaLink/",
+            ShareType.PUBLIC_LINK,
+            "",
+            true,
+            "",
+            OCShare.READ_PERMISSION_FLAG)
+            .execute(client).isSuccess)
+
+        val sut: FileDisplayActivity = activityRule.launchActivity(null)
+        sut.startSyncFolderOperation(storageManager.getFileByPath("/"), true)
+
+        shortSleep()
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+        Screenshot.snapActivity(sut).record()
     }
 }

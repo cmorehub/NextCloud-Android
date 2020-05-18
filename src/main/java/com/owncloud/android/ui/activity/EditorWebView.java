@@ -53,7 +53,6 @@ public abstract class EditorWebView extends ExternalSiteWebView {
     protected Snackbar loadingSnackbar;
 
     protected String fileName;
-    protected String mimeType;
 
     @BindView(R.id.progressBar2)
     ProgressBar progressBar;
@@ -65,8 +64,6 @@ public abstract class EditorWebView extends ExternalSiteWebView {
     TextView fileNameTextView;
 
     private Unbinder unbinder;
-
-    private static final String TAG = EditorWebView.class.getSimpleName();
 
     protected void loadUrl(String url) {
         onUrlLoaded(url);
