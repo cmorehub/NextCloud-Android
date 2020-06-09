@@ -43,6 +43,7 @@ import com.nextcloud.client.di.Injectable;
 import com.nextcloud.client.preferences.AppPreferences;
 import com.nextcloud.qbee.ui.login.FirstLoginActivity;
 import com.nextcloud.qbee.ui.login.QBeeLoginActivity;
+import com.nextcloud.qbee.ui.login.WelcomeActivity;
 import com.owncloud.android.BuildConfig;
 import com.owncloud.android.R;
 import com.owncloud.android.authentication.AuthenticatorActivity;
@@ -135,7 +136,7 @@ public class FirstRunActivity extends BaseActivity implements ViewPager.OnPageCh
 
         if (getResources().getBoolean(R.bool.use_alternative_login)) {
 //            Intent firstLoginIntent = new Intent(this, FirstLoginActivity.class);
-            Intent firstLoginIntent = new Intent(this, QBeeLoginActivity.class);
+            Intent firstLoginIntent = new Intent(this, WelcomeActivity.class);
             startActivityForResult(firstLoginIntent, FIRST_RUN_RESULT_CODE);
         }
     }
