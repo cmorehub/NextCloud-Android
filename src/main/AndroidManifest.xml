@@ -91,6 +91,16 @@
             <!--                <category android:name="android.intent.category.LAUNCHER" />-->
             <!--            </intent-filter>-->
         </activity>
+        <activity android:name="com.nextcloud.qbee.ui.login.WelcomeActivity"></activity>
+        <activity android:name="com.nextcloud.qbee.ui.login.QBeeLoginActivity"></activity>
+        <activity android:name="com.nextcloud.qbee.ui.login.QBeeSelectConnectionActivity"></activity>
+        <activity android:name="com.nextcloud.qbee.ui.login.QBeeSignInActivity"></activity>
+        <activity android:name="com.nextcloud.qbee.ui.login.QBeeSignUpActivity"></activity>
+        <activity android:name="com.nextcloud.qbee.ui.login.QBeeSetUpStep1Activity"></activity>
+        <activity android:name="com.nextcloud.qbee.ui.login.QBeeSetUpStep2Activity"></activity>
+        <activity android:name="com.nextcloud.qbee.ui.login.QBeeSetUpStep3Activity"></activity>
+        <activity android:name="com.nextcloud.qbee.ui.login.QBeeSetupStep4Activity"></activity>
+        <activity android:name="com.nextcloud.qbee.ui.login.QBeeSetupStep5Activity"></activity>
 
         <uses-library
             android:name="org.apache.http.legacy"

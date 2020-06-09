@@ -101,6 +101,7 @@ import com.nextcloud.client.onboarding.FirstRunActivity;
 import com.nextcloud.client.onboarding.OnboardingService;
 import com.nextcloud.client.preferences.AppPreferences;
 import com.nextcloud.qbee.ui.login.FirstLoginActivity;
+import com.nextcloud.qbee.ui.login.QBeeLoginActivity;
 import com.owncloud.android.MainApp;
 import com.owncloud.android.R;
 import com.owncloud.android.lib.common.OwnCloudAccount;
@@ -471,18 +472,28 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
         mLoginWebView.setWebViewClient(new WebViewClient() {
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+
+                Log.d("bibby", "shouldInterceptRequest");
+
                 webViewFidoBridge.delegateShouldInterceptRequest(view, request);
+
                 return super.shouldInterceptRequest(view, request);
             }
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
+
+                Log.d("bibby", "onPageStarted > " + url);
+
                 webViewFidoBridge.delegateOnPageStarted(view, url, favicon);
             }
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
+
+                Log.d("bibby", "shouldOverrideUrlLoading > " + url);
+
                 if (url.startsWith(getString(R.string.login_data_own_scheme) + PROTOCOL_SUFFIX + "login/")) {
                     parseAndLoginFromWebView(url);
                     return true;
@@ -493,6 +504,8 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+
+                Log.d("bibby", "onPageFinished > " + url);
 
                 progressBar.setVisibility(View.GONE);
                 mLoginWebView.setVisibility(View.VISIBLE);
@@ -527,7 +540,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
         });
     }
 
-    private void parseAndLoginFromWebView(String dataString) {
+    private void   parseAndLoginFromWebView(String dataString) {
         String prefix = getString(R.string.login_data_own_scheme) + PROTOCOL_SUFFIX + "login/";
         LoginUrlInfo loginUrlInfo = parseLoginDataUrl(prefix, dataString);
 
@@ -893,13 +906,15 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Log_OC.d(TAG, "onNewIntent()");
+        Log_OC.d("bibby", "onNewIntent()");
 
         if (intent.getBooleanExtra(FirstRunActivity.EXTRA_EXIT, false)) {
             super.finish();
         }
 
         if(getResources().getBoolean(R.bool.use_alternative_login)){
-            startActivityForResult(new Intent(this,FirstLoginActivity.class),REQUEST_CODE_ALTERNATIVE_LOGIN);
+//            startActivityForResult(new Intent(this,FirstLoginActivity.class),REQUEST_CODE_ALTERNATIVE_LOGIN);
+            startActivityForResult(new Intent(this, QBeeLoginActivity.class), REQUEST_CODE_ALTERNATIVE_LOGIN);
             return;
         }
 
