@@ -90,8 +90,8 @@ class FirstLoginActivity : AppCompatActivity() {
 //                loginViewModel.login(username.text.toString(), password.text.toString())
                 Thread{
                     val url = Uri.parse("http://iottalk.cmoremap.com.tw:6325")
-                    val loginName: String = "iottalk"
-                    val password: String = "97497929"
+                    val loginName: String = "askey"
+                    val password: String = "askeyqbee"
 
                     val accountManager = AccountManager.get(this@FirstLoginActivity)
                     val accountName = AccountUtils.buildAccountName(url, loginName)

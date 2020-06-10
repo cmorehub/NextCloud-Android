@@ -86,7 +86,7 @@ repositories {
 // semantic versioning for version code
 def versionMajor = 3
 def versionMinor = 10
-def versionPatch = 1
+def versionPatch = 2
 def versionBuild = 90 // 0-50=Alpha / 51-98=RC / 90-99=stable
 
 for (TaskExecutionRequest tr : getGradle().getStartParameter().getTaskRequests()) {
@@ -105,7 +105,7 @@ spotbugs {
 }
 
 shot {
-    appId = 'com.nextcloud.client'
+    appId = 'com.askey.qbee.m'
     instrumentationTestTask = 'connectedGenericDebugAndroidTest'
 }
 
@@ -115,12 +115,12 @@ android {
         htmlReport true
         htmlOutput file("$project.buildDir/reports/lint/lint.html")
         disable 'MissingTranslation',
-                'GradleDependency',
-                'VectorPath',
-                'IconMissingDensityFolder',
-                'IconDensities',
-                'GoogleAppIndexingWarning',
-                'MissingDefaultResource'
+            'GradleDependency',
+            'VectorPath',
+            'IconMissingDensityFolder',
+            'IconDensities',
+            'GoogleAppIndexingWarning',
+            'MissingDefaultResource'
     }
 
     dexOptions {
@@ -166,24 +166,24 @@ android {
         productFlavors {
             // used for f-droid
             generic {
-                applicationId 'com.nextcloud.client'
+                applicationId 'com.askey.qbee.m'
                 dimension "default"
             }
 
             gplay {
-                applicationId 'com.nextcloud.client'
+                applicationId 'com.askey.qbee.m'
                 dimension "default"
             }
 
             versionDev {
-                applicationId "com.nextcloud.android.beta"
+                applicationId "ccom.askey.qbee.m.beta"
                 dimension "default"
                 versionCode 20200108
                 versionName "20200108"
             }
 
             qa {
-                applicationId "com.nextcloud.android.qa"
+                applicationId "com.askey.qbee.m.qa"
                 dimension "default"
                 versionCode 1
                 versionName "1"
@@ -193,6 +193,16 @@ android {
         testOptions {
             unitTests.returnDefaultValues = true
             execution 'ANDROIDX_TEST_ORCHESTRATOR'
+        }
+
+        sourceSets {
+            main {
+                jniLibs.srcDirs = ['libs']
+            }
+        }
+
+        ndk {
+            abiFilters "armeabi","armeabi-v7a","arm64-v8a","x86","x86_64"
         }
     }
 
@@ -339,7 +349,7 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:1.18.10"
 
     ktlint "com.pinterest:ktlint:0.36.0"
-    implementation 'org.conscrypt:conscrypt-android:2.2.1'
+    implementation 'org.conscrypt:conscrypt-android:2.4.0'
 
     // dependencies for markdown rendering
     implementation "io.noties.markwon:core:$markwonVersion"
@@ -425,7 +435,7 @@ tasks.register("combinedTestReport", JacocoReport) {
     sourceDirectories = files([mainSrc])
     classDirectories = files([debugTree])
     executionData = fileTree(dir: project.buildDir, includes: [
-            'jacoco/testGplayDebugUnitTest.exec', 'outputs/code-coverage/connected/flavors/GPLAY/*coverage.ec'
+        'jacoco/testGplayDebugUnitTest.exec', 'outputs/code-coverage/connected/flavors/GPLAY/*coverage.ec'
     ])
 }
 
