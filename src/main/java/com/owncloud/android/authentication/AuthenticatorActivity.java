@@ -102,7 +102,6 @@ import com.nextcloud.client.onboarding.OnboardingService;
 import com.nextcloud.client.preferences.AppPreferences;
 import com.nextcloud.qbee.ui.login.FirstLoginActivity;
 import com.nextcloud.qbee.ui.login.QBeeLoginActivity;
-import com.nextcloud.qbee.ui.login.WelcomeActivity;
 import com.owncloud.android.MainApp;
 import com.owncloud.android.R;
 import com.owncloud.android.lib.common.OwnCloudAccount;
@@ -915,7 +914,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
 
         if(getResources().getBoolean(R.bool.use_alternative_login)){
 //            startActivityForResult(new Intent(this,FirstLoginActivity.class),REQUEST_CODE_ALTERNATIVE_LOGIN);
-            startActivityForResult(new Intent(this, WelcomeActivity.class), REQUEST_CODE_ALTERNATIVE_LOGIN);
+            startActivityForResult(new Intent(this, QBeeLoginActivity.class), REQUEST_CODE_ALTERNATIVE_LOGIN);
             return;
         }
 
