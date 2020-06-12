@@ -42,6 +42,7 @@ import com.nextcloud.client.appinfo.AppInfo;
 import com.nextcloud.client.di.Injectable;
 import com.nextcloud.client.preferences.AppPreferences;
 import com.nextcloud.qbee.ui.login.FirstLoginActivity;
+import com.nextcloud.qbee.ui.login.WelcomeActivity;
 import com.owncloud.android.BuildConfig;
 import com.owncloud.android.R;
 import com.owncloud.android.authentication.AuthenticatorActivity;
@@ -90,7 +91,7 @@ public class FirstRunActivity extends BaseActivity implements ViewPager.OnPageCh
         loginButton.setOnClickListener(v -> {
             if (getIntent().getBooleanExtra(EXTRA_ALLOW_CLOSE, false)) {
 //                Intent authenticatorActivityIntent = new Intent(this, AuthenticatorActivity.class);
-                Intent firstLoginIntent = new Intent(this, FirstLoginActivity.class);
+                Intent firstLoginIntent = new Intent(this, WelcomeActivity.class);
 //                authenticatorActivityIntent.putExtra(AuthenticatorActivity.EXTRA_USE_PROVIDER_AS_WEBLOGIN, false);
                 startActivityForResult(firstLoginIntent, FIRST_RUN_RESULT_CODE);
             } else {
@@ -133,7 +134,7 @@ public class FirstRunActivity extends BaseActivity implements ViewPager.OnPageCh
         viewPager.addOnPageChangeListener(this);
 
         if (getResources().getBoolean(R.bool.use_alternative_login)) {
-            Intent firstLoginIntent = new Intent(this, FirstLoginActivity.class);
+            Intent firstLoginIntent = new Intent(this, WelcomeActivity.class);
             startActivityForResult(firstLoginIntent, FIRST_RUN_RESULT_CODE);
         }
     }

@@ -1,4 +1,4 @@
-package com.nextcloud.qbee.ui.login
+package com.nextcloud.qbee.ui.setup
 
 import android.accounts.Account
 import android.accounts.AccountManager
@@ -13,6 +13,9 @@ import com.owncloud.android.R
 import com.owncloud.android.lib.common.OwnCloudAccount
 import com.owncloud.android.lib.common.OwnCloudClientManager
 import com.owncloud.android.lib.common.accounts.AccountUtils
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 
 class QBeeSetupStep5Activity : AppCompatActivity() {
 
@@ -58,6 +61,7 @@ class QBeeSetupStep5Activity : AppCompatActivity() {
                         Toast.makeText(this@QBeeSetupStep5Activity, "Login Failed", Toast.LENGTH_SHORT).show()
                         setResult(Activity.RESULT_CANCELED)
                     }
+                    EventBus.getDefault().post(true)
                     this@QBeeSetupStep5Activity.finish()
                 }
             }.start()

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/qbee_setup_navigation"
+    app:startDestination="@id/QBeeSetupConnectionTypeFragment">
+
+    <fragment
+        android:id="@+id/QBeeSetupConnectionTypeFragment"
+        android:name="com.nextcloud.qbee.ui.setup.QBeeSetupConnectionTypeFragment"
+        android:label="QBeeSetupConnectionTypeFragment" >
+        <action
+            android:id="@+id/action_QBeeSetupConnectionTypeFragment_to_QBeeSetup1Fragment"
+            app:destination="@id/QBeeSetup1Fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/QBeeSetup1Fragment"
+        android:name="com.nextcloud.qbee.ui.setup.QBeeSetup1Fragment"
+        android:label="QBeeSetup1Fragment" >
+        <action
+            android:id="@+id/action_QBeeSetup1Fragment_to_QBeeSetup2Fragment"
+            app:destination="@id/QBeeSetup2Fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/QBeeSetup2Fragment"
+        android:name="com.nextcloud.qbee.ui.setup.QBeeSetup2Fragment"
+        android:label="QBeeSetup2Fragment" >
+        <action
+            android:id="@+id/action_QBeeSetup2Fragment_to_QBeeSetup3Fragment"
+            app:destination="@id/QBeeSetup3Fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/QBeeSetup3Fragment"
+        android:name="com.nextcloud.qbee.ui.setup.QBeeSetup3Fragment"
+        android:label="QBeeSetup3Fragment" >
+        <action
+            android:id="@+id/action_QBeeSetup3Fragment_to_QBeeSetup4Fragment"
+            app:destination="@id/QBeeSetup4Fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/QBeeSetup4Fragment"
+        android:name="com.nextcloud.qbee.ui.setup.QBeeSetup4Fragment"
+        android:label="QBeeSetup4Fragment" >
+        <action
+            android:id="@+id/action_QBeeSetup4Fragment_to_QBeeSetup5Fragment"
+            app:destination="@id/QBeeSetup5Fragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/QBeeSetup5Fragment"
+        android:name="com.nextcloud.qbee.ui.setup.QBeeSetup5Fragment"
+        android:label="QBeeSetup5Fragment" />
+</navigation>

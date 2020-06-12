@@ -938,7 +938,7 @@
     <string name="qbee_dont_have_account">Don\'t hava an account yet?</string>
     <string name="qbee_sign_up_free">Sign up for free!</string>
     <string name="qbee_verify_your_account">Verify Yout Account</string>
-    <string name="qbee_check_verify_email">We have sent you a verification code to %1$s,please check your email
+    <string name="qbee_check_verify_email">We have sent you a verification code to %1$s, please check your email
         .</string>
     <string name="qbee_verification_code">Verification Code</string>
     <string name="qbee_set_password">Set your password</string>
