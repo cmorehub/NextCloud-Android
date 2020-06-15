@@ -19,6 +19,7 @@
 package com.owncloud.android.media;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Message;
@@ -47,9 +48,9 @@ import java.util.Locale;
 
 
 /**
- * View containing controls for a {@link MediaPlayer}. 
+ * View containing controls for a {@link MediaPlayer}.
  *
- * Holds buttons "play / pause", "rewind", "fast forward" and a progress slider. 
+ * Holds buttons "play / pause", "rewind", "fast forward" and a progress slider.
  *
  * It synchronizes itself with the state of the {@link MediaPlayer}.
  */
@@ -103,26 +104,59 @@ public class MediaControlView extends FrameLayout implements OnClickListener, On
         handler.removeMessages(SHOW_PROGRESS);
     }
 
+    private float calculateViewHighlightScale(View view){
+        return 1.3f;
+    }
+
+    private OnFocusChangeListener buttonHighlightListener = new OnFocusChangeListener(){
+        @Override
+        public void onFocusChange(View v, boolean hasFocus) {
+            float scale = hasFocus?calculateViewHighlightScale(v):1.0f;
+            v.setScaleX(scale);
+            v.setScaleY(scale);
+        }
+    };
+
+    private int getSeekBarHighlightColor(){
+        return Color.GRAY;
+    }
+
+    private OnFocusChangeListener seekBarHighlightListener = new OnFocusChangeListener(){
+        @Override
+        public void onFocusChange(View v, boolean hasFocus) {
+            if(hasFocus){
+                ThemeUtils.colorHorizontalProgressBar((ProgressBar) v,getSeekBarHighlightColor());
+            } else if(v instanceof SeekBar){
+                ThemeUtils.colorHorizontalSeekBar((SeekBar)v,getContext());
+            } else if(v instanceof ProgressBar){
+                ThemeUtils.colorHorizontalProgressBar((ProgressBar) v,ThemeUtils.primaryAccentColor(getContext()));
+            }
+        }
+    };
 
     private void initControllerView(View v) {
         pauseButton = v.findViewById(R.id.playBtn);
         if (pauseButton != null) {
             pauseButton.requestFocus();
             pauseButton.setOnClickListener(this);
+            pauseButton.setOnFocusChangeListener(buttonHighlightListener);
         }
 
         forwardButton = v.findViewById(R.id.forwardBtn);
         if (forwardButton != null) {
             forwardButton.setOnClickListener(this);
+            forwardButton.setOnFocusChangeListener(buttonHighlightListener);
         }
 
         rewindButton = v.findViewById(R.id.rewindBtn);
         if (rewindButton != null) {
             rewindButton.setOnClickListener(this);
+            rewindButton.setOnFocusChangeListener(buttonHighlightListener);
         }
 
         progressBar = v.findViewById(R.id.progressBar);
         if (progressBar != null) {
+            progressBar.setOnFocusChangeListener(seekBarHighlightListener);
             if (progressBar instanceof SeekBar) {
                 SeekBar seeker = (SeekBar) progressBar;
                 ThemeUtils.colorHorizontalSeekBar(seeker, getContext());
