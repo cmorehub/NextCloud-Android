@@ -1,5 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/qbee_signinup_navigation">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/qbee_signinup_navigation"
+    app:startDestination="@id/QBeeLoginFragment">
 
+    <fragment
+        android:id="@+id/QBeeLoginFragment"
+        android:name="com.nextcloud.qbee.ui.login.QBeeLoginFragment"
+        android:label="QBeeLoginFragment">
+        <action
+            android:id="@+id/action_QBeeLoginFragment_to_QBeeSignUpFragment"
+            app:destination="@id/QBeeSignUpFragment" />
+        <action
+            android:id="@+id/action_QBeeLoginFragment_to_QBeeSignInFragment"
+            app:destination="@id/QBeeSignInFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/QBeeSignInFragment"
+        android:name="com.nextcloud.qbee.ui.login.QBeeSignInFragment"
+        android:label="QBeeSignInFragment">
+        <action
+            android:id="@+id/action_QBeeSignInFragment_to_QBeeSignUpFragment"
+            app:destination="@id/QBeeSignUpFragment"
+            app:popUpTo="@id/QBeeSignUpFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/QBeeSignUpFragment"
+        android:name="com.nextcloud.qbee.ui.login.QBeeSignUpFragment"
+        android:label="QBeeSignUpFragment">
+        <action
+            android:id="@+id/action_QBeeSignUpFragment_to_QBeeVerifyFragment"
+            app:destination="@id/QBeeVerifyFragment" />
+        <action
+            android:id="@+id/action_QBeeSignUpFragment_to_QBeeSignInFragment"
+            app:destination="@id/QBeeSignInFragment"
+            app:popUpTo="@id/QBeeSignInFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/QBeeVerifyFragment"
+        android:name="com.nextcloud.qbee.ui.login.QBeeVerifyFragment"
+        android:label="QBeeVerifyFragment">
+        <argument
+            android:name="mail"
+            app:argType="string"
+            app:nullable="false" />
+        <argument
+            android:name="verified"
+            app:argType="boolean"
+            app:nullable="false" />
+    </fragment>
 </navigation>

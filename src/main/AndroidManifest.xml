@@ -95,14 +95,6 @@
         <activity android:name="com.nextcloud.qbee.ui.login.WelcomeActivity"></activity>
         <activity android:name="com.nextcloud.qbee.ui.login.QBeeLoginActivity"></activity>
         <activity android:name="com.nextcloud.qbee.ui.setup.QBeeSetupActivity"></activity>
-        <activity android:name="com.nextcloud.qbee.ui.login.QBeeSignInActivity"></activity>
-        <activity android:name="com.nextcloud.qbee.ui.login.QBeeSignUpActivity"></activity>
-        <activity android:name="com.nextcloud.qbee.ui.login.QBeeVerifyActivity"></activity>
-        <activity android:name="com.nextcloud.qbee.ui.setup.QBeeSetUpStep1Activity"></activity>
-        <activity android:name="com.nextcloud.qbee.ui.setup.QBeeSetUpStep2Activity"></activity>
-        <activity android:name="com.nextcloud.qbee.ui.setup.QBeeSetUpStep3Activity"></activity>
-        <activity android:name="com.nextcloud.qbee.ui.setup.QBeeSetupStep4Activity"></activity>
-        <activity android:name="com.nextcloud.qbee.ui.setup.QBeeSetupStep5Activity"></activity>
 
         <uses-library
             android:name="org.apache.http.legacy"

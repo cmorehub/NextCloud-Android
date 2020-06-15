@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.navArgs
 import com.blikoon.qrcodescanner.QrCodeActivity
 import com.owncloud.android.R
 import com.owncloud.android.utils.PermissionUtil
@@ -24,6 +25,8 @@ class QBeeSetup3Fragment() : Fragment() {
     var mail: String? = null
     var pwd: String? = null
 
+    private val args: QBeeSetup3FragmentArgs by navArgs()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.activity_qbee_setup_qbee_3, container, false)
 
@@ -34,6 +37,9 @@ class QBeeSetup3Fragment() : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        mail = args.mail
+        pwd = args.pwd
 
         btnScanQRCode.setOnClickListener {
             onScan()
@@ -49,7 +55,9 @@ class QBeeSetup3Fragment() : Fragment() {
                 val result = data.getStringExtra("com.blikoon.qrcodescanner.got_qr_scan_relult") ?: return
                 Log.d("0611", "Scan Result = $result")
                 val navController = NavHostFragment.findNavController(this)
-                navController.navigate(R.id.QBeeSetup4Fragment)
+                var action = QBeeSetup3FragmentDirections.actionQBeeSetup3FragmentToQBeeSetup4Fragment(mail!!, pwd!!,
+                    result!!)
+                navController.navigate(action)
             }
         }
         super.onActivityResult(requestCode, resultCode, data)

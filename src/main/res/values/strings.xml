@@ -925,8 +925,10 @@
     <string name="qbee_welcome_sub">Your Memories. Boxed.</string>
     <string name="qbee_log_in">Log in</string>
     <string name="qbee_create_your_account">Create your account</string>
+    <string name="qbee_verify_code">Verify</string>
     <string name="qbee_sign_up">Sign Up</string>
     <string name="qbee_prompt_email">Email Address</string>
+    <string name="qbee_prompt_email_recommand">*Google mail is recommended</string>
     <string name="qbee_agree_terms_policy">I agree to the QBee Terms of Use, Privacy Policy, Fair Use Policy</string>
     <string name="qbee_create_account">Create Account</string>
     <string name="qbee_already_have_account">Already have an account?</string>
@@ -943,10 +945,10 @@
     <string name="qbee_verification_code">Verification Code</string>
     <string name="qbee_set_password">Set your password</string>
     <string name="qbee_prompt_password">Password</string>
-    <string name="qbee_password_hint">Passwords be 7-64 characters and must contain any combination of
-        alphanumeric characters and the characters . - ! @ $ ^</string>
+    <string name="qbee_password_hint">Passwords be 6-12 characters</string>
     <string name="qbee_confirm_password">Confirm Password</string>
-    <string name="qbee_confir_password">Type your password once more to make sure it is correct.</string>
+    <string name="qbee_confirm_password_hint">Type your password once more to make sure it is correct.</string>
+    <string name="qbee_confirm_password_error">Confirm password is different from password</string>
     <string name="qbee_how_to_setup_qbee">How would you like to set up your QBee?</string>
     <string name="qbee_choose_a_connection">Choose a connection option</string>
     <string name="qbee_setup_ethernet">Ethernet</string>

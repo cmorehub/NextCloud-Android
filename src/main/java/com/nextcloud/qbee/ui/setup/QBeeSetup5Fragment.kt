@@ -13,6 +13,8 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.navArgs
+import com.nextcloud.qbee.ui.event.SetupFinishEvent
 import com.owncloud.android.R
 import com.owncloud.android.lib.common.OwnCloudAccount
 import com.owncloud.android.lib.common.OwnCloudClientManager
@@ -27,14 +29,16 @@ class QBeeSetup5Fragment() : Fragment() {
     var pwd: String? = null
     var mac: String? = null
 
+    private val args: QBeeSetup5FragmentArgs by navArgs()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.activity_qbee_setup_qbee_5, container, false)
         btnSetupFinish = root.findViewById(R.id.btnSetupFinish)
 
+        mail = args.mail
+        pwd = args.pwd
+        mac = args.mac
 
-//        mail = intent.getStringExtra("mail")
-//        pwd = intent.getStringExtra("pwd")
-//        mac = intent.getStringExtra("mac")
         btnSetupFinish.setOnClickListener {
             Thread {
                 val url = Uri.parse("http://iottalk.cmoremap.com.tw:6325")
@@ -54,16 +58,7 @@ class QBeeSetup5Fragment() : Fragment() {
 
                 val client = manager.getClientFor(account, context)
                 val loginSuccess = loginName == client.userId
-//                runOnUiThread {
-//                    if (loginSuccess) {
-//                        setResult(Activity.RESULT_OK, Intent().putExtra("AccountManager.KEY_ACCOUNT_NAME", newAccount.name))
-//                    } else {
-//                        Toast.makeText(this@QBeeSetupStep5Activity, "Login Failed", Toast.LENGTH_SHORT).show()
-//                        setResult(Activity.RESULT_CANCELED)
-//                    }
-//                    EventBus.getDefault().post(true)
-//                    this@QBeeSetupStep5Activity.finish()
-//                }
+                EventBus.getDefault().post(SetupFinishEvent(loginSuccess, newAccount.name))
             }.start()
         }
         return root

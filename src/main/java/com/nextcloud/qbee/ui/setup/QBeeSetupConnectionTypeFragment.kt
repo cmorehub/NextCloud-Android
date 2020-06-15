@@ -7,7 +7,11 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment.findNavController
+import com.nextcloud.qbee.ui.event.SetupDataEvent
 import com.owncloud.android.R
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 
 class QBeeSetupConnectionTypeFragment() : Fragment() {
 
@@ -23,12 +27,34 @@ class QBeeSetupConnectionTypeFragment() : Fragment() {
         return root
 
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val navController = findNavController(this)
         blockOptionEthernet.setOnClickListener {
-            navController.navigate(R.id.QBeeSetup1Fragment)
+            var action = QBeeSetupConnectionTypeFragmentDirections.actionQBeeSetupConnectionTypeFragmentToQBeeSetup1Fragment(mail!!, pwd!!)
+            navController.navigate(action)
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this)
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onMessageEvent(event: SetupDataEvent) {
+        mail = event!!.mail
+        pwd = event!!.pwd
     }
 }

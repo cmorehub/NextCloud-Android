@@ -2,7 +2,9 @@ package com.nextcloud.qbee.network
 
 import android.os.AsyncTask
 import android.util.Log
+import com.nextcloud.qbee.network.model.QBeeSetupResult
 import org.json.JSONException
+import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.IOException
@@ -11,9 +13,9 @@ import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
 
-class QBeeMacBindTask() : AsyncTask<String, Void, String?>() {
+class QBeeSetupTask() : AsyncTask<String, Void, String?>() {
     interface Callback {
-        fun onResult(result: String?)
+        fun onResult(result: QBeeSetupResult)
     }
 
     private var connection: HttpURLConnection? = null
@@ -77,6 +79,9 @@ class QBeeMacBindTask() : AsyncTask<String, Void, String?>() {
     }
 
     override fun onPostExecute(result: String?) {
-        callback!!.onResult(result)
+        var resultJson = JSONObject(result)
+        var setupResult = QBeeSetupResult(resultJson.optString("result", "-1") == "0", resultJson.opt("error"))
+        setupResult.code = resultJson.optString("result", "-9").toInt()
+        callback!!.onResult(setupResult)
     }
 }
