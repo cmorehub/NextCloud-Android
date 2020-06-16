@@ -26,50 +26,43 @@
           android:title="@string/actionbar_search"
           android:contentDescription="@string/actionbar_search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
-          app:showAsAction="ifRoom"/>
+          app:showAsAction="collapseActionView|ifRoom"/>
     <item
         android:id="@+id/action_create_dir"
         android:icon="@drawable/ic_action_create_dir"
         android:orderInCategory="1"
         app:showAsAction="never"
+        android:visible="false"
         android:title="@string/actionbar_mkdir"
         android:contentDescription="@string/actionbar_mkdir"/>
     <item
         android:id="@+id/action_switch_view"
         android:icon="@drawable/ic_view_module"
         android:orderInCategory="2"
-        app:showAsAction="never"
+        app:showAsAction="ifRoom"
         android:title="@string/action_switch_grid_view" />
     <item
         android:id="@+id/action_sync_account"
         android:icon="@drawable/ic_action_refresh"
         android:orderInCategory="1"
-        app:showAsAction="never"
+        app:showAsAction="ifRoom"
         android:title="@string/actionbar_sync"
         android:contentDescription="@string/actionbar_sync"/>
 	<item
         android:id="@+id/action_sort"
         android:icon="@drawable/ic_sort_variant"
         android:orderInCategory="1"
-        app:showAsAction="never"
+        app:showAsAction="ifRoom"
         android:title="@string/actionbar_sort"
         android:contentDescription="@string/actionbar_sort"/>
     <item
         android:id="@+id/action_select_all"
         android:icon="@drawable/ic_select_all"
         android:orderInCategory="1"
-        app:showAsAction="never"
+        app:showAsAction="ifRoom"
+        android:visible="false"
         android:title="@string/select_all"
         android:contentDescription="@string/select_all"/>
-
-    <item
-        android:id="@+id/action_create_rich_workspace"
-        android:icon="@drawable/ic_post_add"
-        android:orderInCategory="2"
-        app:showAsAction="never"
-        android:visible="false"
-        android:title="@string/create_rich_workspace"
-        android:contentDescription="@string/creates_rich_workspace" />
 
     <!-- <item android:id="@+id/search"
     android:title="@string/actionbar_search"
