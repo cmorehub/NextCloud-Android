@@ -881,6 +881,8 @@ public abstract class DrawerActivity extends ToolbarActivity
                 mNavigationView.getMenu().setGroupVisible(R.id.drawer_menu_bottom, true);
             }
         }
+
+        mNavigationView.getMenu().findItem(R.id.nav_notifications).setVisible(false);
     }
 
     /**
