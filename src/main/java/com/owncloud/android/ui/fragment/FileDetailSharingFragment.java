@@ -248,6 +248,9 @@ public class FileDetailSharingFragment extends Fragment implements UserListAdapt
             shareByLinkContainer.setVisibility(View.GONE);
             noList.setText(R.string.reshare_not_allowed);
         }
+
+        searchView.setVisibility(View.GONE);
+        noList.setVisibility(View.GONE);
     }
 
     /**
@@ -338,6 +341,7 @@ public class FileDetailSharingFragment extends Fragment implements UserListAdapt
             createShareLink();
         } else {
             fileOperationsHelper.unshareFileViaLink(file);
+            setShareByLinkInfo(false);
         }
     }
 
