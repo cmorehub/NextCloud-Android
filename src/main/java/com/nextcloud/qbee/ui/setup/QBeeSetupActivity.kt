@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.nextcloud.qbee.ui.event.SetupDataEvent
 import com.nextcloud.qbee.ui.event.SetupFinishEvent
 import com.owncloud.android.R
+import com.owncloud.android.ui.activity.FileDisplayActivity
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -38,10 +39,18 @@ class QBeeSetupActivity : AppCompatActivity() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onMessageEvent(event: SetupFinishEvent) {
         if (event.success) {
-            setResult(RESULT_OK, Intent().putExtra("AccountManager.KEY_ACCOUNT_NAME", event.account))
+//            setResult(RESULT_OK, Intent().putExtra("AccountManager.KEY_ACCOUNT_NAME", event.account))
+            val i = Intent(this, FileDisplayActivity::class.java)
+            i.action = FileDisplayActivity.RESTART
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            startActivity(i)
         } else {
             Toast.makeText(this@QBeeSetupActivity, "Login Failed", Toast.LENGTH_SHORT).show()
             setResult(RESULT_CANCELED)

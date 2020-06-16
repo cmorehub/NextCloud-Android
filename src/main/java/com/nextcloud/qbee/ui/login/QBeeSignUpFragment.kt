@@ -1,6 +1,7 @@
 package com.nextcloud.qbee.ui.login
 
 import android.os.Bundle
+import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,16 +41,22 @@ class QBeeSignUpFragment : Fragment() {
             navController.navigate(action)
         }
         btnCreateAccount.setOnClickListener {
-            QBeeSetupTask(ApiQBeeBind.apiUrl, object : QBeeSetupTask.Callback {
-                override fun onResult(result: QBeeSetupResult) {
-                    var verified = result.code == 0
-                    Toast.makeText(context, result.result as String, Toast.LENGTH_LONG).show()
-                    if (!verified) {
-                        val action = QBeeSignUpFragmentDirections.actionQBeeSignUpFragmentToQBeeVerifyFragment(editTextTextEmailAddress.text.toString(), verified)
-                        navController.navigate(action)
+            val pattern = Patterns.EMAIL_ADDRESS
+            val email = editTextTextEmailAddress.text.toString()
+            if(pattern.matcher(email).matches()){
+                QBeeSetupTask(ApiQBeeBind.apiUrl, object : QBeeSetupTask.Callback {
+                    override fun onResult(result: QBeeSetupResult) {
+                        var verified = result.code == 0
+                        Toast.makeText(context, result.result as String, Toast.LENGTH_LONG).show()
+                        if (!verified) {
+                            val action = QBeeSignUpFragmentDirections.actionQBeeSignUpFragmentToQBeeVerifyFragment(editTextTextEmailAddress.text.toString(), verified)
+                            navController.navigate(action)
+                        }
                     }
-                }
-            }).execute(ApiQBeeBind.getApiVerifyCodeString(editTextTextEmailAddress.text.toString()))
+                }).execute(ApiQBeeBind.getApiVerifyCodeString(email))
+            }else{
+                Toast.makeText(context,R.string.qbee_prompt_email_not_valid,Toast.LENGTH_LONG).show()
+            }
         }
     }
 }

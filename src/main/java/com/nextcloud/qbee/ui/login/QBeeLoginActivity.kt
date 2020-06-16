@@ -1,12 +1,12 @@
 package com.nextcloud.qbee.ui.login
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.nextcloud.qbee.ui.event.LoginFinishEvent
 import com.nextcloud.qbee.ui.setup.QBeeSetupActivity
 import com.owncloud.android.R
+import com.owncloud.android.ui.activity.FileDisplayActivity
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -34,7 +34,11 @@ class QBeeLoginActivity : AppCompatActivity() {
         if (event.success) {
             when (event.nextTo) {
                 LoginFinishEvent.LoginForCloud -> {
-                    setResult(Activity.RESULT_OK, Intent().putExtra("AccountManager.KEY_ACCOUNT_NAME", event.account))
+//                    setResult(Activity.RESULT_OK, Intent().putExtra("AccountManager.KEY_ACCOUNT_NAME", event.account))
+                    val i = Intent(this, FileDisplayActivity::class.java)
+                    i.action = FileDisplayActivity.RESTART
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    startActivity(i)
                     this@QBeeLoginActivity.finish()
                 }
                 LoginFinishEvent.LoginForSetup -> {

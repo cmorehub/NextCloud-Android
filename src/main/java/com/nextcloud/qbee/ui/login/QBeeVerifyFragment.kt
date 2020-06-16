@@ -53,6 +53,8 @@ class QBeeVerifyFragment : Fragment() {
 
         mail = args.mail
 
+        textView14.text = getString(R.string.qbee_check_verify_email, mail)
+
         val navController = NavHostFragment.findNavController(this)
         btnVerifyCode.setOnClickListener {
 
@@ -70,19 +72,23 @@ class QBeeVerifyFragment : Fragment() {
         }
         btnSignUp.setOnClickListener {
             val oriPwd = edtPassword.text.toString()
-            val confirmPwd = edtPassword.text.toString()
-            if (oriPwd == confirmPwd) {
-                QBeeSetupTask(ApiQBeeBind.apiUrl, object : QBeeSetupTask.Callback {
-                    override fun onResult(result: QBeeSetupResult) {
-                        if (result.success) {
-                            EventBus.getDefault().post(LoginFinishEvent(true, mail!!, oriPwd, LoginFinishEvent
-                                .LoginForSetup))
+            val confirmPwd = edtConfirmPassword.text.toString()
+            if (oriPwd.length in 7..12) {
+                if (oriPwd == confirmPwd) {
+                    QBeeSetupTask(ApiQBeeBind.apiUrl, object : QBeeSetupTask.Callback {
+                        override fun onResult(result: QBeeSetupResult) {
+                            if (result.success) {
+                                EventBus.getDefault().post(LoginFinishEvent(true, mail!!, oriPwd, LoginFinishEvent
+                                    .LoginForSetup))
+                            }
+                            Toast.makeText(context, result.result as String, Toast.LENGTH_LONG).show()
                         }
-                        Toast.makeText(context, result.result as String, Toast.LENGTH_LONG).show()
-                    }
-                }).execute(ApiQBeeBind.getApiRegisterString(mail!!, oriPwd))
+                    }).execute(ApiQBeeBind.getApiRegisterString(mail!!, oriPwd))
+                } else {
+                    Toast.makeText(context, R.string.qbee_confirm_password_error, Toast.LENGTH_LONG).show()
+                }
             } else {
-                Toast.makeText(context, R.string.qbee_confirm_password_error, Toast.LENGTH_LONG).show()
+                Toast.makeText(context, R.string.qbee_password_length_error, Toast.LENGTH_LONG).show()
             }
         }
     }

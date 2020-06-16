@@ -195,7 +195,8 @@
 
 	<!-- Launch screen -->
 	<style name="Theme.ownCloud.Launcher">
-		<item name="android:windowBackground">@drawable/launch_screen</item>
+<!--		<item name="android:windowBackground">@drawable/launch_screen</item>-->
+        <item name="android:windowBackground">@drawable/launch_screen_qbee</item>
         <item name="android:textColorHint">@color/secondary_text_color</item>
 	</style>
 

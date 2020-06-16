@@ -65,14 +65,18 @@ class QBeeSetup3Fragment() : Fragment() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>,
                                             grantResults: IntArray) {
+
+        Log.d("0616","onRequestPermissionsResult")
         when (requestCode) {
             PermissionUtil.PERMISSIONS_CAMERA -> {
 
                 // If request is cancelled, result arrays are empty.
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d("0616","PERMISSION_GRANTED")
                     // permission was granted
                     startQRScanner()
                 } else {
+                    Log.d("0616","PERMISSION_DENIED")
                     // permission denied
                     return
                 }
@@ -91,6 +95,7 @@ class QBeeSetup3Fragment() : Fragment() {
     }
 
     private fun startQRScanner() {
+        Log.d("0616","startQRScanner")
         val i = Intent(context, QrCodeActivity::class.java)
         startActivityForResult(i, REQUEST_CODE_QR_SCAN)
     }
