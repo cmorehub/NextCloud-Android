@@ -70,6 +70,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import static android.content.Context.ACCOUNT_SERVICE;
+import static com.nextcloud.qbee.ui.login.QBeeLoginSharedPref.QBEE_LOGIN_DATA;
 import static com.owncloud.android.ui.activity.ManageAccountsActivity.PENDING_FOR_REMOVAL;
 
 /**
@@ -151,6 +152,9 @@ public class AccountRemovalJob extends Job implements AccountManagerCallback<Boo
                 Uri rootsUri = DocumentsContract.buildRootsUri(authority);
                 context.getContentResolver().notifyChange(rootsUri, null);
             }
+
+
+            context.getSharedPreferences(QBEE_LOGIN_DATA, 0).edit().clear().apply();
 
             return Result.SUCCESS;
         } else {

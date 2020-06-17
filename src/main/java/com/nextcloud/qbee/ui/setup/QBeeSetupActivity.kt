@@ -2,6 +2,7 @@ package com.nextcloud.qbee.ui.setup
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.nextcloud.qbee.ui.event.SetupDataEvent
@@ -40,7 +41,13 @@ class QBeeSetupActivity : AppCompatActivity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        Log.d("0616","activity onActivityResult")
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        Log.d("0616","activity onRequestPermissionsResult")
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

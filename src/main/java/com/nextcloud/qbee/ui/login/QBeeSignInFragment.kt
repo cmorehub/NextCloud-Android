@@ -17,6 +17,7 @@ import com.nextcloud.qbee.network.QBeeSetupTask
 import com.nextcloud.qbee.network.model.ApiQBeeBind
 import com.nextcloud.qbee.network.model.QBeeSetupResult
 import com.nextcloud.qbee.ui.event.LoginFinishEvent
+import com.nextcloud.qbee.ui.event.QBeeLoginEvent
 import com.nextcloud.qbee.ui.event.SetupFinishEvent
 import com.owncloud.android.R
 import com.owncloud.android.lib.common.OwnCloudAccount
@@ -52,6 +53,8 @@ class QBeeSignInFragment : Fragment() {
             navController.navigate(action)
         }
         btnSignIn.setOnClickListener {
+            val acctmail = editTextTextEmailAddress2.text.toString()
+            val pass = editTextTextPassword.text.toString()
             QBeeSetupTask(ApiQBeeBind.apiUrl, object : QBeeSetupTask.Callback {
                 override fun onResult(result: QBeeSetupResult) {
                     if (result.success) {
@@ -76,18 +79,19 @@ class QBeeSignInFragment : Fragment() {
                                 val client = manager.getClientFor(account, context)
                                 val loginSuccess = loginName == client.userId
                                 EventBus.getDefault().post(LoginFinishEvent(loginSuccess, newAccount.name, "", LoginFinishEvent.LoginForCloud))
+                                EventBus.getDefault().post(QBeeLoginEvent(acctmail, pass))
                             } else {
                                 EventBus.getDefault().post(LoginFinishEvent(true, editTextTextEmailAddress2.text.toString(), editTextTextPassword
                                     .text.toString(), LoginFinishEvent
                                     .LoginForSetup))
+                                EventBus.getDefault().post(QBeeLoginEvent(acctmail, pass))
                             }
                         }.start()
                     } else {
                         Toast.makeText(context, result.result as String, Toast.LENGTH_LONG).show()
                     }
                 }
-            }).execute(ApiQBeeBind.getApiLoginString(editTextTextEmailAddress2.text.toString(), editTextTextPassword
-                .text.toString()))
+            }).execute(ApiQBeeBind.getApiLoginString(acctmail, pass))
         }
     }
 }

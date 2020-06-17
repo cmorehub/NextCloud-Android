@@ -15,6 +15,7 @@ import com.nextcloud.qbee.network.QBeeSetupTask
 import com.nextcloud.qbee.network.model.ApiQBeeBind
 import com.nextcloud.qbee.network.model.QBeeSetupResult
 import com.nextcloud.qbee.ui.event.LoginFinishEvent
+import com.nextcloud.qbee.ui.event.QBeeLoginEvent
 import com.owncloud.android.R
 import org.greenrobot.eventbus.EventBus
 
@@ -80,6 +81,7 @@ class QBeeVerifyFragment : Fragment() {
                             if (result.success) {
                                 EventBus.getDefault().post(LoginFinishEvent(true, mail!!, oriPwd, LoginFinishEvent
                                     .LoginForSetup))
+                                EventBus.getDefault().post(QBeeLoginEvent(mail!!, oriPwd))
                             }
                             Toast.makeText(context, result.result as String, Toast.LENGTH_LONG).show()
                         }
