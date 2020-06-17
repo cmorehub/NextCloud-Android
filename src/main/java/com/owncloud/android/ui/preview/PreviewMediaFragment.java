@@ -44,6 +44,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -90,7 +91,7 @@ import androidx.annotation.StringRes;
  * By now, if the {@link OCFile} passed is not downloaded, an {@link IllegalStateException} is
  * generated on instantiation too.
  */
-public class PreviewMediaFragment extends FileFragment implements OnTouchListener, Injectable {
+public class PreviewMediaFragment extends FileFragment implements OnTouchListener, OnClickListener, Injectable {
 
     private static final String TAG = PreviewMediaFragment.class.getSimpleName();
 
@@ -193,6 +194,7 @@ public class PreviewMediaFragment extends FileFragment implements OnTouchListene
         mImagePreview = view.findViewById(R.id.image_preview);
         mVideoPreview = view.findViewById(R.id.video_preview);
         mVideoPreview.setOnTouchListener(this);
+        mVideoPreview.setOnClickListener(this);
 
         mMediaController = view.findViewById(R.id.media_controller);
         mMultiView = view.findViewById(R.id.multi_view);
@@ -629,6 +631,11 @@ public class PreviewMediaFragment extends FileFragment implements OnTouchListene
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onClick(View v) {
+        startFullScreenVideo();
     }
 
     private void startFullScreenVideo() {

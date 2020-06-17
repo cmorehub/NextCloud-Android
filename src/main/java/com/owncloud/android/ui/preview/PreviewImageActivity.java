@@ -33,6 +33,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -116,6 +117,7 @@ public class PreviewImageActivity extends FileActivity implements
 
         // ActionBar
         updateActionBarTitleAndHomeButton(null);
+        if(actionBar!=null) actionBar.setDisplayHomeAsUpEnabled(!getResources().getBoolean(R.bool.is_tv_build));
 
         mFullScreenAnchorView = getWindow().getDecorView();
         // to keep our UI controls visibility in line with system bars visibility
@@ -378,6 +380,24 @@ public class PreviewImageActivity extends FileActivity implements
         super.onPause();
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        ActionBar actionBar = getSupportActionBar();
+        switch (keyCode){
+            case KeyEvent.KEYCODE_DPAD_UP:
+                if(actionBar!=null) {
+                    actionBar.show();
+                }
+                break;
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+                if(actionBar!=null) {
+                    actionBar.hide();
+                }
+                break;
+            default:
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
     private void backToDisplayActivity() {
         finish();

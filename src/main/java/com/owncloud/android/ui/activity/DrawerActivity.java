@@ -701,7 +701,7 @@ public abstract class DrawerActivity extends ToolbarActivity
             }
         }
 
-        if (persistingAccounts.size() > 0) {
+        if (mNavigationView!=null && mDrawerLayout!=null && persistingAccounts.size() > 0) {
             repopulateAccountList(persistingAccounts);
             setAccountInDrawer(accountManager.getUser());
             mAvatars = getUserAvatars();
@@ -735,7 +735,7 @@ public abstract class DrawerActivity extends ToolbarActivity
             } else {
                 mAccountMiddleAccountAvatar.setVisibility(View.GONE);
             }
-        } else {
+        } else if(mAccountMiddleAccountAvatar!=null&&mAccountEndAccountAvatar!=null) {
             mAccountEndAccountAvatar.setVisibility(View.GONE);
             mAccountMiddleAccountAvatar.setVisibility(View.GONE);
         }

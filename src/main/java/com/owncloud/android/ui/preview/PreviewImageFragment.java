@@ -189,7 +189,7 @@ public class PreviewImageFragment extends FileFragment implements Injectable {
 
         mIgnoreFirstSavedState = args.getBoolean(ARG_IGNORE_FIRST);
         mShowResizedImage = args.getBoolean(ARG_SHOW_RESIZED_IMAGE);
-        setHasOptionsMenu(true);
+        setHasOptionsMenu(!getResources().getBoolean(R.bool.is_tv_build));
     }
 
     @Override
