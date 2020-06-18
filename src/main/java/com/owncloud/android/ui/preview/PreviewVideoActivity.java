@@ -23,21 +23,30 @@ package com.owncloud.android.ui.preview;
 import android.accounts.Account;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.MediaController;
+import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.VideoView;
 
 import com.nextcloud.client.media.ErrorFormat;
 import com.owncloud.android.R;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.lib.common.utils.Log_OC;
+import com.owncloud.android.ui.activity.BaseActivity;
 import com.owncloud.android.ui.activity.FileActivity;
 import com.owncloud.android.utils.MimeTypeUtil;
+import com.owncloud.android.utils.ThemeUtils;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -49,7 +58,8 @@ import androidx.appcompat.app.AlertDialog;
  *  Currently, it always plays in landscape mode, full screen. When the playback ends,
  *  the activity is finished.
  */
-public class PreviewVideoActivity extends FileActivity implements OnCompletionListener, OnPreparedListener, OnErrorListener {
+public class PreviewVideoActivity extends BaseActivity implements OnCompletionListener, OnPreparedListener,
+    OnErrorListener {
 
     /** Key to receive a flag signaling if the video should be started immediately */
     public static final String EXTRA_AUTOPLAY = "AUTOPLAY";
@@ -66,6 +76,7 @@ public class PreviewVideoActivity extends FileActivity implements OnCompletionLi
     private VideoView mVideoPlayer;             // view to play the file; both performs and show the playback
     private MediaController mMediaController;   // panel control used by the user to control the playback
     private Uri mStreamUri;
+    private OCFile mFile;
 
     /**
      *  Called when the activity is first created.
@@ -83,16 +94,20 @@ public class PreviewVideoActivity extends FileActivity implements OnCompletionLi
         Log_OC.v(TAG, "onCreate");
 
         setContentView(R.layout.video_layout);
-
-        if (savedInstanceState == null) {
-            Bundle extras = getIntent().getExtras();
-            mSavedPlaybackPosition = extras.getInt(EXTRA_START_POSITION);
-            mAutoplay = extras.getBoolean(EXTRA_AUTOPLAY);
-            mStreamUri = (Uri) extras.get(EXTRA_STREAM_URL);
-        } else {
+        Bundle extras = getIntent().getExtras();
+        if (savedInstanceState != null) {
+            mFile = savedInstanceState.getParcelable(FileActivity.EXTRA_FILE);
             mSavedPlaybackPosition = savedInstanceState.getInt(EXTRA_START_POSITION);
             mAutoplay = savedInstanceState.getBoolean(EXTRA_AUTOPLAY);
             mStreamUri = (Uri) savedInstanceState.get(EXTRA_STREAM_URL);
+        } else if(extras!=null){
+            mFile = extras.getParcelable(FileActivity.EXTRA_FILE);
+            mSavedPlaybackPosition = extras.getInt(EXTRA_START_POSITION);
+            mAutoplay = extras.getBoolean(EXTRA_AUTOPLAY);
+            mStreamUri = (Uri) extras.get(EXTRA_STREAM_URL);
+        } else{
+            finish();
+            return;
         }
 
         mVideoPlayer = findViewById(R.id.videoPlayer);
@@ -116,6 +131,7 @@ public class PreviewVideoActivity extends FileActivity implements OnCompletionLi
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putParcelable(FileActivity.EXTRA_FILE, mFile);
         outState.putInt(PreviewVideoActivity.EXTRA_START_POSITION, mVideoPlayer.getCurrentPosition());
         outState.putBoolean(PreviewVideoActivity.EXTRA_AUTOPLAY , mVideoPlayer.isPlaying());
         outState.putParcelable(PreviewVideoActivity.EXTRA_STREAM_URL, mStreamUri);
@@ -148,6 +164,7 @@ public class PreviewVideoActivity extends FileActivity implements OnCompletionLi
             mVideoPlayer.start();
         }
         mMediaController.show(5000);
+        setupMediaController(mMediaController);
     }
 
 
@@ -182,17 +199,83 @@ public class PreviewVideoActivity extends FileActivity implements OnCompletionLi
         if (mVideoPlayer.getWindowToken() != null) {
             String message = ErrorFormat.toString(this, what, extra);
             new AlertDialog.Builder(this)
-                    .setMessage(message)
-                    .setPositiveButton(android.R.string.VideoView_error_button,
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int whichButton) {
-                                    PreviewVideoActivity.this.onCompletion(null);
-                                }
-                            })
-                    .setCancelable(false)
-                    .show();
+                .setMessage(message)
+                .setPositiveButton(android.R.string.VideoView_error_button,
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            PreviewVideoActivity.this.onCompletion(null);
+                        }
+                    })
+                .setCancelable(false)
+                .show();
         }
         return true;
+    }
+
+    private float calculateViewHighlightScale(View view){
+        return 1.3f;
+    }
+
+    private View.OnFocusChangeListener buttonHighlightListener = new View.OnFocusChangeListener(){
+        @Override
+        public void onFocusChange(View v, boolean hasFocus) {
+            float scale = hasFocus?calculateViewHighlightScale(v):1.0f;
+            v.setScaleX(scale);
+            v.setScaleY(scale);
+        }
+    };
+
+    private int getSeekBarHighlightColor(){
+        return Color.GRAY;
+    }
+
+    private View.OnFocusChangeListener seekBarHighlightListener = new View.OnFocusChangeListener(){
+        @Override
+        public void onFocusChange(View v, boolean hasFocus) {
+            if(hasFocus){
+                ThemeUtils.colorHorizontalProgressBar((ProgressBar) v, getSeekBarHighlightColor());
+            } else if(v instanceof SeekBar){
+                ThemeUtils.colorHorizontalSeekBar((SeekBar)v,PreviewVideoActivity.this);
+            } else if(v instanceof ProgressBar){
+                ThemeUtils.colorHorizontalProgressBar((ProgressBar) v,
+                    ThemeUtils.primaryAccentColor(PreviewVideoActivity.this));
+            }
+        }
+    };
+
+    /**
+     * Add onFocus Effect on MediaController.
+     * Seems should be ran after onPrepared or won't made effect.
+     * @param controller The MediaController to setup.
+     */
+    private void setupMediaController(MediaController controller){
+        LinearLayout mediaControllerButtonLayout =
+            (LinearLayout) ((LinearLayout)controller.getChildAt(0)).getChildAt(0);
+        LinearLayout mediaControllerTimeBarLayout =
+            (LinearLayout) ((LinearLayout)controller.getChildAt(0)).getChildAt(1);
+
+        for(int i = 0; i<mediaControllerTimeBarLayout.getChildCount(); i++){
+            View child = mediaControllerTimeBarLayout.getChildAt(i);
+            if(child instanceof SeekBar){
+                child.setOnFocusChangeListener(seekBarHighlightListener);
+            }
+        }
+
+        for(int i = 0; i<mediaControllerButtonLayout.getChildCount(); i++){
+            View child = mediaControllerButtonLayout.getChildAt(i);
+            if(child instanceof ImageButton){
+                child.setOnFocusChangeListener(buttonHighlightListener);
+            }
+        }
+    }
+
+    /**
+     * Getter for the main {@link OCFile} handled by the activity.
+     *
+     * @return  Main {@link OCFile} handled by the activity.
+     */
+    public OCFile getFile() {
+        return mFile;
     }
 
     @Override
@@ -227,7 +310,6 @@ public class PreviewVideoActivity extends FileActivity implements OnCompletionLi
         } else {
             finish();
         }
-   }
-
-
+    }
+    
 }
