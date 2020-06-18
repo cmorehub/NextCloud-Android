@@ -113,7 +113,9 @@
       the whole menu in case of quota being displayed
     -->
     <group>
+        <!-- Idk who made this but it seems unnecessary - Evermore Y3k -->
         <item
+            android:visible="false"
             android:enabled="false"
             android:orderInCategory="200"
             android:title=""/>
