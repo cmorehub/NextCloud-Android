@@ -171,7 +171,7 @@ public class PreviewMediaFragment extends FileFragment implements OnTouchListene
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
+        setHasOptionsMenu(!getResources().getBoolean(R.bool.is_tv_build));
 
         Bundle bundle = getArguments();
 
