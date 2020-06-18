@@ -54,6 +54,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.appinfo.AppInfo;
@@ -286,6 +287,15 @@ public class FileDisplayActivity extends FileActivity
 
         if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
             handleOpenFileViaIntent(getIntent());
+        }
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        try{
+            getPackageManager().getPackageInfo("com.evermore.ottmediaplayer",0);
+        } catch (Exception e){
+            // expecting PackageManager.NameNotFoundException
+            // or in case getPackageManager() returns null
+            navigationView.getMenu().findItem(R.id.nav_cmore_media).setVisible(false);
         }
 
         mPlayerConnection = new PlayerServiceConnection(this);

@@ -497,6 +497,13 @@ public abstract class DrawerActivity extends ToolbarActivity
                                                    SearchEvent.UnsetType.UNSET_BOTTOM_NAV_BAR),
                                    menuItem.getItemId());
                 break;
+            case R.id.nav_cmore_media:
+                try{
+                    startActivity(getPackageManager().getLaunchIntentForPackage("com.evermore.ottmediaplayer"));
+                } catch (Exception e){
+                    Log.e(TAG,"QBee CmoreMedia",e);
+                }
+                break;
             default:
                 if (menuItem.getItemId() >= MENU_ITEM_EXTERNAL_LINK &&
                     menuItem.getItemId() <= MENU_ITEM_EXTERNAL_LINK + 100) {
