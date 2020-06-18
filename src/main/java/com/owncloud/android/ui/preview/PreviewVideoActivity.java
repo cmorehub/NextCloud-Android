@@ -23,13 +23,20 @@ package com.owncloud.android.ui.preview;
 import android.accounts.Account;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.MediaController;
+import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.VideoView;
 
 import com.nextcloud.client.media.ErrorFormat;
@@ -38,6 +45,7 @@ import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.ui.activity.FileActivity;
 import com.owncloud.android.utils.MimeTypeUtil;
+import com.owncloud.android.utils.ThemeUtils;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -148,6 +156,27 @@ public class PreviewVideoActivity extends FileActivity implements OnCompletionLi
             mVideoPlayer.start();
         }
         mMediaController.show(5000);
+        LinearLayout mediaControllerButtonLayout =
+            (LinearLayout) ((LinearLayout)mMediaController.getChildAt(0)).getChildAt(0);
+        LinearLayout mediaControllerTimeBarLayout =
+            (LinearLayout) ((LinearLayout)mMediaController.getChildAt(0)).getChildAt(1);
+
+        for(int i = 0; i<mediaControllerTimeBarLayout.getChildCount(); i++){
+            View child = mediaControllerTimeBarLayout.getChildAt(i);
+            if(child instanceof SeekBar){
+                child.setOnFocusChangeListener(seekBarHighlightListener);
+            }
+            Log.d("NCY3k", "PreviewVideoActivity MediaController Child:"+child.getClass().getName());
+        }
+
+        for(int i = 0; i<mediaControllerButtonLayout.getChildCount(); i++){
+            View child = mediaControllerButtonLayout.getChildAt(i);
+            Log.d("NCY3k", "PreviewVideoActivity MediaController Child:"+child.getClass().getName());
+            if(child instanceof ImageButton){
+                Log.d("NCY3k", "setting OnFocusListener");
+                child.setOnFocusChangeListener(buttonHighlightListener);
+            }
+        }
     }
 
 
@@ -194,6 +223,38 @@ public class PreviewVideoActivity extends FileActivity implements OnCompletionLi
         }
         return true;
     }
+
+    private float calculateViewHighlightScale(View view){
+        return 1.3f;
+    }
+
+    private View.OnFocusChangeListener buttonHighlightListener = new View.OnFocusChangeListener(){
+        @Override
+        public void onFocusChange(View v, boolean hasFocus) {
+            Log.d("NCY3k","OnFocus "+hasFocus);
+            float scale = hasFocus?calculateViewHighlightScale(v):1.0f;
+            v.setScaleX(scale);
+            v.setScaleY(scale);
+        }
+    };
+
+    private int getSeekBarHighlightColor(){
+        return Color.GRAY;
+    }
+
+    private View.OnFocusChangeListener seekBarHighlightListener = new View.OnFocusChangeListener(){
+        @Override
+        public void onFocusChange(View v, boolean hasFocus) {
+            if(hasFocus){
+                ThemeUtils.colorHorizontalProgressBar((ProgressBar) v, getSeekBarHighlightColor());
+            } else if(v instanceof SeekBar){
+                ThemeUtils.colorHorizontalSeekBar((SeekBar)v,PreviewVideoActivity.this);
+            } else if(v instanceof ProgressBar){
+                ThemeUtils.colorHorizontalProgressBar((ProgressBar) v,
+                                                      ThemeUtils.primaryAccentColor(PreviewVideoActivity.this));
+            }
+        }
+    };
 
     @Override
     protected void onStart() {

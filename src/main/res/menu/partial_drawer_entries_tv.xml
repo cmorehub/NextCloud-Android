@@ -100,7 +100,7 @@
             android:icon="@drawable/ic_cmoremedia_flower"
             android:orderInCategory="0"
             android:title="@string/drawer_item_cmore_media"
-            android:visible="false"/>
+            android:visible="true"/>
         <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/nav_logout"
