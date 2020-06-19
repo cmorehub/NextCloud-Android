@@ -23,20 +23,67 @@ import com.owncloud.android.lib.common.OwnCloudAccount
 import com.owncloud.android.lib.common.OwnCloudClientManager
 import com.owncloud.android.lib.common.accounts.AccountUtils
 import com.owncloud.android.ui.activity.FileDisplayActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class FirstLoginActivity : AppCompatActivity() {
 
     private lateinit var loginViewModel: LoginViewModel
 
+    private suspend fun loginQBee(){
+        withContext(Dispatchers.Main){
+            loading.visibility = View.VISIBLE
+            withContext(Dispatchers.IO){
+                val url = Uri.parse("http://iottalk.cmoremap.com.tw:6325")
+                val loginName: String = "askey"
+                val password: String = "askeyqbee"
+
+                val accountManager = AccountManager.get(this@FirstLoginActivity)
+                val accountName = AccountUtils.buildAccountName(url, loginName)
+                val newAccount = Account(accountName, "nextcloud")
+
+                accountManager.addAccountExplicitly(newAccount, password, null)
+                accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_OC_BASE_URL, url.toString())
+                accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_USER_ID, loginName)
+
+                val manager = OwnCloudClientManager()
+                val account = OwnCloudAccount(newAccount, this@FirstLoginActivity)
+
+                val client = manager.getClientFor(account, this@FirstLoginActivity)
+                val loginSuccess = loginName==client.userId
+                withContext(Dispatchers.Main){
+                    this@FirstLoginActivity.loading.visibility = View.GONE
+                    if (loginSuccess){
+                        setResult(Activity.RESULT_OK,Intent().putExtra("AccountManager.KEY_ACCOUNT_NAME",newAccount.name))
+                    }else{
+                        Toast.makeText(this@FirstLoginActivity,"Login Failed",Toast.LENGTH_SHORT).show()
+                        setResult(Activity.RESULT_CANCELED)
+                    }
+                    this@FirstLoginActivity.finish()
+                }
+            }
+        }
+    }
+
+    val username by lazy{
+        findViewById<EditText>(R.id.username)
+    }
+    val password by lazy{
+        findViewById<EditText>(R.id.password)
+    }
+    val login by lazy{
+        findViewById<Button>(R.id.login)
+    }
+    val loading by lazy{
+        findViewById<ProgressBar>(R.id.loading)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_simple_login)
-
-        val username = findViewById<EditText>(R.id.username)
-        val password = findViewById<EditText>(R.id.password)
-        val login = findViewById<Button>(R.id.login)
-        val loading = findViewById<ProgressBar>(R.id.loading)
 
         loginViewModel = ViewModelProviders.of(this, LoginViewModelFactory())
             .get(LoginViewModel::class.java)
@@ -57,6 +104,12 @@ class FirstLoginActivity : AppCompatActivity() {
 
         loginViewModel.loginResult.observe(this@FirstLoginActivity, Observer {
             val loginResult = it ?: return@Observer
+            CoroutineScope(Dispatchers.Main).launch {
+                if(loginResult.success!=null) loginQBee()
+                else{
+                    Toast.makeText(this@FirstLoginActivity,loginResult.error?:R.string.login_failed,Toast.LENGTH_SHORT).show()
+                }
+            }
         })
 
         username.afterTextChanged {
@@ -87,36 +140,8 @@ class FirstLoginActivity : AppCompatActivity() {
 
             login.setOnClickListener {
                 loading.visibility = View.VISIBLE
-//                loginViewModel.login(username.text.toString(), password.text.toString())
-                Thread{
-                    val url = Uri.parse("http://iottalk.cmoremap.com.tw:6325")
-                    val loginName: String = "askey"
-                    val password: String = "askeyqbee"
-
-                    val accountManager = AccountManager.get(this@FirstLoginActivity)
-                    val accountName = AccountUtils.buildAccountName(url, loginName)
-                    val newAccount = Account(accountName, "nextcloud")
-
-                    accountManager.addAccountExplicitly(newAccount, password, null)
-                    accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_OC_BASE_URL, url.toString())
-                    accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_USER_ID, loginName)
-
-                    val manager = OwnCloudClientManager()
-                    val account = OwnCloudAccount(newAccount, this@FirstLoginActivity)
-
-                    val client = manager.getClientFor(account, this@FirstLoginActivity)
-                    val loginSuccess = loginName==client.userId
-                    runOnUiThread {
-                        loading.visibility = View.GONE
-                        if (loginSuccess){
-                            setResult(Activity.RESULT_OK,Intent().putExtra("AccountManager.KEY_ACCOUNT_NAME",newAccount.name))
-                        }else{
-                            Toast.makeText(this@FirstLoginActivity,"Login Failed",Toast.LENGTH_SHORT).show()
-                            setResult(Activity.RESULT_CANCELED)
-                        }
-                        this@FirstLoginActivity.finish()
-                    }
-                }.start()
+                loginViewModel.login(username.text.toString(), password.text.toString())
+                loading.visibility = View.INVISIBLE
             }
         }
     }
