@@ -123,6 +123,25 @@ public class SortingOrderDialogFragment extends DialogFragment {
         mTaggedViews[11] = view.findViewById(R.id.sortBySizeBiggestFirstText);
         mTaggedViews[11].setTag(FileSortOrder.sort_big_to_small);
 
+        // Views with same FileSortOrder shares same hover effect.
+        View.OnFocusChangeListener onFocusChangeListener = new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                int focusColor = getResources().getColor(hasFocus?R.color.primary:R.color.bg_default);
+                Object sortType = v.getTag();
+                for(View taggedView : mTaggedViews){
+                    if(taggedView.getTag()==sortType){
+                        v.setBackgroundColor(focusColor);
+                        taggedView.setBackgroundColor(focusColor);
+                    }
+                }
+            }
+        };
+
+        for(View v : mTaggedViews){
+            v.setOnFocusChangeListener(onFocusChangeListener);
+        }
+
         setupActiveOrderSelection();
     }
 
