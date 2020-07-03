@@ -136,6 +136,7 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private List<ThumbnailsCacheManager.ThumbnailGenerationTask> asyncTasks = new ArrayList<>();
     private boolean onlyOnDevice;
     private boolean showShareAvatar = false;
+    private final boolean isTVBuild;
     @Setter private OCFile highlightedItem;
 
     public OCFileListAdapter(
@@ -146,15 +147,17 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         ComponentsGetter transferServiceGetter,
         OCFileListFragmentInterface ocFileListFragmentInterface,
         boolean argHideItemOptions,
-        boolean gridView
+        boolean gridView,
+        boolean isTVBuild
     ) {
         this.ocFileListFragmentInterface = ocFileListFragmentInterface;
         this.activity = activity;
         this.preferences = preferences;
         this.accountManager = accountManager;
         this.user = user;
-        hideItemOptions = argHideItemOptions;
+        hideItemOptions = argHideItemOptions||isTVBuild;
         this.gridView = gridView;
+        this.isTVBuild = isTVBuild;
         checkedFiles = new HashSet<>();
 
         this.transferServiceGetter = transferServiceGetter;
@@ -543,7 +546,7 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 }
             }
 
-            if (hideItemOptions || (file.isFolder() && !file.canReshare())) {
+            if (hideItemOptions || (file.isFolder() && !file.canReshare()) || isTVBuild) {
                 gridViewHolder.shared.setVisibility(View.GONE);
             } else {
                 showShareIcon(gridViewHolder, file);

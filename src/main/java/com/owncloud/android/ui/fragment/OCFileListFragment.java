@@ -338,7 +338,8 @@ public class OCFileListFragment extends ExtendedListFragment implements
             mContainerActivity,
             this,
             hideItemOptions,
-            isGridViewPreferred(mFile)
+            isGridViewPreferred(mFile),
+            getResources().getBoolean(R.bool.is_tv_build)
         );
         setRecyclerViewAdapter(mAdapter);
 
