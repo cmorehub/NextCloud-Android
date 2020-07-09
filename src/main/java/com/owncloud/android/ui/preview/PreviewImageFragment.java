@@ -712,10 +712,27 @@ public class PreviewImageFragment extends FileFragment implements Injectable {
         }
     }
 
+    private Snackbar currentErrorSnackbar;
+
+    private void clearCurrentErrorSnackbar(){
+        if(currentErrorSnackbar!=null&&currentErrorSnackbar.isShown()){
+            currentErrorSnackbar.dismiss();
+            currentErrorSnackbar = null;
+        }
+    }
+
     public void setErrorPreviewMessage() {
+        clearCurrentErrorSnackbar();
         try {
             if (getActivity() != null) {
-                Snackbar.make(mMultiView,
+                if(getResources().getBoolean(R.bool.is_tv_build)){
+                    currentErrorSnackbar = Snackbar.make(mMultiView,
+                                  getResources().getString(R.string.could_not_download_image),
+                                  Snackbar.LENGTH_INDEFINITE);
+                    currentErrorSnackbar.show();
+                    return;
+                }
+                currentErrorSnackbar = Snackbar.make(mMultiView,
                               R.string.resized_image_not_possible_download,
                               Snackbar.LENGTH_INDEFINITE)
                     .setAction(R.string.common_yes, v -> {
@@ -723,15 +740,17 @@ public class PreviewImageFragment extends FileFragment implements Injectable {
                                    if (activity != null) {
                                        activity.requestForDownload(getFile());
                                    } else {
-                                       Snackbar.make(mMultiView,
+                                       currentErrorSnackbar = Snackbar.make(mMultiView,
                                                      getResources().getString(R.string.could_not_download_image),
-                                                     Snackbar.LENGTH_INDEFINITE).show();
+                                                     Snackbar.LENGTH_INDEFINITE);
+                                       currentErrorSnackbar.show();
                                    }
                                }
-                    ).show();
+                    );
             } else {
-                Snackbar.make(mMultiView, R.string.resized_image_not_possible, Snackbar.LENGTH_INDEFINITE).show();
+                currentErrorSnackbar = Snackbar.make(mMultiView, R.string.resized_image_not_possible, Snackbar.LENGTH_INDEFINITE);
             }
+            currentErrorSnackbar.show();
         } catch (IllegalArgumentException e) {
             Log_OC.d(TAG, e.getMessage());
         }
