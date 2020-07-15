@@ -195,7 +195,7 @@ public class OCFileListFragment extends ExtendedListFragment implements
 
     protected enum MenuItemAddRemove {
         DO_NOTHING, REMOVE_SORT, REMOVE_GRID_AND_SORT, ADD_SORT, ADD_GRID_AND_SORT, ADD_GRID_AND_SORT_WITH_SEARCH,
-        REMOVE_SEARCH
+        REMOVE_SEARCH,REMOVE_REFRESH
     }
 
     protected MenuItemAddRemove menuItemAddRemoveValue = MenuItemAddRemove.DO_NOTHING;
@@ -789,6 +789,8 @@ public class OCFileListFragment extends ExtendedListFragment implements
             menu.removeItem(R.id.action_sort);
             menu.removeItem(R.id.action_switch_view);
             menu.removeItem(R.id.action_search);
+        }else if(menuItemAddRemoveValue == MenuItemAddRemove.REMOVE_REFRESH){
+            menu.removeItem(R.id.action_sync_account);
         }
 
         // create rich workspace
@@ -1493,6 +1495,7 @@ public class OCFileListFragment extends ExtendedListFragment implements
         getArguments().putParcelable(OCFileListFragment.SEARCH_EVENT, null);
 
         setFabVisible(true);
+        setSwipeEnabled(true);
     }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
@@ -1521,6 +1524,7 @@ public class OCFileListFragment extends ExtendedListFragment implements
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onMessageEvent(final SearchEvent event) {
+        Log_OC.d("0710", "onMessageEvent="+event.searchType.name());
         if (SearchRemoteOperation.SearchType.PHOTO_SEARCH == event.searchType) {
             return;
         }
@@ -1597,6 +1601,11 @@ public class OCFileListFragment extends ExtendedListFragment implements
                                     if (fileDisplayActivity != null) {
                                         fileDisplayActivity.setIndeterminate(false);
                                     }
+                                    menuItemAddRemoveValue = MenuItemAddRemove.REMOVE_REFRESH;
+                                    if (getActivity() != null) {
+                                        getActivity().invalidateOptionsMenu();
+                                    }
+                                    setSwipeEnabled(false);
                                 }
                             });
                         }
