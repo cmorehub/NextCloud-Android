@@ -966,10 +966,12 @@
     <string name="qbee_setup_scan_qrcode">Scan QRCode</string>
     <string name="qbee_setup_device_info">Device Info</string>
     <string name="qbee_setup_device_id">DeviceID：%1$s</string>
-    <string name="qbee_setup_device_status">DeviceStarus：%1$s</string>
+    <string name="qbee_setup_device_status">DeviceStatus：%1$s</string>
     <string name="qbee_setup_device_connect">Connect</string>
     <string name="qbee_setup_connected_to_qbee">Connected to QBee</string>
     <string name="qbee_setup_connected_result">You have connected your device to QBee.</string>
+    <string name="qbee_setup_connected_error">Can not connect to QBee, please check QBee is online or call the
+        consumer hotline for help</string>
     <string name="qbee_setup_complete">Continue to get QBee service.</string>
     <string name="qbee_setup_finish">continue</string>
 </resources>

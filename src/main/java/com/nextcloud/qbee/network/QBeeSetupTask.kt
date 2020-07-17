@@ -30,6 +30,8 @@ class QBeeSetupTask() : AsyncTask<String, Void, String?>() {
 
     override fun doInBackground(vararg params: String?): String? {
         var result: String? = null
+
+        Log.d("0716", "params?.get(0)=${params?.get(0)}")
         try {
             var server_response_code = 0
             val url = URL(SERVER_URL)
@@ -58,7 +60,7 @@ class QBeeSetupTask() : AsyncTask<String, Void, String?>() {
                 stream.write(buffer2, 0, readCount)
             }
             val resultString = stream.toString()
-            Log.d("0206", resultString)
+            Log.d("0716", resultString)
             result = if (server_response_code == 200) {
                 resultString
             } else {

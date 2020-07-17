@@ -40,4 +40,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="@string/qbee_setup_device_connect" />
+
+    <ProgressBar
+        android:id="@+id/pgsConnecting"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:visibility="gone" />
 </LinearLayout>

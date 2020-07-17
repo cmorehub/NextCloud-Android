@@ -28,6 +28,7 @@ class QBeeSetup5Fragment() : Fragment() {
     var mail: String? = null
     var pwd: String? = null
     var mac: String? = null
+    var url: String? = null
 
     private val args: QBeeSetup5FragmentArgs by navArgs()
 
@@ -38,12 +39,13 @@ class QBeeSetup5Fragment() : Fragment() {
         mail = args.mail
         pwd = args.pwd
         mac = args.mac
+        url = args.url
 
         btnSetupFinish.setOnClickListener {
             Thread {
-                val url = Uri.parse("http://iottalk.cmoremap.com.tw:6325")
-                val loginName: String = "askey"
-                val password: String = "askeyqbee"
+                val url = Uri.parse(url)
+                val loginName: String = "admin"
+                val password: String = "admin"
 
                 val accountManager = AccountManager.get(context)
                 val accountName = AccountUtils.buildAccountName(url, loginName)

@@ -88,6 +88,11 @@
             android:defaultValue=""
             app:argType="string"
             app:nullable="false" />
+        <action
+            android:id="@+id/action_QBeeSetup4Fragment_to_QBeeSetupConnectionTypeFragment"
+            app:destination="@id/QBeeSetupConnectionTypeFragment"
+            app:popUpTo="@id/QBeeSetupConnectionTypeFragment"
+            app:popUpToInclusive="true"/>
     </fragment>
     <fragment
         android:id="@+id/QBeeSetup5Fragment"
@@ -105,6 +110,11 @@
             app:nullable="false" />
         <argument
             android:name="mac"
+            android:defaultValue=""
+            app:argType="string"
+            app:nullable="false" />
+        <argument
+            android:name="url"
             android:defaultValue=""
             app:argType="string"
             app:nullable="false" />
