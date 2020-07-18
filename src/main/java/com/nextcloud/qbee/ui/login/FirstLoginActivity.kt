@@ -22,11 +22,14 @@ import com.owncloud.android.R
 import com.owncloud.android.lib.common.OwnCloudAccount
 import com.owncloud.android.lib.common.OwnCloudClientManager
 import com.owncloud.android.lib.common.accounts.AccountUtils
+import com.owncloud.android.lib.common.network.NetworkUtils
 import com.owncloud.android.ui.activity.FileDisplayActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.security.cert.CertificateFactory
+import java.security.cert.X509Certificate
 
 class FirstLoginActivity : AppCompatActivity() {
 
@@ -143,6 +146,13 @@ class FirstLoginActivity : AppCompatActivity() {
                 loginViewModel.login(username.text.toString(), password.text.toString())
                 loading.visibility = View.INVISIBLE
             }
+        }
+    }
+
+    private suspend fun addQBeeCert() = withContext(Dispatchers.IO){
+        resources.openRawResource(R.raw.qbee).use {
+            val cert = CertificateFactory.getInstance("X.509").generateCertificate(it) as X509Certificate
+            NetworkUtils.addCertToKnownServersStore(cert,this@FirstLoginActivity)
         }
     }
 
