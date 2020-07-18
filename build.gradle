@@ -402,6 +402,8 @@ dependencies {
 //    androidJacocoAnt "org.jacoco:org.jacoco.agent:${jacocoVersion}"
 
     implementation "com.github.stateless4j:stateless4j:2.6.0"
+
+    implementation project(":P2PManager")
 }
 
 configurations.all {

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="invalid_user_password">Invalid userName or password</string>
+    <string name="already_signed_in">Already signed in as %1$s</string>
+    <string name="invalid_user_hash">Invalid userName or authHash</string>
+</resources>
