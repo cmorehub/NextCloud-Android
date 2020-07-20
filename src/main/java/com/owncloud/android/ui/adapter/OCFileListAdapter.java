@@ -699,7 +699,7 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     private boolean shouldShowHeader() {
-        if (currentDirectory == null) {
+        if (activity.getResources().getBoolean(R.bool.is_tv_build) || currentDirectory == null) {
             return false;
         }
 
