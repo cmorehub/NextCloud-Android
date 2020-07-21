@@ -20,8 +20,9 @@ class RemoteItController(context: Context) {
 
     companion object {
         private const val DEVELOPER_KEY = "QzlEQ0JDQzItNjYyMC00RjVCLUIwOTgtQkFBQkNCMzgxRUFG"
-        private const val TYPE_BULK = "00:23:81:00:00:04:00:06:04:60:FF:FF:00:01:00:00"
-        private const val TYPE_NEXTCLOUD = "00:26:81:00:00:04:00:06:04:60:01:BB:00:01:00:00"
+        const val TYPE_BULK = "00:23:81:00:00:04:00:06:04:60:FF:FF:00:01:00:00"
+        const val TYPE_HTTP = "00:1E:00:00:00:04:00:08:00:00:18:B5:00:01:00:00"
+        const val TYPE_NEXTCLOUD = "00:26:81:00:00:04:00:06:04:60:01:BB:00:01:00:00"
     }
 
     @Throws(IOException::class)
@@ -69,7 +70,7 @@ class RemoteItController(context: Context) {
         }
 
     @Throws(IOException::class)
-    public suspend fun restGetDeviceList(authToken: String, ofType: String = TYPE_NEXTCLOUD): List<String> =
+    public suspend fun restGetDeviceList(authToken: String, ofType: String? = null): List<String> =
         withContext(Dispatchers.IO) {
             val urlConnection = restRequest("https://api.remot3.it/apv/v27/device/list/all")
             urlConnection.setRequestProperty("token", authToken)
@@ -77,7 +78,9 @@ class RemoteItController(context: Context) {
                 val result = mutableListOf<String>()
                 if (this.get("status").asBoolean) {
                     this.getAsJsonArray("devices").forEach {
-                        if (it.asJsonObject.get("devicetype").asString == ofType)
+//                        Log.d("RemoteIt","devicealias=${it.asJsonObject.get("devicealias").asString} " +
+//                            "devicetype=${it.asJsonObject.get("devicetype").asString}")
+                        if (ofType==null || it.asJsonObject.get("devicetype").asString == ofType)
                             result.add(it.asJsonObject.get("deviceaddress").asString)
                     }
                 }
