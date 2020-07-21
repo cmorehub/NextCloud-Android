@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
@@ -18,12 +19,13 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.nextcloud.qbee.qbeecom.QBeeDotCom
+import com.nextcloud.qbee.remoteit.RemoteItController
 import com.owncloud.android.R
 import com.owncloud.android.lib.common.OwnCloudAccount
 import com.owncloud.android.lib.common.OwnCloudClientManager
 import com.owncloud.android.lib.common.accounts.AccountUtils
 import com.owncloud.android.lib.common.network.NetworkUtils
-import com.owncloud.android.ui.activity.FileDisplayActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,38 +36,55 @@ import java.security.cert.X509Certificate
 class FirstLoginActivity : AppCompatActivity() {
 
     private lateinit var loginViewModel: LoginViewModel
+    private val remoteItController by lazy{
+        RemoteItController(this)
+    }
+    private var remoteItAuthToken : String? = null
 
-    private suspend fun loginQBee(){
-        withContext(Dispatchers.Main){
-            loading.visibility = View.VISIBLE
-            withContext(Dispatchers.IO){
-                val url = Uri.parse("http://iottalk.cmoremap.com.tw:6325")
-                val loginName: String = "askey"
-                val password: String = "askeyqbee"
+    @Throws(Exception::class)
+    private suspend fun findQBeeDeviceOfName(deviceName:String):RemoteItController
+    .RemoteDevice?{
+        remoteItAuthToken = remoteItController.restGetAuthToken()
+        val filteredDeviceList = remoteItController.restGetDeviceList(remoteItAuthToken!!).filter {
+            it.name == deviceName
+        }
+        return if(filteredDeviceList.isEmpty()) null else filteredDeviceList[0]
+    }
 
-                val accountManager = AccountManager.get(this@FirstLoginActivity)
-                val accountName = AccountUtils.buildAccountName(url, loginName)
-                val newAccount = Account(accountName, "nextcloud")
+    private suspend fun loginQBee(remoteItQBee : RemoteItController.RemoteDevice) = withContext(Dispatchers.Main){
+        loading.visibility = View.VISIBLE
+        withContext(Dispatchers.IO){
+            addQBeeCert()
+            remoteItAuthToken = remoteItAuthToken?:remoteItController.restGetAuthToken()
+            remoteItController.peerToPeerLogin()
+            val qbeeUrl = remoteItController.restGetRemoteProxy(remoteItAuthToken!!,remoteItQBee.address)
+            Log.d("QBeeDotCom","qbeeUrl = $qbeeUrl")
+            val url = Uri.parse(qbeeUrl!!.replace("http:","https:"))
+            val loginName = "admin"
+            val password = "admin"
 
-                accountManager.addAccountExplicitly(newAccount, password, null)
-                accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_OC_BASE_URL, url.toString())
-                accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_USER_ID, loginName)
+            val accountManager = AccountManager.get(this@FirstLoginActivity)
+            val accountName = AccountUtils.buildAccountName(url, loginName)
+            val newAccount = Account(accountName, "nextcloud")
 
-                val manager = OwnCloudClientManager()
-                val account = OwnCloudAccount(newAccount, this@FirstLoginActivity)
+            accountManager.addAccountExplicitly(newAccount, password, null)
+            accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_OC_BASE_URL, url.toString())
+            accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_USER_ID, loginName)
 
-                val client = manager.getClientFor(account, this@FirstLoginActivity)
-                val loginSuccess = loginName==client.userId
-                withContext(Dispatchers.Main){
-                    this@FirstLoginActivity.loading.visibility = View.GONE
-                    if (loginSuccess){
-                        setResult(Activity.RESULT_OK,Intent().putExtra("AccountManager.KEY_ACCOUNT_NAME",newAccount.name))
-                    }else{
-                        Toast.makeText(this@FirstLoginActivity,"Login Failed",Toast.LENGTH_SHORT).show()
-                        setResult(Activity.RESULT_CANCELED)
-                    }
-                    this@FirstLoginActivity.finish()
+            val manager = OwnCloudClientManager()
+            val account = OwnCloudAccount(newAccount, this@FirstLoginActivity)
+
+            val client = manager.getNextcloudClientFor(account, this@FirstLoginActivity)
+            val loginSuccess = loginName==client.userId
+            withContext(Dispatchers.Main){
+                this@FirstLoginActivity.loading.visibility = View.GONE
+                if (loginSuccess){
+                    setResult(Activity.RESULT_OK,Intent().putExtra("AccountManager.KEY_ACCOUNT_NAME",newAccount.name))
+                }else{
+                    Toast.makeText(this@FirstLoginActivity,"Login Failed",Toast.LENGTH_SHORT).show()
+                    setResult(Activity.RESULT_CANCELED)
                 }
+                this@FirstLoginActivity.finish()
             }
         }
     }
@@ -106,14 +125,24 @@ class FirstLoginActivity : AppCompatActivity() {
         })
 
         loginViewModel.loginResult.observe(this@FirstLoginActivity, Observer {
-            val loginResult = it ?: return@Observer
             CoroutineScope(Dispatchers.Main).launch {
-                if(loginResult.success!=null) loginQBee()
-                else{
-                    Toast.makeText(this@FirstLoginActivity,loginResult.error?:R.string.login_failed,Toast.LENGTH_SHORT).show()
+                if(it?.success != null) {
+                    val device = findQBeeDeviceOfName(it.success.device?.remote?:return@launch)
+                    if(device!=null){
+                        loginQBee(device)
+                    } else Toast.makeText(this@FirstLoginActivity,it.error?.message?:getString(R.string.login_failed)
+                        ,Toast
+                        .LENGTH_SHORT)
+                        .show()
+                } else{
+                    Toast.makeText(this@FirstLoginActivity,it.error?.message?:getString(R.string.login_failed),Toast
+                        .LENGTH_SHORT)
+                        .show()
                 }
             }
         })
+
+        username.setText("ccmaped@gmail.com")
 
         username.afterTextChanged {
             loginViewModel.loginDataChanged(
@@ -133,18 +162,24 @@ class FirstLoginActivity : AppCompatActivity() {
             setOnEditorActionListener { _, actionId, _ ->
                 when (actionId) {
                     EditorInfo.IME_ACTION_DONE ->
-                        loginViewModel.login(
-                            username.text.toString(),
-                            password.text.toString()
-                        )
+                        CoroutineScope(Dispatchers.Main).launch {
+                            loading.visibility = View.VISIBLE
+                            loginViewModel.login(
+                                username.text.toString(),
+                                password.text.toString()
+                            )
+                            loading.visibility = View.INVISIBLE
+                        }
                 }
                 false
             }
 
             login.setOnClickListener {
-                loading.visibility = View.VISIBLE
-                loginViewModel.login(username.text.toString(), password.text.toString())
-                loading.visibility = View.INVISIBLE
+                CoroutineScope(Dispatchers.Main).launch {
+                    loading.visibility = View.VISIBLE
+                    loginViewModel.login(username.text.toString(), password.text.toString())
+                    loading.visibility = View.INVISIBLE
+                }
             }
         }
     }

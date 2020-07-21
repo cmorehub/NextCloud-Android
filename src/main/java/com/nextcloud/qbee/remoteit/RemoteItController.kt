@@ -23,6 +23,8 @@ class RemoteItController(context: Context) {
         const val TYPE_BULK = "00:23:81:00:00:04:00:06:04:60:FF:FF:00:01:00:00"
         const val TYPE_HTTP = "00:1E:00:00:00:04:00:08:00:00:18:B5:00:01:00:00"
         const val TYPE_NEXTCLOUD = "00:26:81:00:00:04:00:06:04:60:01:BB:00:01:00:00"
+        const val DEFAULT_USERNAME = "ccmaped@gmail.com"
+        const val DEFAULT_PASSWORD = "maped1234"
     }
 
     @Throws(IOException::class)
@@ -45,7 +47,7 @@ class RemoteItController(context: Context) {
         }
 
     @Throws(IOException::class)
-    public suspend fun restGetAuthToken(userName: String, password: String) =
+    public suspend fun restGetAuthToken(userName: String = DEFAULT_USERNAME, password: String = DEFAULT_PASSWORD) =
         withContext(Dispatchers.IO) {
             val urlConnection = restRequest("https://api.remot3.it/apv/v27/user/login")
             urlConnection.requestMethod = "POST"
@@ -69,19 +71,24 @@ class RemoteItController(context: Context) {
             }
         }
 
+    class RemoteDevice(
+        @com.google.gson.annotations.SerializedName("devicetype") val type:String,
+        @com.google.gson.annotations.SerializedName("devicealias") val name:String,
+        @com.google.gson.annotations.SerializedName("deviceaddress") val address:String
+    )
+
     @Throws(IOException::class)
-    public suspend fun restGetDeviceList(authToken: String, ofType: String? = null): List<String> =
+    public suspend fun restGetDeviceList(authToken: String, ofType: String? = null): List<RemoteDevice> =
         withContext(Dispatchers.IO) {
             val urlConnection = restRequest("https://api.remot3.it/apv/v27/device/list/all")
             urlConnection.setRequestProperty("token", authToken)
             return@withContext with(urlConnection.getResponseJson()) {
-                val result = mutableListOf<String>()
+                val result = mutableListOf<RemoteDevice>()
                 if (this.get("status").asBoolean) {
                     this.getAsJsonArray("devices").forEach {
-//                        Log.d("RemoteIt","devicealias=${it.asJsonObject.get("devicealias").asString} " +
-//                            "devicetype=${it.asJsonObject.get("devicetype").asString}")
-                        if (ofType==null || it.asJsonObject.get("devicetype").asString == ofType)
-                            result.add(it.asJsonObject.get("deviceaddress").asString)
+                        val device = Gson().fromJson(it,RemoteDevice::class.java)
+                        if (ofType==null || device.type==ofType)
+                            result.add(device)
                     }
                 }
                 return@with result
@@ -116,7 +123,7 @@ class RemoteItController(context: Context) {
         }
 
     @Throws(IOException::class)
-    public suspend fun peerToPeerLogin(userName: String, password: String) =
+    public suspend fun peerToPeerLogin(userName: String= DEFAULT_USERNAME, password: String= DEFAULT_PASSWORD) =
         withContext(Dispatchers.IO) {
             p2PManager.signInWithPassword(userName, password, hashMapOf()) // seems not blocking
         }

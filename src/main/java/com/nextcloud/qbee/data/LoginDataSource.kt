@@ -1,7 +1,9 @@
 package com.nextcloud.qbee.data
 
 import android.accounts.AuthenticatorException
+import android.util.Log
 import com.nextcloud.qbee.data.model.LoggedInUser
+import com.nextcloud.qbee.qbeecom.QBeeDotCom
 import java.io.IOException
 
 /**
@@ -9,16 +11,24 @@ import java.io.IOException
  */
 class LoginDataSource {
 
-    fun login(username: String, password: String): Result<LoggedInUser> {
+    suspend fun login(username: String, password: String): Result<LoginRepository.User> {
         try {
-            if(username!="qbee@askey.com"||password!="askeyqbee"){
-                return Result.Error(AuthenticatorException("Invalid user or password!!"))
+            val loginQBeeDotCom = QBeeDotCom.login(username, password)
+            return if(loginQBeeDotCom.result!=0){
+                if(loginQBeeDotCom is QBeeDotCom.WusiungError)
+                    Result.Error(AuthenticatorException(loginQBeeDotCom.error))
+                else
+                    Result.Error(AuthenticatorException("Invalid user or password!!"))
+            } else if(loginQBeeDotCom is QBeeDotCom.WusiungResult && loginQBeeDotCom
+                    .deviceList.isNullOrEmpty()){
+                Result.Error(AuthenticatorException("Not bound with any device!!"))
+            } else if(loginQBeeDotCom is QBeeDotCom.WusiungResult && !loginQBeeDotCom.deviceList.isNullOrEmpty()){
+                Result.Success(LoginRepository.User(username,password,loginQBeeDotCom.deviceList[0]))
             } else{
-                val fakeUser = LoggedInUser(java.util.UUID.randomUUID().toString(), "Jane Doe")
-                return Result.Success(fakeUser)
+                Result.Error(IOException("Unknown Response:$loginQBeeDotCom"))
             }
-        } catch (e: Throwable) {
-            return Result.Error(IOException("Error logging in", e))
+        } catch (e: Exception) {
+            return Result.Error(e)
         }
     }
 
