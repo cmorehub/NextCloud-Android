@@ -27,6 +27,15 @@
           android:contentDescription="@string/actionbar_search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
           app:showAsAction="collapseActionView|ifRoom"/>
+
+    <item
+        android:id="@+id/action_voice"
+        android:icon="@drawable/speak_icon"
+        android:orderInCategory="1"
+        app:showAsAction="ifRoom"
+        android:title="@string/menu_item_speak"
+        android:contentDescription="@string/menu_item_speak"/>
+
     <item
         android:id="@+id/action_create_dir"
         android:icon="@drawable/ic_action_create_dir"
