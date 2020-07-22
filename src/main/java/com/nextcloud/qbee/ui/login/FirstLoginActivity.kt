@@ -19,7 +19,6 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.nextcloud.qbee.qbeecom.QBeeDotCom
 import com.nextcloud.qbee.remoteit.RemoteItController
 import com.owncloud.android.R
 import com.owncloud.android.lib.common.OwnCloudAccount
@@ -36,30 +35,34 @@ import java.security.cert.X509Certificate
 class FirstLoginActivity : AppCompatActivity() {
 
     private lateinit var loginViewModel: LoginViewModel
-    private val remoteItController by lazy{
+    private val remoteItController by lazy {
         RemoteItController(this)
     }
-    private var remoteItAuthToken : String? = null
+    private var remoteItAuthToken: String? = null
 
     @Throws(Exception::class)
-    private suspend fun findQBeeDeviceOfName(deviceName:String):RemoteItController
-    .RemoteDevice?{
+    private suspend fun findQBeeDeviceOfName(deviceName: String): RemoteItController
+    .RemoteDevice? {
         remoteItAuthToken = remoteItController.restGetAuthToken()
         val filteredDeviceList = remoteItController.restGetDeviceList(remoteItAuthToken!!).filter {
             it.name == deviceName
         }
-        return if(filteredDeviceList.isEmpty()) null else filteredDeviceList[0]
+        return if (filteredDeviceList.isEmpty()) null else filteredDeviceList[0]
     }
 
-    private suspend fun loginQBee(remoteItQBee : RemoteItController.RemoteDevice) = withContext(Dispatchers.Main){
-        loading.visibility = View.VISIBLE
-        withContext(Dispatchers.IO){
+    private suspend fun loginQBee(remoteItQBee: RemoteItController.RemoteDevice, usePeerToPeer: Boolean = false) =
+        withContext(Dispatchers.IO) {
+            setLoadingEnabled()
             addQBeeCert()
-            remoteItAuthToken = remoteItAuthToken?:remoteItController.restGetAuthToken()
-            remoteItController.peerToPeerLogin()
-            val qbeeUrl = remoteItController.restGetRemoteProxy(remoteItAuthToken!!,remoteItQBee.address)
-            Log.d("QBeeDotCom","qbeeUrl = $qbeeUrl")
-            val url = Uri.parse(qbeeUrl!!.replace("http:","https:"))
+            remoteItAuthToken = remoteItAuthToken ?: remoteItController.restGetAuthToken()
+            val qbeeUrl =
+                if(usePeerToPeer) {
+                    remoteItController.peerToPeerLogin()
+                    remoteItController.peerToPeerConnect(remoteItQBee.address)
+                }
+                else remoteItController.restGetRemoteProxy(remoteItAuthToken!!, remoteItQBee.address)
+            Log.d("QBeeDotCom", "qbeeUrl = $qbeeUrl")
+            val url = Uri.parse(qbeeUrl!!.replace("http:", "https:"))
             val loginName = "admin"
             val password = "admin"
 
@@ -75,30 +78,42 @@ class FirstLoginActivity : AppCompatActivity() {
             val account = OwnCloudAccount(newAccount, this@FirstLoginActivity)
 
             val client = manager.getNextcloudClientFor(account, this@FirstLoginActivity)
-            val loginSuccess = loginName==client.userId
-            withContext(Dispatchers.Main){
-                this@FirstLoginActivity.loading.visibility = View.GONE
-                if (loginSuccess){
-                    setResult(Activity.RESULT_OK,Intent().putExtra("AccountManager.KEY_ACCOUNT_NAME",newAccount.name))
-                }else{
-                    Toast.makeText(this@FirstLoginActivity,"Login Failed",Toast.LENGTH_SHORT).show()
+            val loginSuccess = loginName == client.userId
+            withContext(Dispatchers.Main) {
+                if (loginSuccess) {
+                    setResult(Activity.RESULT_OK, Intent().putExtra("AccountManager.KEY_ACCOUNT_NAME", newAccount.name))
+                } else {
+                    Toast.makeText(this@FirstLoginActivity, "Login Failed", Toast.LENGTH_SHORT).show()
                     setResult(Activity.RESULT_CANCELED)
                 }
                 this@FirstLoginActivity.finish()
             }
         }
+
+    private suspend fun setLoadingEnabled() = withContext(Dispatchers.Main) {
+        this@FirstLoginActivity.loading.visibility = View.VISIBLE
+        this@FirstLoginActivity.login.isEnabled = false
+        this@FirstLoginActivity.username.isEnabled = false
+        this@FirstLoginActivity.password.isEnabled = false
     }
 
-    val username by lazy{
+    private suspend fun setLoadingDisabled() = withContext(Dispatchers.Main) {
+        this@FirstLoginActivity.loading.visibility = View.GONE
+        this@FirstLoginActivity.login.isEnabled = true
+        this@FirstLoginActivity.username.isEnabled = true
+        this@FirstLoginActivity.password.isEnabled = true
+    }
+
+    private val username by lazy {
         findViewById<EditText>(R.id.username)
     }
-    val password by lazy{
+    private val password by lazy {
         findViewById<EditText>(R.id.password)
     }
-    val login by lazy{
+    private val login by lazy {
         findViewById<Button>(R.id.login)
     }
-    val loading by lazy{
+    private val loading by lazy {
         findViewById<ProgressBar>(R.id.loading)
     }
 
@@ -126,18 +141,21 @@ class FirstLoginActivity : AppCompatActivity() {
 
         loginViewModel.loginResult.observe(this@FirstLoginActivity, Observer {
             CoroutineScope(Dispatchers.Main).launch {
-                if(it?.success != null) {
-                    val device = findQBeeDeviceOfName(it.success.device?.remote?:return@launch)
-                    if(device!=null){
+                if (it?.success != null) {
+                    val device = findQBeeDeviceOfName(it.success.device?.remote ?: return@launch)
+                    if (device != null) {
                         loginQBee(device)
-                    } else Toast.makeText(this@FirstLoginActivity,it.error?.message?:getString(R.string.login_failed)
-                        ,Toast
+                    } else {
+                        Toast.makeText(this@FirstLoginActivity, it.error?.message ?: getString(R.string
+                            .login_failed)
+                            , Toast.LENGTH_SHORT).show()
+                        setLoadingDisabled()
+                    }
+                } else {
+                    Toast.makeText(this@FirstLoginActivity, it.error?.message ?: getString(R.string.login_failed), Toast
                         .LENGTH_SHORT)
                         .show()
-                } else{
-                    Toast.makeText(this@FirstLoginActivity,it.error?.message?:getString(R.string.login_failed),Toast
-                        .LENGTH_SHORT)
-                        .show()
+                    setLoadingDisabled()
                 }
             }
         })
@@ -163,12 +181,11 @@ class FirstLoginActivity : AppCompatActivity() {
                 when (actionId) {
                     EditorInfo.IME_ACTION_DONE ->
                         CoroutineScope(Dispatchers.Main).launch {
-                            loading.visibility = View.VISIBLE
+                            setLoadingEnabled()
                             loginViewModel.login(
                                 username.text.toString(),
                                 password.text.toString()
                             )
-                            loading.visibility = View.INVISIBLE
                         }
                 }
                 false
@@ -176,18 +193,17 @@ class FirstLoginActivity : AppCompatActivity() {
 
             login.setOnClickListener {
                 CoroutineScope(Dispatchers.Main).launch {
-                    loading.visibility = View.VISIBLE
+                    setLoadingEnabled()
                     loginViewModel.login(username.text.toString(), password.text.toString())
-                    loading.visibility = View.INVISIBLE
                 }
             }
         }
     }
 
-    private suspend fun addQBeeCert() = withContext(Dispatchers.IO){
+    private suspend fun addQBeeCert() = withContext(Dispatchers.IO) {
         resources.openRawResource(R.raw.qbee).use {
             val cert = CertificateFactory.getInstance("X.509").generateCertificate(it) as X509Certificate
-            NetworkUtils.addCertToKnownServersStore(cert,this@FirstLoginActivity)
+            NetworkUtils.addCertToKnownServersStore(cert, this@FirstLoginActivity)
         }
     }
 
