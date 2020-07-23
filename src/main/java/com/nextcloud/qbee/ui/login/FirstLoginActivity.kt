@@ -41,13 +41,19 @@ class FirstLoginActivity : AppCompatActivity() {
     private var remoteItAuthToken: String? = null
 
     @Throws(Exception::class)
-    private suspend fun findQBeeDeviceOfName(deviceName: String): RemoteItController
+    private suspend fun findQBeeDeviceOfName(deviceName: String, forceFirst: Boolean = false): RemoteItController
     .RemoteDevice? {
         remoteItAuthToken = remoteItController.restGetAuthToken()
-        val filteredDeviceList = remoteItController.restGetDeviceList(remoteItAuthToken!!).filter {
-            it.name == deviceName
+        val deviceList = remoteItController.restGetDeviceList(remoteItAuthToken!!,ofType = if(forceFirst)
+            RemoteItController.TYPE_NEXTCLOUD else null)
+        return if(forceFirst){
+            deviceList[0]
+        } else{
+            val filteredDeviceList = deviceList.filter {
+                it.name == deviceName
+            }
+            if (filteredDeviceList.isEmpty()) null else filteredDeviceList[0]
         }
-        return if (filteredDeviceList.isEmpty()) null else filteredDeviceList[0]
     }
 
     private suspend fun loginQBee(remoteItQBee: RemoteItController.RemoteDevice, usePeerToPeer: Boolean = false) =
@@ -91,29 +97,29 @@ class FirstLoginActivity : AppCompatActivity() {
         }
 
     private suspend fun setLoadingEnabled() = withContext(Dispatchers.Main) {
-        this@FirstLoginActivity.loading.visibility = View.VISIBLE
-        this@FirstLoginActivity.login.isEnabled = false
-        this@FirstLoginActivity.username.isEnabled = false
-        this@FirstLoginActivity.password.isEnabled = false
+        this@FirstLoginActivity.loadingBar.visibility = View.VISIBLE
+        this@FirstLoginActivity.loginButton.isEnabled = false
+        this@FirstLoginActivity.usernameEditText.isEnabled = false
+        this@FirstLoginActivity.passwordEditText.isEnabled = false
     }
 
     private suspend fun setLoadingDisabled() = withContext(Dispatchers.Main) {
-        this@FirstLoginActivity.loading.visibility = View.GONE
-        this@FirstLoginActivity.login.isEnabled = true
-        this@FirstLoginActivity.username.isEnabled = true
-        this@FirstLoginActivity.password.isEnabled = true
+        this@FirstLoginActivity.loadingBar.visibility = View.GONE
+        this@FirstLoginActivity.loginButton.isEnabled = true
+        this@FirstLoginActivity.usernameEditText.isEnabled = true
+        this@FirstLoginActivity.passwordEditText.isEnabled = true
     }
 
-    private val username by lazy {
+    private val usernameEditText by lazy {
         findViewById<EditText>(R.id.username)
     }
-    private val password by lazy {
+    private val passwordEditText by lazy {
         findViewById<EditText>(R.id.password)
     }
-    private val login by lazy {
+    private val loginButton by lazy {
         findViewById<Button>(R.id.login)
     }
-    private val loading by lazy {
+    private val loadingBar by lazy {
         findViewById<ProgressBar>(R.id.loading)
     }
 
@@ -129,13 +135,13 @@ class FirstLoginActivity : AppCompatActivity() {
             val loginState = it ?: return@Observer
 
             // disable login button unless both username / password is valid
-            login.isEnabled = loginState.isDataValid
+            loginButton.isEnabled = loginState.isDataValid
 
             if (loginState.usernameError != null) {
-                username.error = getString(loginState.usernameError)
+                usernameEditText.error = getString(loginState.usernameError)
             }
             if (loginState.passwordError != null) {
-                password.error = getString(loginState.passwordError)
+                passwordEditText.error = getString(loginState.passwordError)
             }
         })
 
@@ -160,43 +166,44 @@ class FirstLoginActivity : AppCompatActivity() {
             }
         })
 
-        username.setText("ccmaped@gmail.com")
+        usernameEditText.setText("ccmaped@gmail.com")
 
-        username.afterTextChanged {
+        usernameEditText.afterTextChanged {
             loginViewModel.loginDataChanged(
-                username.text.toString(),
-                password.text.toString()
+                usernameEditText.text.toString(),
+                passwordEditText.text.toString()
             )
         }
 
-        password.apply {
+        passwordEditText.apply {
             afterTextChanged {
                 loginViewModel.loginDataChanged(
-                    username.text.toString(),
-                    password.text.toString()
+                    usernameEditText.text.toString(),
+                    passwordEditText.text.toString()
                 )
             }
 
             setOnEditorActionListener { _, actionId, _ ->
                 when (actionId) {
                     EditorInfo.IME_ACTION_DONE ->
-                        CoroutineScope(Dispatchers.Main).launch {
-                            setLoadingEnabled()
-                            loginViewModel.login(
-                                username.text.toString(),
-                                password.text.toString()
-                            )
-                        }
+                        loginAskeyQBeeDotCom()
                 }
                 false
             }
 
-            login.setOnClickListener {
-                CoroutineScope(Dispatchers.Main).launch {
-                    setLoadingEnabled()
-                    loginViewModel.login(username.text.toString(), password.text.toString())
-                }
+            loginButton.setOnClickListener {
+                loginAskeyQBeeDotCom()
             }
+        }
+    }
+
+    private  fun loginAskeyQBeeDotCom() {
+        CoroutineScope(Dispatchers.Main).launch {
+            setLoadingEnabled()
+            loginViewModel.login(
+                usernameEditText.text.toString(),
+                passwordEditText.text.toString()
+            )
         }
     }
 

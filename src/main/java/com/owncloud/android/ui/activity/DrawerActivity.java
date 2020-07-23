@@ -413,8 +413,6 @@ public abstract class DrawerActivity extends ToolbarActivity
 
         setDrawerMenuItemChecked(menuItem.getItemId());
 
-        Log.d("NCY3K", "selectNavigationItem("+getResources().getResourceName(menuItem.getItemId())+")");
-
         if (menuItem.getGroupId() == R.id.drawer_menu_accounts) {
             handleAccountItemClick(menuItem);
             return;

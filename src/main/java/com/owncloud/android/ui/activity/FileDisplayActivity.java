@@ -41,8 +41,6 @@ import android.content.ServiceConnection;
 import android.content.SyncRequest;
 import android.content.pm.PackageManager;
 import android.content.res.Resources.NotFoundException;
-import android.graphics.Color;
-import android.graphics.LightingColorFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -55,7 +53,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
@@ -221,6 +218,8 @@ public class FileDisplayActivity extends FileActivity
     public static final String KEY_SEARCH_QUERY = "SEARCH_QUERY";
 
     private String searchQuery = "";
+    private MenuItem searchActionMenuItem;
+    private boolean isSearching;
     private boolean searchOpen;
 
     private SearchView searchView;
@@ -794,9 +793,8 @@ public class FileDisplayActivity extends FileActivity
         menu.findItem(R.id.action_create_dir).setVisible(false);
 
         menu.findItem(R.id.action_select_all).setVisible(false);
-        MenuItem searchMenuItem = menu.findItem(R.id.action_search);
+        searchActionMenuItem = menu.findItem(R.id.action_search);
         searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-        searchMenuItem.setVisible(false);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
@@ -904,7 +902,7 @@ public class FileDisplayActivity extends FileActivity
             case R.id.action_voice:
                 Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
                 intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "請說～");
+                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.enter_filename));
                 startActivityForResult(intent, REQUEST_CODE__SELECT_ITEM_VOICE);
                 break;
             case R.id.action_sync_account: {
@@ -999,15 +997,30 @@ public class FileDisplayActivity extends FileActivity
         if (requestCode == REQUEST_CODE__SELECT_ITEM_VOICE) {
             if (resultCode == RESULT_OK && data != null) {
                 ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                Log.w(TAG, "onActivityResult: " + result.get(0));
-
-                searchView.setIconified(false);
-                setDrawerIndicatorEnabled(false);
-                searchView.setQuery(result.get(0), true);
+                if(result!=null){
+                    try {
+                        String searchText = result.get(0);
+                        Log.w(TAG, "voice: " + searchText);
+                        Toast.makeText(FileDisplayActivity.this,String.format("%s : %s",
+                                                                              getString(R.string.actionbar_search),
+                                                                              searchText),Toast.LENGTH_LONG).show();
+                        setSearchQuery(searchText);
+                        searchActionMenuItem.expandActionView();
+                        searchView.setQuery(searchText, true);
+                        isSearching = true;
+                        // some issues come with search intent.
+//                        Intent searchIntent = new Intent(Intent.ACTION_SEARCH)
+//                            .setClass(FileDisplayActivity.this,FileDisplayActivity.class)
+//                            .putExtra(OCFileListFragment.SEARCH_EVENT, Parcels.wrap(new SearchEvent(searchText,
+//                                                                                                    SearchRemoteOperation.SearchType.FILE_SEARCH,
+//                                                                                                    SearchEvent.UnsetType.NO_UNSET)));
+//                        startActivity(searchIntent);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-        }
-
-        if (requestCode == REQUEST_CODE__SELECT_CONTENT_FROM_APPS &&
+        }else if (requestCode == REQUEST_CODE__SELECT_CONTENT_FROM_APPS &&
             (resultCode == RESULT_OK ||
                 resultCode == UploadFilesActivity.RESULT_OK_AND_MOVE)) {
 
@@ -1215,7 +1228,9 @@ public class FileDisplayActivity extends FileActivity
          *    4. navigate up (only if drawer and FAB aren't open)
          */
 
-        if (isSearchOpen && searchView != null) {
+        if (isSearching || (isSearchOpen && searchView != null)) {
+            isSearching = false;
+            showFiles(false);
             searchView.setQuery("", true);
             searchView.onActionViewCollapsed();
             setDrawerIndicatorEnabled(isDrawerIndicatorAvailable());

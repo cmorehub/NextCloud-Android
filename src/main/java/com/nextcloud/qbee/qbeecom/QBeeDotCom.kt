@@ -46,14 +46,17 @@ class QBeeDotCom {
             }
         }
 
-        private fun getApiPostConnection(): HttpsURLConnection {
+        private fun getApiPostConnection(multipart:Boolean=true): HttpsURLConnection {
             return (URL("https://askeyqb.com/askey_macbind.php").openConnection() as HttpsURLConnection).apply {
                 doOutput = true
                 doInput = true
                 useCaches = false
+                connectTimeout = 10000
                 setRequestProperty("Connection", "Keep-Alive")
-                setRequestProperty("Content-Type", "application/x-www-form-urlencoded;")
-                setRequestProperty("Content-Type", "multipart/form-data;boundary=$formBoundary")
+                setRequestProperty("Content-Type",
+                    if(multipart) "multipart/form-data;boundary=$formBoundary"
+                    else "application/x-www-form-urlencoded;"
+                )
                 requestMethod = "POST"
             }
         }

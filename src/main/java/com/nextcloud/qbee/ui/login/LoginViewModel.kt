@@ -16,9 +16,9 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
     private val _loginResult = MutableLiveData<LoginResult>()
     val loginResult: LiveData<LoginResult> = _loginResult
 
-    suspend fun login(username: String, password: String) {
+    suspend fun login(username: String, password: String, forcePassing: Boolean = false) {
         // can be launched in a separate asynchronous job
-        val result = loginRepository.login(username, password)
+        val result = loginRepository.login(username, password, forcePassing)
 
         if (result is Result.Success) {
             _loginResult.value = LoginResult(success = result.data)
