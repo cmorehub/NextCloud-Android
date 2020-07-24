@@ -4,6 +4,7 @@ import android.accounts.Account
 import android.accounts.AccountManager
 import android.accounts.AccountManagerCallback
 import android.accounts.AccountManagerFuture
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -11,6 +12,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.nextcloud.qbee.network.QBeeSetupTask
 import com.nextcloud.qbee.network.RemoteItRestTask
@@ -89,6 +91,9 @@ class WelcomeActivity : AppCompatActivity() {
                                                                     val devicedata = result.result as JSONObject
                                                                     val connectInfo = devicedata.getJSONObject("connection")
                                                                     val deviceProxy = connectInfo.getString("proxy")
+//                                                                    val url = Uri.parse("http://iottalk.cmoremap.com.tw:6325")
+//                                                                    val loginName: String = "askey"
+//                                                                    val password: String = "askeyqbee"
                                                                     val url = Uri.parse(deviceProxy.replace("http", "https"))
                                                                     val loginName: String = "admin"
                                                                     val password: String = "admin"
@@ -166,43 +171,18 @@ class WelcomeActivity : AppCompatActivity() {
                         startActivity(intent)
                         this@WelcomeActivity.finish()
                     }
-//                    Thread {
-//                        val devices = result.result as JSONArray
-//                        if (devices.length() > 0) {
-//                            val url = Uri.parse("http://iottalk.cmoremap.com.tw:6325")
-//                            val loginName: String = "askey"
-//                            val password: String = "askeyqbee"
-//
-//                            val accountManager = AccountManager.get(this@WelcomeActivity)
-//                            val accountName = AccountUtils.buildAccountName(url, loginName)
-//                            val newAccount = Account(accountName, "nextcloud")
-//
-//                            accountManager.addAccountExplicitly(newAccount, password, null)
-//                            accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_OC_BASE_URL, url.toString())
-//                            accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_USER_ID, loginName)
-//
-//                            val manager = OwnCloudClientManager()
-//                            val account = OwnCloudAccount(newAccount, this@WelcomeActivity)
-//
-//                            val client = manager.getClientFor(account, this@WelcomeActivity)
-//                            val loginSuccess = loginName == client.userId
-//                            val i = Intent(this@WelcomeActivity, FileDisplayActivity::class.java)
-//                            i.action = FileDisplayActivity.RESTART
-//                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-//                            startActivity(i)
-//                            this@WelcomeActivity.finish()
-//                        } else {
-//                            var intent = Intent(this@WelcomeActivity, QBeeSetupActivity::class.java)
-//                            intent.putExtra("mail", acctmail)
-//                            intent.putExtra("pwd", pass)
-//                            startActivity(intent)
-//                            this@WelcomeActivity.finish()
-//                        }
-//                    }.start()
                 } else {
-                    var intent = Intent(this@WelcomeActivity, QBeeLoginActivity::class.java)
-                    startActivity(intent)
-                    this@WelcomeActivity.finish()
+                    val errorMsg = result.result as String
+                    Toast.makeText(this@WelcomeActivity, errorMsg, Toast.LENGTH_LONG).show()
+                    AlertDialog.Builder(this@WelcomeActivity)
+                        .setTitle("Connect Error")
+                        .setMessage(errorMsg)
+                        .setPositiveButton("OK") { dialog, which ->
+//                            var intent = Intent(this@WelcomeActivity, QBeeLoginActivity::class.java)
+//                            startActivity(intent)
+                            this@WelcomeActivity.finish()
+                        }
+                        .create().show()
                 }
             }
         }).execute(ApiQBeeBind.getApiLoginString(acctmail!!, pass!!))

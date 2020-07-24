@@ -860,7 +860,8 @@ public class FileDisplayActivity extends FileActivity
         boolean retval = true;
         switch (item.getItemId()) {
             case R.id.action_sync_account: {
-                startSynchronization();
+//                startSynchronization();
+                startSyncFolderOperation(getCurrentDir(), false);
                 break;
             }
             case android.R.id.home: {

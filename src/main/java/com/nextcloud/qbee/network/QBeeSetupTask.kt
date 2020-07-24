@@ -12,6 +12,7 @@ import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
+import java.net.UnknownHostException
 
 class QBeeSetupTask() : AsyncTask<String, Void, String?>() {
     interface Callback {
@@ -31,7 +32,6 @@ class QBeeSetupTask() : AsyncTask<String, Void, String?>() {
     override fun doInBackground(vararg params: String?): String? {
         var result: String? = null
 
-        Log.d("0716", "params?.get(0)=${params?.get(0)}")
         try {
             var server_response_code = 0
             val url = URL(SERVER_URL)
@@ -60,16 +60,21 @@ class QBeeSetupTask() : AsyncTask<String, Void, String?>() {
                 stream.write(buffer2, 0, readCount)
             }
             val resultString = stream.toString()
-            Log.d("0716", resultString)
+//            Log.d("0716", resultString)
             result = if (server_response_code == 200) {
                 resultString
             } else {
-                null
+                var error = JSONObject()
+                error.put("result", "-9")
+                error.put("error", "Please check device is connect to network.")
+                error.toString()
             }
 
             data_output_stream!!.flush()
             data_output_stream!!.close()
             inputStream.close()
+        } catch (e: UnknownHostException) {
+            e.printStackTrace()
         } catch (e: MalformedURLException) {
             e.printStackTrace()
         } catch (e: IOException) {
@@ -81,7 +86,15 @@ class QBeeSetupTask() : AsyncTask<String, Void, String?>() {
     }
 
     override fun onPostExecute(result: String?) {
-        var resultJson = JSONObject(result)
+        val resultStr = if (result == null) {
+            var error = JSONObject()
+            error.put("result", "-9")
+            error.put("error", "Please check device is connect to network.")
+            error.toString()
+        } else {
+            result
+        }
+        var resultJson = JSONObject(resultStr)
         var setupResult = QBeeSetupResult(resultJson.optString("result", "-1") == "0", resultJson.opt("error"))
         setupResult.code = resultJson.optString("result", "-9").toInt()
         callback!!.onResult(setupResult)

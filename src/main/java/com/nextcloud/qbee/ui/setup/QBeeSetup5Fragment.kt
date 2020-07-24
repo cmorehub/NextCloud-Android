@@ -43,6 +43,10 @@ class QBeeSetup5Fragment() : Fragment() {
 
         btnSetupFinish.setOnClickListener {
             Thread {
+
+//                val url = Uri.parse("http://iottalk.cmoremap.com.tw:6325")
+//                val loginName: String = "askey"
+//                val password: String = "askeyqbee"
                 val url = Uri.parse(url)
                 val loginName: String = "admin"
                 val password: String = "admin"

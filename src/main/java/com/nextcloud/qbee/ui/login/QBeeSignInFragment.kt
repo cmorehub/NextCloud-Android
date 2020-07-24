@@ -9,9 +9,12 @@ import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -40,6 +43,7 @@ class QBeeSignInFragment : Fragment() {
     lateinit var editTextTextPassword: EditText
     lateinit var btnSignIn: Button
     lateinit var btnSignUp: TextView
+    lateinit var progressSignIn: ProgressBar
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.activity_qbee_signin, container, false)
@@ -48,6 +52,8 @@ class QBeeSignInFragment : Fragment() {
         editTextTextPassword = root.findViewById(R.id.editTextTextPassword)
         btnSignIn = root.findViewById(R.id.btnSignIn)
         btnSignUp = root.findViewById(R.id.btnSignUp)
+        progressSignIn = root.findViewById(R.id.progressSignIn)
+        progressSignIn.visibility = GONE
 
         return root
     }
@@ -64,6 +70,8 @@ class QBeeSignInFragment : Fragment() {
         btnSignIn.setOnClickListener {
             val acctmail = editTextTextEmailAddress2.text.toString()
             val pass = editTextTextPassword.text.toString()
+            btnSignIn.isEnabled = false
+            progressSignIn.visibility = VISIBLE
             QBeeSetupTask(ApiQBeeBind.apiUrl, object : QBeeSetupTask.Callback {
                 override fun onResult(result: QBeeSetupResult) {
                     if (result.success) {
@@ -86,7 +94,7 @@ class QBeeSignInFragment : Fragment() {
                                                     for (i in 0 until devicesListArr.length()) {
                                                         val deviceJson = devicesListArr[i] as JSONObject
                                                         if (deviceJson.getString("servicetitle") == "NextCloud") {
-                                                            if (deviceJson.getString("devicealias").contains(devicemac,true)
+                                                            if (deviceJson.getString("devicealias").contains(devicemac, true)
                                                                 || deviceJson.getString("devicealias") == deviceremote) {
                                                                 deviceRemoteIdAddr = deviceJson.getString("deviceaddress")
                                                                 break
@@ -98,21 +106,32 @@ class QBeeSignInFragment : Fragment() {
                                                         RemoteItRestTask(RemoteItRest.deviceProxyUrl, object : RemoteItRestTask.Callback {
                                                             override fun onResult(result: RemoteItRest) {
                                                                 if (result.success) {
-                                                                    Thread{
+                                                                    Thread {
                                                                         val devicedata = result.result as JSONObject
                                                                         val connectInfo = devicedata.getJSONObject("connection")
                                                                         val deviceProxy = connectInfo.getString("proxy")
+//                                                                    val url = Uri.parse("http://iottalk.cmoremap.com.tw:6325")
+//                                                                    val loginName: String = "askey"
+//                                                                    val password: String = "askeyqbee"
                                                                         val url = Uri.parse(deviceProxy.replace("http", "https"))
                                                                         val loginName: String = "admin"
                                                                         val password: String = "admin"
 
                                                                         val accountManager = AccountManager.get(context)
                                                                         val accountName = AccountUtils.buildAccountName(url, loginName)
-                                                                        val newAccount = Account(accountName, "nextcloud")
-
-                                                                        accountManager.addAccountExplicitly(newAccount, password, null)
-                                                                        accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_OC_BASE_URL, url.toString())
-                                                                        accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_USER_ID, loginName)
+                                                                        val accounts = accountManager.getAccountsByType("nextcloud")
+                                                                        val newAccount = if (accounts.isEmpty()) {
+                                                                            val account = Account(accountName, "nextcloud")
+                                                                            accountManager.addAccountExplicitly(account, password, null)
+                                                                            accountManager.setUserData(account, AccountUtils.Constants.KEY_OC_BASE_URL, url.toString())
+                                                                            accountManager.setUserData(account, AccountUtils.Constants.KEY_USER_ID, loginName)
+                                                                            account
+                                                                        } else {
+                                                                            val account = accounts[0]
+                                                                            accountManager.setUserData(account, AccountUtils.Constants.KEY_OC_BASE_URL, url.toString())
+                                                                            accountManager.setUserData(account, AccountUtils.Constants.KEY_USER_ID, loginName)
+                                                                            account
+                                                                        }
 
                                                                         val manager = OwnCloudClientManager()
                                                                         val account = OwnCloudAccount(newAccount, context)
@@ -126,6 +145,8 @@ class QBeeSignInFragment : Fragment() {
                                                                     val errorJson = result.result as JSONObject
                                                                     val reason = errorJson.getString("reason")
                                                                     Toast.makeText(context, getString(R.string.qbee_setup_connected_error), Toast.LENGTH_LONG).show()
+                                                                    btnSignIn.isEnabled = true
+                                                                    progressSignIn.visibility = GONE
                                                                 }
 
                                                             }
@@ -134,9 +155,13 @@ class QBeeSignInFragment : Fragment() {
                                                             RemoteItRest.getApiDeviceProxyString(deviceRemoteIdAddr, true, "0.0.0.0"))
                                                     } else {
                                                         Toast.makeText(context, getString(R.string.qbee_setup_connected_error), Toast.LENGTH_LONG).show()
+                                                        btnSignIn.isEnabled = true
+                                                        progressSignIn.visibility = GONE
                                                     }
                                                 } else {
                                                     Toast.makeText(context, getString(R.string.qbee_setup_connected_error), Toast.LENGTH_LONG).show()
+                                                    btnSignIn.isEnabled = true
+                                                    progressSignIn.visibility = GONE
                                                 }
                                             }
                                         }).execute(RemoteItRest.getApiCommonHeader(remotruser.dev, remotruser.token),
@@ -145,6 +170,8 @@ class QBeeSignInFragment : Fragment() {
                                         val errorJson = result.result as JSONObject
                                         val reason = errorJson.getString("reason")
                                         Toast.makeText(context, getString(R.string.qbee_setup_connected_error), Toast.LENGTH_LONG).show()
+                                        btnSignIn.isEnabled = true
+                                        progressSignIn.visibility = GONE
                                     }
                                 }
                             }).execute(RemoteItRest.getApiLoginHeader("QzlEQ0JDQzItNjYyMC00RjVCLUIwOTgtQkFBQkNCMzgxRUFG"),
@@ -159,6 +186,8 @@ class QBeeSignInFragment : Fragment() {
                             }.start()
                         }
                     } else {
+                        btnSignIn.isEnabled = true
+                        progressSignIn.visibility = GONE
                         Toast.makeText(context, result.result as String, Toast.LENGTH_LONG).show()
                     }
                 }
