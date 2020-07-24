@@ -15,10 +15,10 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import com.nextcloud.qbee.remoteit.RemoteItController
 import com.owncloud.android.R
 import com.owncloud.android.lib.common.OwnCloudAccount
@@ -34,7 +34,8 @@ import java.security.cert.X509Certificate
 
 class FirstLoginActivity : AppCompatActivity() {
 
-    private lateinit var loginViewModel: LoginViewModel
+    private val viewModelFactory = LoginViewModelFactory()
+    private val loginViewModel: LoginViewModel by viewModels{viewModelFactory}
     private val remoteItController by lazy {
         RemoteItController(this)
     }
@@ -42,11 +43,11 @@ class FirstLoginActivity : AppCompatActivity() {
 
     @Throws(Exception::class)
     private suspend fun findQBeeDeviceOfName(deviceName: String, forceFirst: Boolean = false): RemoteItController
-    .RemoteDevice? {
+    .RemoteDevice? = withContext(Dispatchers.IO){
         remoteItAuthToken = remoteItController.restGetAuthToken()
         val deviceList = remoteItController.restGetDeviceList(remoteItAuthToken!!,ofType = if(forceFirst)
             RemoteItController.TYPE_NEXTCLOUD else null)
-        return if(forceFirst){
+        return@withContext if(forceFirst){
             deviceList[0]
         } else{
             val filteredDeviceList = deviceList.filter {
@@ -73,6 +74,10 @@ class FirstLoginActivity : AppCompatActivity() {
             val password = "admin"
 
             val accountManager = AccountManager.get(this@FirstLoginActivity)
+
+            val accounts = accountManager.getAccountsByType("nextcloud")
+
+
             val accountName = AccountUtils.buildAccountName(url, loginName)
             val newAccount = Account(accountName, "nextcloud")
 
@@ -128,8 +133,8 @@ class FirstLoginActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_simple_login)
 
-        loginViewModel = ViewModelProviders.of(this, LoginViewModelFactory())
-            .get(LoginViewModel::class.java)
+//        loginViewModel = ViewModelProviders.of(this, LoginViewModelFactory())
+//            .get(LoginViewModel::class.java)
 
         loginViewModel.loginFormState.observe(this@FirstLoginActivity, Observer {
             val loginState = it ?: return@Observer
@@ -150,7 +155,7 @@ class FirstLoginActivity : AppCompatActivity() {
                 if (it?.success != null) {
                     val device = findQBeeDeviceOfName(it.success.device?.remote ?: return@launch)
                     if (device != null) {
-                        loginQBee(device)
+                        loginQBee(device,usePeerToPeer = true)
                     } else {
                         Toast.makeText(this@FirstLoginActivity, it.error?.message ?: getString(R.string
                             .login_failed)
