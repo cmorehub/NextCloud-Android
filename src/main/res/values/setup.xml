@@ -6,8 +6,10 @@
 
     <!-- App name  and other strings-->
     <string name="app_name">QBee</string>
-    <string name="account_type">nextcloud</string>     <!-- better if was a domain name; but changing it now would require migrate accounts when the app is updated -->
-    <string name="authority">org.nextcloud</string>    <!-- better if was the app package with ".provider" appended ; it identifies the provider -->
+    <string name="account_type">qbee</string>     <!-- better if was a domain name; but changing it now would require
+    migrate accounts when the app is updated -->
+    <string name="authority">org.qbee</string>    <!-- better if was the app package with ".provider" appended ; it
+    identifies the provider -->
     <string name="users_and_groups_search_authority">com.nextcloud.android.providers.UsersAndGroupsSearchProvider</string>
     <string name="users_and_groups_share_with">com.nextcloud.android.providers.UsersAndGroupsSearchProvider.action.SHARE_WITH</string>
     <string name="document_provider_authority">org.nextcloud.documents</string>
@@ -131,6 +133,7 @@
 
     <!-- QBee variant settings -->
     <bool name="is_tv_build">true</bool>
+    <string name="default_email">ccmaped@gmail.com</string>
 </resources>
 
 

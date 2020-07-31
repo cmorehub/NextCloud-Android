@@ -40,6 +40,9 @@ class FirstLoginActivity : AppCompatActivity() {
         RemoteItController(this)
     }
     private var remoteItAuthToken: String? = null
+    private val accountType by lazy{
+        getString(R.string.account_type)
+    }
 
     @Throws(Exception::class)
     private suspend fun findQBeeDeviceOfName(deviceName: String, forceFirst: Boolean = false): RemoteItController
@@ -59,6 +62,7 @@ class FirstLoginActivity : AppCompatActivity() {
 
     private suspend fun loginQBee(remoteItQBee: RemoteItController.RemoteDevice, usePeerToPeer: Boolean = false) =
         withContext(Dispatchers.IO) {
+            Log.d("QBeeDotCom","connecting QBee $remoteItQBee")
             setLoadingEnabled()
             addQBeeCert()
             remoteItAuthToken = remoteItAuthToken ?: remoteItController.restGetAuthToken()
@@ -73,10 +77,10 @@ class FirstLoginActivity : AppCompatActivity() {
 
     private suspend fun loginQBee(url: Uri, loginName: String, password: String) = withContext(Dispatchers.Main) {
         val accountManager = AccountManager.get(this@FirstLoginActivity)
-        val accounts = accountManager.getAccountsByType("nextcloud") // TODO
+        val accounts = accountManager.getAccountsByType(accountType) // TODO
 
         val accountName = AccountUtils.buildAccountName(url, loginName)
-        val newAccount = Account(accountName, "nextcloud")
+        val newAccount = Account(accountName, accountType)
 
         accountManager.addAccountExplicitly(newAccount, password, null)
         accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_OC_BASE_URL, url.toString())
@@ -171,7 +175,7 @@ class FirstLoginActivity : AppCompatActivity() {
             }
         })
 
-        usernameEditText.setText("ccmaped@gmail.com")
+        usernameEditText.setText(getString(R.string.default_email))
 
         usernameEditText.afterTextChanged {
             loginViewModel.loginDataChanged(
