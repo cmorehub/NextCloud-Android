@@ -35,7 +35,7 @@ import java.security.cert.X509Certificate
 class FirstLoginActivity : AppCompatActivity() {
 
     private val viewModelFactory = LoginViewModelFactory()
-    private val loginViewModel: LoginViewModel by viewModels{viewModelFactory}
+    private val loginViewModel: LoginViewModel by viewModels { viewModelFactory }
     private val remoteItController by lazy {
         RemoteItController(this)
     }
@@ -43,13 +43,13 @@ class FirstLoginActivity : AppCompatActivity() {
 
     @Throws(Exception::class)
     private suspend fun findQBeeDeviceOfName(deviceName: String, forceFirst: Boolean = false): RemoteItController
-    .RemoteDevice? = withContext(Dispatchers.IO){
+    .RemoteDevice? = withContext(Dispatchers.IO) {
         remoteItAuthToken = remoteItController.restGetAuthToken()
-        val deviceList = remoteItController.restGetDeviceList(remoteItAuthToken!!,ofType = if(forceFirst)
+        val deviceList = remoteItController.restGetDeviceList(remoteItAuthToken!!, ofType = if (forceFirst)
             RemoteItController.TYPE_NEXTCLOUD else null)
-        return@withContext if(forceFirst){
+        return@withContext if (forceFirst) {
             deviceList[0]
-        } else{
+        } else {
             val filteredDeviceList = deviceList.filter {
                 it.name == deviceName
             }
@@ -62,44 +62,44 @@ class FirstLoginActivity : AppCompatActivity() {
             setLoadingEnabled()
             addQBeeCert()
             remoteItAuthToken = remoteItAuthToken ?: remoteItController.restGetAuthToken()
-            val qbeeUrl =
-                if(usePeerToPeer) {
+            val qBeeUrl =
+                if (usePeerToPeer) {
                     remoteItController.peerToPeerLogin()
                     remoteItController.peerToPeerConnect(remoteItQBee.address)
-                }
-                else remoteItController.restGetRemoteProxy(remoteItAuthToken!!, remoteItQBee.address)
-            Log.d("QBeeDotCom", "qbeeUrl = $qbeeUrl")
-            val url = Uri.parse(qbeeUrl!!.replace("http:", "https:"))
-            val loginName = "admin"
-            val password = "admin"
-
-            val accountManager = AccountManager.get(this@FirstLoginActivity)
-
-            val accounts = accountManager.getAccountsByType("nextcloud")
-
-
-            val accountName = AccountUtils.buildAccountName(url, loginName)
-            val newAccount = Account(accountName, "nextcloud")
-
-            accountManager.addAccountExplicitly(newAccount, password, null)
-            accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_OC_BASE_URL, url.toString())
-            accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_USER_ID, loginName)
-
-            val manager = OwnCloudClientManager()
-            val account = OwnCloudAccount(newAccount, this@FirstLoginActivity)
-
-            val client = manager.getNextcloudClientFor(account, this@FirstLoginActivity)
-            val loginSuccess = loginName == client.userId
-            withContext(Dispatchers.Main) {
-                if (loginSuccess) {
-                    setResult(Activity.RESULT_OK, Intent().putExtra("AccountManager.KEY_ACCOUNT_NAME", newAccount.name))
-                } else {
-                    Toast.makeText(this@FirstLoginActivity, "Login Failed", Toast.LENGTH_SHORT).show()
-                    setResult(Activity.RESULT_CANCELED)
-                }
-                this@FirstLoginActivity.finish()
-            }
+                } else remoteItController.restGetRemoteProxy(remoteItAuthToken!!, remoteItQBee.address)
+            Log.d("QBeeDotCom", "qbeeUrl = $qBeeUrl")
+            loginQBee(android.net.Uri.parse(qBeeUrl!!.replace("http:", "https:")), "admin", "admin")
         }
+
+    private suspend fun loginQBee(url: Uri, loginName: String, password: String) = withContext(Dispatchers.Main) {
+        val accountManager = AccountManager.get(this@FirstLoginActivity)
+        val accounts = accountManager.getAccountsByType("nextcloud") // TODO
+
+        val accountName = AccountUtils.buildAccountName(url, loginName)
+        val newAccount = Account(accountName, "nextcloud")
+
+        accountManager.addAccountExplicitly(newAccount, password, null)
+        accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_OC_BASE_URL, url.toString())
+        accountManager.setUserData(newAccount, AccountUtils.Constants.KEY_USER_ID, loginName)
+
+        val manager = OwnCloudClientManager()
+        val account = OwnCloudAccount(newAccount, this@FirstLoginActivity)
+
+        val loginSuccess = withContext(Dispatchers.IO){
+            val client = manager.getNextcloudClientFor(account, this@FirstLoginActivity)
+            loginName == client.userId
+        }
+
+        withContext(Dispatchers.Main) {
+            if (loginSuccess) {
+                setResult(Activity.RESULT_OK, Intent().putExtra("AccountManager.KEY_ACCOUNT_NAME", newAccount.name))
+            } else {
+                Toast.makeText(this@FirstLoginActivity, "Login Failed", Toast.LENGTH_SHORT).show()
+                setResult(Activity.RESULT_CANCELED)
+            }
+            this@FirstLoginActivity.finish()
+        }
+    }
 
     private suspend fun setLoadingEnabled() = withContext(Dispatchers.Main) {
         this@FirstLoginActivity.loadingBar.visibility = View.VISIBLE
@@ -202,7 +202,7 @@ class FirstLoginActivity : AppCompatActivity() {
         }
     }
 
-    private  fun loginAskeyQBeeDotCom() {
+    private fun loginAskeyQBeeDotCom() {
         CoroutineScope(Dispatchers.Main).launch {
             setLoadingEnabled()
             loginViewModel.login(
