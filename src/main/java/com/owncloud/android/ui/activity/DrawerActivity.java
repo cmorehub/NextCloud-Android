@@ -54,6 +54,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
@@ -1092,6 +1093,8 @@ public abstract class DrawerActivity extends ToolbarActivity
                             }
                         });
                     }
+                }else{
+                    Toast.makeText(DrawerActivity.this, "getAndDisplayUserQuota Error", Toast.LENGTH_SHORT).show();
                 }
             }
         });

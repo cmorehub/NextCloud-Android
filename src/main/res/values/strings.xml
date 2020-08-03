@@ -972,6 +972,8 @@
     <string name="qbee_setup_connected_result">You have connected your device to QBee.</string>
     <string name="qbee_setup_connected_error">Can not connect to QBee, please check QBee is online or call the
         consumer hotline for help</string>
+    <string name="qbee_setup_device_not_found_error">Can not find QBee, please check QBee is online or call the
+        consumer hotline for help</string>
     <string name="qbee_setup_complete">Continue to get QBee service.</string>
     <string name="qbee_setup_finish">continue</string>
 </resources>
