@@ -132,7 +132,7 @@ android {
     compileSdkVersion 29
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 22
         targetSdkVersion 29
 
         // arguments to be passed to functional tests
@@ -414,6 +414,7 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:2.3.0-rc01"
     implementation "androidx.navigation:navigation-dynamic-features-fragment:2.3.0-rc01"
 
+    implementation project(":P2PManager")
 }
 
 configurations.all {
