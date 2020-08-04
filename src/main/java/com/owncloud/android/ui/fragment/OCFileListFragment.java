@@ -205,7 +205,8 @@ public class OCFileListFragment extends ExtendedListFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
+        Bundle args = getArguments();
+        setHasOptionsMenu(args==null||args.containsKey(OCFileListFragment.SEARCH_EVENT));
         mSystemBarActionModeColor = getResources().getColor(R.color.action_mode_status_bar_background);
         mSystemBarColor = ThemeUtils.primaryColor(getContext());
         mProgressBarActionModeColor = getResources().getColor(R.color.action_mode_background);
@@ -765,6 +766,7 @@ public class OCFileListFragment extends ExtendedListFragment implements
             }
         } else if (menuItemAddRemoveValue == MenuItemAddRemove.REMOVE_SEARCH) {
             menu.removeItem(R.id.action_search);
+            menu.removeItem(R.id.action_voice);
         } else if (menuItemAddRemoveValue == MenuItemAddRemove.ADD_GRID_AND_SORT_WITH_SEARCH) {
             if (menu.findItem(R.id.action_switch_view) == null) {
                 menuItemOrig = mOriginalMenuItems.get(0);
