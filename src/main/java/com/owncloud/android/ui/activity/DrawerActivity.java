@@ -41,6 +41,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.text.Html;
 import android.text.TextUtils;
@@ -1094,7 +1095,9 @@ public abstract class DrawerActivity extends ToolbarActivity
                         });
                     }
                 }else{
+                    Looper.prepare();
                     Toast.makeText(DrawerActivity.this, "getAndDisplayUserQuota Error", Toast.LENGTH_SHORT).show();
+                    Looper.loop();
                 }
             }
         });
