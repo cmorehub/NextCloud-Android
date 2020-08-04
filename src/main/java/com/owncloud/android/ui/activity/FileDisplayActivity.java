@@ -2586,7 +2586,7 @@ public class FileDisplayActivity extends FileActivity
                 Log_OC.d(TAG, "Initializing Fragments in onAccountChanged..");
                 initFragmentsWithFile();
                 if (file.isFolder() && TextUtils.isEmpty(searchQuery)) {
-                    startSyncFolderOperation(file, false);
+                    startSyncFolderOperation(file, false, true);
                 }
             } else {
                 updateFragmentsVisibility(!file.isFolder());

@@ -36,6 +36,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -236,28 +237,31 @@ public class ExtendedListFragment extends Fragment implements
         final View mSearchEditFrame = searchView
             .findViewById(androidx.appcompat.R.id.search_edit_frame);
 
-        ViewTreeObserver vto = mSearchEditFrame.getViewTreeObserver();
-        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            int oldVisibility = -1;
-
-            @Override
-            public void onGlobalLayout() {
-
-                int currentVisibility = mSearchEditFrame.getVisibility();
-
-                if (currentVisibility != oldVisibility) {
-                    if (currentVisibility == View.VISIBLE) {
-
-                        setEmptyListMessage(SearchType.REGULAR_FILTER);
-                    } else {
-                        setEmptyListMessage(SearchType.NO_SEARCH);
-                    }
-
-                    oldVisibility = currentVisibility;
-                }
-
-            }
-        });
+//        ViewTreeObserver vto = mSearchEditFrame.getViewTreeObserver();
+//        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//            int oldVisibility = -1;
+//
+//            @Override
+//            public void onGlobalLayout() {
+//
+//                Log.d("0804", "onGlobalLayout");
+//                int currentVisibility = mSearchEditFrame.getVisibility();
+//                Log.d("0804", "currentVisibility="+currentVisibility+", oldVisibility="+oldVisibility);
+//
+//                if (currentVisibility != oldVisibility) {
+//                    if (currentVisibility == View.VISIBLE) {
+//
+//                        setEmptyListMessage(SearchType.REGULAR_FILTER);
+//                    } else {
+//                        Log.d("0804", "onGlobalLayout NO_SEARCH");
+//                        setEmptyListMessage(SearchType.NO_SEARCH);
+//                    }
+//
+//                    oldVisibility = currentVisibility;
+//                }
+//
+//            }
+//        });
 
         int fontColor = ThemeUtils.fontColor(getContext());
 
