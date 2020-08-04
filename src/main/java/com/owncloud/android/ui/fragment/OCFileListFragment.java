@@ -788,10 +788,12 @@ public class OCFileListFragment extends ExtendedListFragment implements
         } else if (menuItemAddRemoveValue == MenuItemAddRemove.REMOVE_SORT) {
             menu.removeItem(R.id.action_sort);
             menu.removeItem(R.id.action_search);
+            menu.removeItem(R.id.action_voice);
         } else if (menuItemAddRemoveValue == MenuItemAddRemove.REMOVE_GRID_AND_SORT) {
             menu.removeItem(R.id.action_sort);
             menu.removeItem(R.id.action_switch_view);
             menu.removeItem(R.id.action_search);
+            menu.removeItem(R.id.action_voice);
         }
 
         // create rich workspace
