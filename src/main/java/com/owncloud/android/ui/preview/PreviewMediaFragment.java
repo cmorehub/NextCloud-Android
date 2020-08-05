@@ -37,6 +37,7 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -57,6 +58,7 @@ import com.nextcloud.client.device.DeviceInfo;
 import com.nextcloud.client.di.Injectable;
 import com.nextcloud.client.media.ErrorFormat;
 import com.nextcloud.client.media.PlayerServiceConnection;
+import com.nextcloud.qbee.ui.widget.SSLVideoView;
 import com.owncloud.android.R;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.files.FileMenuFilter;
@@ -73,7 +75,9 @@ import com.owncloud.android.ui.dialog.RemoveFilesDialogFragment;
 import com.owncloud.android.ui.fragment.FileFragment;
 import com.owncloud.android.utils.MimeTypeUtil;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
+import java.net.URLDecoder;
 
 import javax.inject.Inject;
 
@@ -83,12 +87,12 @@ import androidx.annotation.StringRes;
 
 /**
  * This fragment shows a preview of a downloaded media file (audio or video).
- *
- * Trying to get an instance with NULL {@link OCFile} or ownCloud {@link Account} values will
- * produce an {@link IllegalStateException}.
- *
- * By now, if the {@link OCFile} passed is not downloaded, an {@link IllegalStateException} is
- * generated on instantiation too.
+ * <p>
+ * Trying to get an instance with NULL {@link OCFile} or ownCloud {@link Account} values will produce an {@link
+ * IllegalStateException}.
+ * <p>
+ * By now, if the {@link OCFile} passed is not downloaded, an {@link IllegalStateException} is generated on
+ * instantiation too.
  */
 public class PreviewMediaFragment extends FileFragment implements OnTouchListener, Injectable {
 
@@ -107,7 +111,7 @@ public class PreviewMediaFragment extends FileFragment implements OnTouchListene
 
     private Account mAccount;
     private ImageView mImagePreview;
-    private VideoView mVideoPreview;
+    private SSLVideoView mVideoPreview;
     private int mSavedPlaybackPosition;
 
     private RelativeLayout mMultiView;
@@ -130,7 +134,7 @@ public class PreviewMediaFragment extends FileFragment implements OnTouchListene
 
     /**
      * Creates a fragment to preview a file.
-     *
+     * <p>
      * When 'fileToDetail' or 'ocAccount' are null
      *
      * @param fileToDetail An {@link OCFile} to preview in the fragment
@@ -154,11 +158,10 @@ public class PreviewMediaFragment extends FileFragment implements OnTouchListene
     /**
      * Creates an empty fragment for previews.
      * <p/>
-     * MUST BE KEPT: the system uses it when tries to reinstantiate a fragment automatically
-     * (for instance, when the device is turned a aside).
+     * MUST BE KEPT: the system uses it when tries to reinstantiate a fragment automatically (for instance, when the
+     * device is turned a aside).
      * <p/>
-     * DO NOT CALL IT: an {@link OCFile} and {@link Account} must be provided for a successful
-     * construction
+     * DO NOT CALL IT: an {@link OCFile} and {@link Account} must be provided for a successful construction
      */
     public PreviewMediaFragment() {
         super();
@@ -304,7 +307,7 @@ public class PreviewMediaFragment extends FileFragment implements OnTouchListene
                 outState.putInt(PreviewMediaFragment.EXTRA_PLAY_POSITION, mSavedPlaybackPosition);
                 outState.putBoolean(PreviewMediaFragment.EXTRA_PLAYING, mAutoplay);
             }
-        } else if(mMediaPlayerServiceConnection.isConnected()) {
+        } else if (mMediaPlayerServiceConnection.isConnected()) {
             outState.putInt(PreviewMediaFragment.EXTRA_PLAY_POSITION, mMediaPlayerServiceConnection.getCurrentPosition());
             outState.putBoolean(PreviewMediaFragment.EXTRA_PLAYING, mMediaPlayerServiceConnection.isPlaying());
         }
@@ -403,10 +406,10 @@ public class PreviewMediaFragment extends FileFragment implements OnTouchListene
             item.setEnabled(false);
         }
 
-        if(getFile().isSharedWithMe() && !getFile().canReshare()){
+        if (getFile().isSharedWithMe() && !getFile().canReshare()) {
             // additional restriction for this fragment
             item = menu.findItem(R.id.action_send_share_file);
-            if(item != null){
+            if (item != null) {
                 item.setVisible(false);
                 item.setEnabled(false);
             }
@@ -445,7 +448,7 @@ public class PreviewMediaFragment extends FileFragment implements OnTouchListene
     /**
      * Update the file of the fragment with file value
      *
-     * @param file      Replaces the held file with a new one
+     * @param file Replaces the held file with a new one
      */
     public void updateFile(OCFile file) {
         setFile(file);
@@ -481,7 +484,7 @@ public class PreviewMediaFragment extends FileFragment implements OnTouchListene
             try {
                 OwnCloudAccount ocAccount = new OwnCloudAccount(mAccount, getContext());
                 OwnCloudClient client = OwnCloudClientManagerFactory.getDefaultSingleton().
-                        getClientFor(ocAccount, getContext());
+                    getClientFor(ocAccount, getContext());
 
                 new LoadStreamUrl(this, client).execute(getFile().getLocalId());
             } catch (Exception e) {
@@ -518,13 +521,25 @@ public class PreviewMediaFragment extends FileFragment implements OnTouchListene
             final Context context = previewMediaFragment != null ? previewMediaFragment.getContext() : null;
             if (previewMediaFragment != null && context != null) {
                 if (uri != null) {
-                    previewMediaFragment.mVideoUri = uri;
-                    previewMediaFragment.mVideoPreview.setVideoURI(uri);
+                    try {
+                        Uri.Builder uriBuilder = uri.buildUpon();
+                        uriBuilder.scheme(client.getBaseUri().getScheme());
+                        uriBuilder.authority(client.getBaseUri().getAuthority());
+                        Log.d("0805", "decode=" + URLDecoder.decode(client.getBaseUri().getAuthority(), "utf-8"));
+                        String newUrl = uriBuilder.build().toString();
+                        Uri newUri = Uri.parse(URLDecoder.decode(newUrl, "utf-8"));
+                        Log.d("0805", "newUri=" + newUri);
+                        previewMediaFragment.mVideoUri = newUri;
+                        previewMediaFragment.mVideoPreview.setVideoURI(newUri);
+                        Log.d("0805", "mVideoUri=" + uri);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
                 } else {
                     previewMediaFragment.mMultiView.setVisibility(View.VISIBLE);
                     previewMediaFragment.setMessageForMultiList(
-                            previewMediaFragment.getString(R.string.stream_not_possible_headline),
-                            R.string.stream_not_possible_message, R.drawable.file_movie);
+                        previewMediaFragment.getString(R.string.stream_not_possible_headline),
+                        R.string.stream_not_possible_message, R.drawable.file_movie);
                 }
             } else {
                 Log_OC.e(TAG, "Error streaming file: no previewMediaFragment!");
@@ -539,7 +554,7 @@ public class PreviewMediaFragment extends FileFragment implements OnTouchListene
          * <p/>
          * Just starts the playback.
          *
-         * @param   vp    {@link MediaPlayer} instance performing the playback.
+         * @param vp {@link MediaPlayer} instance performing the playback.
          */
         @Override
         public void onPrepared(MediaPlayer vp) {
@@ -668,8 +683,7 @@ public class PreviewMediaFragment extends FileFragment implements OnTouchListene
     }
 
     /**
-     * Helper method to test if an {@link OCFile} can be passed to a {@link PreviewMediaFragment}
-     * to be previewed.
+     * Helper method to test if an {@link OCFile} can be passed to a {@link PreviewMediaFragment} to be previewed.
      *
      * @param file File to test if can be previewed.
      * @return 'True' if the file can be handled by the fragment.

@@ -83,8 +83,8 @@ class WelcomeActivity : AppCompatActivity() {
                                     try {
                                         val remoteDevice = findQBeeDeviceOfName(deviceremote ?: return@launch)
                                         if (remoteDevice != null) {
-//                                            loginQBee(remoteDevice, acctmail!!, pass!!)
-                                            loginQBee(remoteDevice, acctmail!!, pass!!, true)
+                                            loginQBee(remoteDevice, acctmail!!, pass!!)
+//                                            loginQBee(remoteDevice, acctmail!!, pass!!, true)
                                         } else {
                                             Toast.makeText(this@WelcomeActivity, getString(R.string.qbee_setup_device_not_found_error), Toast.LENGTH_LONG).show()
                                             var intent = Intent(this@WelcomeActivity, QBeeLoginActivity::class.java)
@@ -180,14 +180,15 @@ class WelcomeActivity : AppCompatActivity() {
             Log.d("QBeeDotCom", "loginQBee")
             addQBeeCert()
             remoteItAuthToken = remoteItAuthToken ?: remoteItController.restGetAuthToken()
-            val qbeeUrl =
-                if (usePeerToPeer) {
-                    remoteItController.peerToPeerLogin()
-                    remoteItController.peerToPeerConnect(remoteItQBee.address)
-                } else remoteItController.restGetRemoteProxy(remoteItAuthToken!!, remoteItQBee.address)
+            val qbeeUrl = if (usePeerToPeer) {
+                remoteItController.peerToPeerLogin()
+                remoteItController.peerToPeerConnect(remoteItQBee.address)
+            } else remoteItController.restGetRemoteProxy(remoteItAuthToken!!, remoteItQBee.address)
+            //"https://iottalk.cmoremap.com.tw:6326"//"https://www.askey.it"//"https://iottalk.cmoremap
+            // .com.tw:6326"
             Log.d("QBeeDotCom", "qbeeUrl = $qbeeUrl")
-            val loginName = "admin"
-            val password = "admin"
+            val loginName = "admin"//"nextcloud"//"iottalk"//"admin"
+            val password = "admin"//"Aa123456"//"97497929"//"admin"
 
             val accountManager = AccountManager.get(this@WelcomeActivity)
             val accountName = AccountUtils.buildAccountName(Uri.parse(qbeeUrl), loginName)
@@ -423,8 +424,12 @@ class WelcomeActivity : AppCompatActivity() {
     }
 
     private suspend fun addQBeeCert() = withContext(Dispatchers.IO) {
-        Log.d("QBeeDotCom", "addQBeeCert")
         resources.openRawResource(R.raw.qbee).use {
+            val cert = CertificateFactory.getInstance("X.509").generateCertificate(it) as X509Certificate
+            NetworkUtils.addCertToKnownServersStore(cert, this@WelcomeActivity)
+        }
+        Log.d("QBeeDotCom", "addQBeeCert")
+        resources.openRawResource(R.raw.askeyit).use {
             val cert = CertificateFactory.getInstance("X.509").generateCertificate(it) as X509Certificate
             NetworkUtils.addCertToKnownServersStore(cert, this@WelcomeActivity)
         }

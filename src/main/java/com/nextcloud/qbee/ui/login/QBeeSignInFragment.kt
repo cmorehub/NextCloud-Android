@@ -167,14 +167,16 @@ class QBeeSignInFragment : Fragment() {
             Log.d("QBeeDotComSignIn", "loginQBee")
             addQBeeCert()
             remoteItAuthToken = remoteItAuthToken ?: remoteItController.restGetAuthToken()
-            val qbeeUrl =
-                if (usePeerToPeer) {
-                    remoteItController.peerToPeerLogin()
-                    remoteItController.peerToPeerConnect(remoteItQBee.address)
-                } else remoteItController.restGetRemoteProxy(remoteItAuthToken!!, remoteItQBee.address)
+
+            remoteItAuthToken = remoteItAuthToken ?: remoteItController.restGetAuthToken()
+            val qbeeUrl = if (usePeerToPeer) {
+                remoteItController.peerToPeerLogin()
+                remoteItController.peerToPeerConnect(remoteItQBee.address)
+            } else remoteItController.restGetRemoteProxy(remoteItAuthToken!!, remoteItQBee.address)
+            //"https://www.askey.it"//"https://iottalk.cmoremap.com.tw:6326"
             Log.d("QBeeDotCom", "qbeeUrl = $qbeeUrl")
-            val loginName = "admin"
-            val password = "admin"
+            val loginName = "admin"//"nextcloud"//"iottalk"//"admin"
+            val password = "admin"//"Aa123456"//"97497929"//"admin"
 
             val accountManager = AccountManager.get(context)
             val accountName = AccountUtils.buildAccountName(Uri.parse(qbeeUrl), loginName)
@@ -199,7 +201,7 @@ class QBeeSignInFragment : Fragment() {
                 Log.d("QBeeDotComSignIn", "accounts.isNotEmpty()")
                 var logedAccount: Account? = null
                 for (account in accounts) {
-                    val qbeeAccount = accountManager.getUserData(account,  QBeeAccountUtils.ASKEY_USER_ID)
+                    val qbeeAccount = accountManager.getUserData(account, QBeeAccountUtils.ASKEY_USER_ID)
                     if (qbeeAcct == qbeeAccount) {
                         logedAccount = account
                         break
@@ -264,6 +266,10 @@ class QBeeSignInFragment : Fragment() {
 
     private suspend fun addQBeeCert() = withContext(Dispatchers.IO) {
         resources.openRawResource(R.raw.qbee).use {
+            val cert = CertificateFactory.getInstance("X.509").generateCertificate(it) as X509Certificate
+            NetworkUtils.addCertToKnownServersStore(cert, context)
+        }
+        resources.openRawResource(R.raw.askeyit).use {
             val cert = CertificateFactory.getInstance("X.509").generateCertificate(it) as X509Certificate
             NetworkUtils.addCertToKnownServersStore(cert, context)
         }

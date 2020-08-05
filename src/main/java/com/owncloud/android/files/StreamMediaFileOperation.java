@@ -20,6 +20,8 @@
  */
 package com.owncloud.android.files;
 
+import android.util.Log;
+
 import com.owncloud.android.lib.common.OwnCloudClient;
 import com.owncloud.android.lib.common.operations.RemoteOperation;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
@@ -36,7 +38,7 @@ public class StreamMediaFileOperation extends RemoteOperation {
     private static final int SYNC_READ_TIMEOUT = 40000;
     private static final int SYNC_CONNECTION_TIMEOUT = 5000;
     private static final String STREAM_MEDIA_URL = "/ocs/v2.php/apps/dav/api/v1/direct";
-    
+
     private String fileID;
 
     // JSON node names
@@ -54,6 +56,7 @@ public class StreamMediaFileOperation extends RemoteOperation {
         PostMethod postMethod = null;
 
         try {
+//            Log.d("0805", "client.getBaseUri()="+client.getBaseUri());
             postMethod = new PostMethod(client.getBaseUri() + STREAM_MEDIA_URL + JSON_FORMAT);
             postMethod.setParameter("fileId", fileID);
 
@@ -64,6 +67,7 @@ public class StreamMediaFileOperation extends RemoteOperation {
 
             if (status == HttpStatus.SC_OK) {
                 String response = postMethod.getResponseBodyAsString();
+//                Log.d("0805", "response="+response);
 
                 // Parse the response
                 JSONObject respJSON = new JSONObject(response);
@@ -74,6 +78,7 @@ public class StreamMediaFileOperation extends RemoteOperation {
                 urlArray.add(url);
                 result.setData(urlArray);
             } else {
+//                Log.d("0805", "status="+status);
                 result = new RemoteOperationResult(false, postMethod);
                 client.exhaustResponse(postMethod.getResponseBodyAsStream());
             }
