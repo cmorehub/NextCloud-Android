@@ -168,7 +168,6 @@ class QBeeSignInFragment : Fragment() {
             addQBeeCert()
             remoteItAuthToken = remoteItAuthToken ?: remoteItController.restGetAuthToken()
 
-            remoteItAuthToken = remoteItAuthToken ?: remoteItController.restGetAuthToken()
             val qbeeUrl = if (usePeerToPeer) {
                 remoteItController.peerToPeerLogin()
                 remoteItController.peerToPeerConnect(remoteItQBee.address)
