@@ -16,7 +16,6 @@ class SSLVideoView : VideoView {
 
     override fun setVideoURI(uri: Uri?) {
         super.setVideoURI(uri)
-//        Log.d("0805", "SSLVideoView setVideoURI=$uri")
         try {
             HttpsURLConnection.setDefaultSSLSocketFactory(SSLUtiles.createSSLSocketFactory())
             HttpsURLConnection.setDefaultHostnameVerifier(SSLUtiles.TrustAllHostnameVerifier())

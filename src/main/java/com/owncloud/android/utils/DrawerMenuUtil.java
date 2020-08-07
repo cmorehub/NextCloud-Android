@@ -68,7 +68,6 @@ public final class DrawerMenuUtil {
                                               @Nullable Account account,
                                               @Nullable OCCapability capability,
                                               UserAccountManager accountManager) {
-        Log.d("0724", "account is null=" + (account != null) + ", capability is null=" + (capability != null));
         if (account != null && capability != null &&
             (accountManager.getServerVersion(account).compareTo(OwnCloudVersion.nextcloud_14) < 0 ||
                 capability.getFilesUndelete().isFalse() || capability.getFilesUndelete().isUnknown())) {

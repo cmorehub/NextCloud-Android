@@ -90,7 +90,6 @@ class QBeeSetup4Fragment() : Fragment() {
                                             }
                                         }
                                     }
-                                    Log.d("0716", "deviceRemoteIdAddr:$deviceRemoteIdAddr")
                                     if (deviceRemoteIdAddr != "") {
                                         RemoteItRestTask(RemoteItRest.deviceProxyUrl, object : RemoteItRestTask.Callback {
                                             override fun onResult(result: RemoteItRest) {
@@ -114,7 +113,6 @@ class QBeeSetup4Fragment() : Fragment() {
                                                     setConnectState(false)
                                                     val errorJson = result.result as JSONObject
                                                     val reason = errorJson.getString("reason")
-                                                    Log.d("0716", "reason=$reason")
                                                     Toast.makeText(context, getString(R.string.qbee_setup_connected_error), Toast.LENGTH_LONG).show()
                                                     val navController = NavHostFragment.findNavController(this@QBeeSetup4Fragment)
                                                     var action = QBeeSetup4FragmentDirections.actionQBeeSetup4FragmentToQBeeSetupConnectionTypeFragment()
@@ -146,7 +144,6 @@ class QBeeSetup4Fragment() : Fragment() {
                         setConnectState(false)
                         val errorJson = result.result as JSONObject
                         val reason = errorJson.getString("reason")
-                        Log.d("0716", "reason=$reason")
                         Toast.makeText(context, getString(R.string.qbee_setup_connected_error), Toast.LENGTH_LONG).show()
                         val navController = NavHostFragment.findNavController(this@QBeeSetup4Fragment)
                         var action = QBeeSetup4FragmentDirections.actionQBeeSetup4FragmentToQBeeSetupConnectionTypeFragment()

@@ -79,7 +79,6 @@ class WelcomeActivity : AppCompatActivity() {
                                     val device = devices[0] as JSONObject
                                     val devicemac = device.getString("mac").toLowerCase()
                                     val deviceremote = device.getString("remote")
-                                    Log.d("0716", "deviceremote=$deviceremote")
                                     try {
                                         val remoteDevice = findQBeeDeviceOfName(deviceremote ?: return@launch)
                                         if (remoteDevice != null) {
@@ -300,7 +299,6 @@ class WelcomeActivity : AppCompatActivity() {
                                     val device = devices[0] as JSONObject
                                     val devicemac = device.getString("mac").toLowerCase()
                                     val deviceremote = device.getString("remote")
-                                    Log.d("0716", "deviceremote=$deviceremote")
                                     RemoteItRestTask(RemoteItRest.deviceListUrl, object : RemoteItRestTask.Callback {
                                         override fun onResult(result: RemoteItRest) {
                                             if (result.success) {
@@ -317,7 +315,6 @@ class WelcomeActivity : AppCompatActivity() {
                                                         }
                                                     }
                                                 }
-                                                Log.d("0716", "deviceRemoteIdAddr:$deviceRemoteIdAddr")
                                                 if (deviceRemoteIdAddr != "") {
                                                     RemoteItRestTask(RemoteItRest.deviceProxyUrl, object : RemoteItRestTask.Callback {
                                                         override fun onResult(result: RemoteItRest) {

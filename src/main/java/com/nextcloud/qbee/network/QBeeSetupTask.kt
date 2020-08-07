@@ -60,7 +60,6 @@ class QBeeSetupTask() : AsyncTask<String, Void, String?>() {
                 stream.write(buffer2, 0, readCount)
             }
             val resultString = stream.toString()
-//            Log.d("0716", resultString)
             result = if (server_response_code == 200) {
                 resultString
             } else {

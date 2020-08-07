@@ -1306,7 +1306,6 @@ public class FileDisplayActivity extends FileActivity
          */
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("0804", "onReceive");
             try {
                 String event = intent.getAction();
                 Log_OC.d(TAG, "Received broadcast " + event);
@@ -1433,13 +1432,11 @@ public class FileDisplayActivity extends FileActivity
      * Show a text message on screen view for notifying user if content is loading or folder is empty
      */
     private void setBackgroundText() {
-        Log.d("0804", "setBackgroundText");
         final OCFileListFragment ocFileListFragment = getListOfFilesFragment();
         if (ocFileListFragment != null) {
             if (mSyncInProgress) {
                 ocFileListFragment.setEmptyListLoadingMessage();
             } else {
-                Log.d("0804", "setBackgroundText NO_SEARCH");
                 ocFileListFragment.setEmptyListMessage(ExtendedListFragment.SearchType.NO_SEARCH);
             }
         } else {
@@ -2460,7 +2457,6 @@ public class FileDisplayActivity extends FileActivity
     }
 
     private void syncAndUpdateFolder(boolean ignoreETag) {
-        Log.d("0804", "syncAndUpdateFolder");
         OCFileListFragment listOfFiles = getListOfFilesFragment();
         if (listOfFiles != null && !listOfFiles.isSearchFragment()) {
             OCFile folder = listOfFiles.getCurrentFile();

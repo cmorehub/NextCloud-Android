@@ -33,7 +33,6 @@ class RemoteItRestTask() : AsyncTask<JSONObject, Void, String?>() {
         try {
             var server_response_code = 0
             val url = URL(SERVER_URL)
-            Log.d("0716", "SERVER_URL:$SERVER_URL")
             connection = url.openConnection() as HttpURLConnection
             connection!!.doInput = true //Allow Inputs
             connection!!.doOutput = params[1]!!.getString("method") == "POST" //Allow Outputs
@@ -44,10 +43,8 @@ class RemoteItRestTask() : AsyncTask<JSONObject, Void, String?>() {
             params[0]!!.keys().forEach {
                 val prop = params[0]!!.getString(it)
                 connection!!.setRequestProperty(it, prop)
-                Log.d("0716", "remoteit:$it=$prop")
             }
             connection!!.requestMethod = params[1]!!.getString("method")
-            Log.d("0716", "method=${params[1]!!.getString("method")}")
 
             if (params[1]!!.getString("method") == "POST") {
                 connection!!.setRequestProperty("Content-Type", "application/json;")
@@ -58,9 +55,7 @@ class RemoteItRestTask() : AsyncTask<JSONObject, Void, String?>() {
                 data_output_stream!!.close()
             }
             server_response_code = connection!!.responseCode
-            Log.d("0716", "server_response_code=$server_response_code")
             val serverResponseMessage: String = connection!!.responseMessage
-            Log.d("0716", "serverResponseMessage=$serverResponseMessage")
 
             val inputStream: InputStream = if (server_response_code == 200) {
                 connection!!.inputStream
@@ -74,7 +69,6 @@ class RemoteItRestTask() : AsyncTask<JSONObject, Void, String?>() {
                 stream.write(buffer2, 0, readCount)
             }
             val resultString = stream.toString()
-            Log.d("0716", "resultString:$resultString")
             result = resultString
 
             inputStream.close()

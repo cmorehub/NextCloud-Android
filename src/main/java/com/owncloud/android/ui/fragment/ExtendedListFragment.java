@@ -244,16 +244,13 @@ public class ExtendedListFragment extends Fragment implements
 //            @Override
 //            public void onGlobalLayout() {
 //
-//                Log.d("0804", "onGlobalLayout");
 //                int currentVisibility = mSearchEditFrame.getVisibility();
-//                Log.d("0804", "currentVisibility="+currentVisibility+", oldVisibility="+oldVisibility);
 //
 //                if (currentVisibility != oldVisibility) {
 //                    if (currentVisibility == View.VISIBLE) {
 //
 //                        setEmptyListMessage(SearchType.REGULAR_FILTER);
 //                    } else {
-//                        Log.d("0804", "onGlobalLayout NO_SEARCH");
 //                        setEmptyListMessage(SearchType.NO_SEARCH);
 //                    }
 //
@@ -289,6 +286,7 @@ public class ExtendedListFragment extends Fragment implements
 
     @Override
     public boolean onQueryTextSubmit(String query) {
+        Log.d("benno-0807", "onQueryTextSubmit=" + query);
         performSearch(query, true);
         return true;
     }

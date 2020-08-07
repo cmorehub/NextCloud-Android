@@ -56,7 +56,6 @@ public class StreamMediaFileOperation extends RemoteOperation {
         PostMethod postMethod = null;
 
         try {
-//            Log.d("0805", "client.getBaseUri()="+client.getBaseUri());
             postMethod = new PostMethod(client.getBaseUri() + STREAM_MEDIA_URL + JSON_FORMAT);
             postMethod.setParameter("fileId", fileID);
 
@@ -67,7 +66,6 @@ public class StreamMediaFileOperation extends RemoteOperation {
 
             if (status == HttpStatus.SC_OK) {
                 String response = postMethod.getResponseBodyAsString();
-//                Log.d("0805", "response="+response);
 
                 // Parse the response
                 JSONObject respJSON = new JSONObject(response);
@@ -78,7 +76,6 @@ public class StreamMediaFileOperation extends RemoteOperation {
                 urlArray.add(url);
                 result.setData(urlArray);
             } else {
-//                Log.d("0805", "status="+status);
                 result = new RemoteOperationResult(false, postMethod);
                 client.exhaustResponse(postMethod.getResponseBodyAsStream());
             }
