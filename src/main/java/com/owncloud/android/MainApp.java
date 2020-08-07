@@ -72,6 +72,7 @@ import com.owncloud.android.datastorage.StoragePoint;
 import com.owncloud.android.jobs.MediaFoldersDetectionJob;
 import com.owncloud.android.jobs.NCJobCreator;
 import com.owncloud.android.lib.common.OwnCloudClientManagerFactory;
+import com.owncloud.android.lib.common.network.NetworkUtils;
 import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.lib.resources.status.OwnCloudVersion;
 import com.owncloud.android.ui.activity.ContactsPreferenceActivity;
@@ -85,9 +86,16 @@ import com.owncloud.android.utils.SecurityUtils;
 
 import org.conscrypt.Conscrypt;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.Security;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -96,8 +104,12 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.X509TrustManager;
 
 import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
@@ -117,7 +129,7 @@ import static com.owncloud.android.ui.activity.ContactsPreferenceActivity.PREFER
 
 /**
  * Main Application of the project
- *
+ * <p>
  * Contains methods to build the "static" strings. These strings were before constants in different classes
  */
 public class MainApp extends MultiDexApplication implements HasAndroidInjector {
@@ -179,24 +191,21 @@ public class MainApp extends MultiDexApplication implements HasAndroidInjector {
     }
 
     /**
-     * Temporary getter replacing Dagger DI
-     * TODO: remove when cleaning DI in NContentObserverJob
+     * Temporary getter replacing Dagger DI TODO: remove when cleaning DI in NContentObserverJob
      */
     public AppPreferences getPreferences() {
         return preferences;
     }
 
     /**
-     * Temporary getter replacing Dagger DI
-     * TODO: remove when cleaning DI in NContentObserverJob
+     * Temporary getter replacing Dagger DI TODO: remove when cleaning DI in NContentObserverJob
      */
     public PowerManagementService getPowerManagementService() {
         return powerManagementService;
     }
 
     /**
-     * Temporary getter enabling intermediate refactoring.
-     * TODO: remove when FileSyncHelper is refactored/removed
+     * Temporary getter enabling intermediate refactoring. TODO: remove when FileSyncHelper is refactored/removed
      */
     public BackgroundJobManager getBackgroundJobManager() {
         return backgroundJobManager;
@@ -204,7 +213,7 @@ public class MainApp extends MultiDexApplication implements HasAndroidInjector {
 
     private String getAppProcessName() {
         String processName = "";
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
             ActivityManager manager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
             final int ownPid = android.os.Process.myPid();
             final List<ActivityManager.RunningAppProcessInfo> processes = manager.getRunningAppProcesses();
@@ -245,6 +254,54 @@ public class MainApp extends MultiDexApplication implements HasAndroidInjector {
         }
     }
 
+    private void disableSSLCertificateChecking(X509Certificate[] trustedCerts) throws KeyManagementException, NoSuchAlgorithmException {
+        SSLContext sc = SSLContext.getInstance("TLS");
+        sc.init(null, new X509TrustManager[]{
+            new X509TrustManager() {
+                @SuppressLint("TrustAllX509TrustManager")
+                @Override
+                public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+
+                }
+
+                @SuppressLint("TrustAllX509TrustManager")
+                @Override
+                public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+
+                }
+
+                @Override
+                public X509Certificate[] getAcceptedIssuers() {
+                    if(trustedCerts!=null&&trustedCerts.length!=0){
+                        return trustedCerts;
+                    } else return new X509Certificate[0];
+                }
+            }
+        }, new SecureRandom());
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+            @SuppressLint("BadHostnameVerifier")
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        });
+    }
+
+    private X509Certificate[] getQBeeCerts() throws CertificateException {
+        CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+        return new X509Certificate[]{
+            (X509Certificate) certFactory.generateCertificate(getResources().openRawResource(R.raw.qbee)),
+            (X509Certificate) certFactory.generateCertificate(getResources().openRawResource(R.raw.askeyit))
+        };
+    }
+
+    private void addQBeeCerts() throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException {
+        for (X509Certificate certificate : getQBeeCerts()) {
+            NetworkUtils.addCertToKnownServersStore(certificate, this);
+        }
+    }
+
     @SuppressFBWarnings("ST")
     @Override
     public void onCreate() {
@@ -256,6 +313,21 @@ public class MainApp extends MultiDexApplication implements HasAndroidInjector {
         initSecurityKeyManager();
 
         registerActivityLifecycleCallbacks(new ActivityInjector());
+
+        try {
+            disableSSLCertificateChecking(getQBeeCerts());
+            addQBeeCerts();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         Thread t = new Thread(() -> {
             // best place, before any access to AccountManager or database

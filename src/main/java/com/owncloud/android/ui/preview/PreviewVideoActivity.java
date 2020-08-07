@@ -24,14 +24,17 @@ import android.accounts.Account;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
@@ -78,6 +81,9 @@ public class PreviewVideoActivity extends BaseActivity implements OnCompletionLi
     private Uri mStreamUri;
     private OCFile mFile;
 
+    private FrameLayout videoFocusSelector;
+    Drawable videoPreviewFocusBackground;
+
     /**
      *  Called when the activity is first created.
      *
@@ -119,6 +125,13 @@ public class PreviewVideoActivity extends BaseActivity implements OnCompletionLi
 
         // keep the screen on while the playback is performed (prevents screen off by battery save)
         mVideoPlayer.setKeepScreenOn(true);
+
+        videoFocusSelector = (FrameLayout) findViewById(R.id.video_focus_indicator);
+        videoPreviewFocusBackground =
+            Build.VERSION.SDK_INT>20?
+                getResources().getDrawable(R.drawable.view_selector_border_frame,getTheme())
+                :getResources().getDrawable(R.drawable.view_selector_border_frame);
+
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
@@ -253,6 +266,10 @@ public class PreviewVideoActivity extends BaseActivity implements OnCompletionLi
             (LinearLayout) ((LinearLayout)controller.getChildAt(0)).getChildAt(0);
         LinearLayout mediaControllerTimeBarLayout =
             (LinearLayout) ((LinearLayout)controller.getChildAt(0)).getChildAt(1);
+
+        mVideoPlayer.setOnFocusChangeListener((v,focus)->{
+            videoFocusSelector.setBackground(focus?videoPreviewFocusBackground:null);
+        });
 
         for(int i = 0; i<mediaControllerTimeBarLayout.getChildCount(); i++){
             View child = mediaControllerTimeBarLayout.getChildAt(i);

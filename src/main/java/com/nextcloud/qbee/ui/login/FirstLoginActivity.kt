@@ -18,19 +18,17 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.lifecycle.Observer
 import com.nextcloud.qbee.remoteit.RemoteItController
 import com.owncloud.android.R
 import com.owncloud.android.lib.common.OwnCloudAccount
 import com.owncloud.android.lib.common.OwnCloudClientManager
 import com.owncloud.android.lib.common.accounts.AccountUtils
-import com.owncloud.android.lib.common.network.NetworkUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.security.cert.CertificateFactory
-import java.security.cert.X509Certificate
 
 class FirstLoginActivity : AppCompatActivity() {
 
@@ -64,7 +62,6 @@ class FirstLoginActivity : AppCompatActivity() {
         withContext(Dispatchers.IO) {
             Log.d("QBeeDotCom","connecting QBee $remoteItQBee")
             setLoadingEnabled()
-            addQBeeCert()
             remoteItAuthToken = remoteItAuthToken ?: remoteItController.restGetAuthToken()
             val qBeeUrl =
                 if (usePeerToPeer) {
@@ -157,9 +154,11 @@ class FirstLoginActivity : AppCompatActivity() {
         loginViewModel.loginResult.observe(this@FirstLoginActivity, Observer {
             CoroutineScope(Dispatchers.Main).launch {
                 if (it?.success != null) {
+//                    loginQBee("https://www.askey.it".toUri(),"nextcloud","Aa123456")
+//                    loginQBee("http://iottalk.cmoremap.com.tw:6325".toUri(),"iottalk","97497929")
                     val device = findQBeeDeviceOfName(it.success.device?.remote ?: return@launch)
                     if (device != null) {
-                        loginQBee(device,usePeerToPeer = true)
+                        loginQBee(device,usePeerToPeer = false)
                     } else {
                         Toast.makeText(this@FirstLoginActivity, it.error?.message ?: getString(R.string
                             .login_failed)
@@ -216,12 +215,6 @@ class FirstLoginActivity : AppCompatActivity() {
         }
     }
 
-    private suspend fun addQBeeCert() = withContext(Dispatchers.IO) {
-        resources.openRawResource(R.raw.qbee).use {
-            val cert = CertificateFactory.getInstance("X.509").generateCertificate(it) as X509Certificate
-            NetworkUtils.addCertToKnownServersStore(cert, this@FirstLoginActivity)
-        }
-    }
 
     private fun updateUiWithUser(model: LoggedInUserView) {
         val welcome = getString(R.string.welcome)

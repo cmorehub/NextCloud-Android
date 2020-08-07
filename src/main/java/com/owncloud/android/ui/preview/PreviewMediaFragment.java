@@ -29,6 +29,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -36,6 +37,7 @@ import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -46,6 +48,7 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -119,6 +122,7 @@ public class PreviewMediaFragment extends FileFragment implements OnTouchListene
     private TextView mMultiListHeadline;
     private ImageView mMultiListIcon;
     private ProgressBar mMultiListProgress;
+    private FrameLayout videoFocusSelector;
 
     private MediaControlView mMediaController;
     private boolean mAutoplay;
@@ -193,8 +197,17 @@ public class PreviewMediaFragment extends FileFragment implements OnTouchListene
         mPreviewContainer = view.findViewById(R.id.file_preview_container);
         mImagePreview = view.findViewById(R.id.image_preview);
         mVideoPreview = view.findViewById(R.id.video_preview);
+        videoFocusSelector = view.findViewById(R.id.video_focus_indicator);
         mVideoPreview.setOnTouchListener(this);
         mVideoPreview.setOnClickListener(this);
+        Drawable videoPreviewFocusBackground =
+            Build.VERSION.SDK_INT>20?
+                getResources().getDrawable(R.drawable.view_selector_border_frame,getActivity().getTheme())
+            :getResources().getDrawable(R.drawable.view_selector_border_frame);
+        mVideoPreview.setOnFocusChangeListener((v,focus)->{
+            videoFocusSelector.setBackground(focus?videoPreviewFocusBackground:null);
+        });
+        mVideoPreview.clearFocus();
 
         mMediaController = view.findViewById(R.id.media_controller);
         mMultiView = view.findViewById(R.id.multi_view);
