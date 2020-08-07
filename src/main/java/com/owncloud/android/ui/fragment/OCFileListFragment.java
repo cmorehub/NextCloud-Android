@@ -1614,9 +1614,9 @@ public class OCFileListFragment extends ExtendedListFragment implements
                                         fileDisplayActivity.setIndeterminate(false);
                                     }
                                     menuItemAddRemoveValue = MenuItemAddRemove.REMOVE_REFRESH;
-                                    if (getActivity() != null) {
-                                        getActivity().invalidateOptionsMenu();
-                                    }
+//                                    if (getActivity() != null) {
+//                                        getActivity().invalidateOptionsMenu();
+//                                    }
                                     setSwipeEnabled(false);
                                 }
                             });
