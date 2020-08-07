@@ -2067,7 +2067,9 @@ public class FileDisplayActivity extends FileActivity
                 }
             }
 
-            if (getStorageManager().getFileById(renamedFile.getParentId()).equals(getCurrentDir())) {
+            OCFile parentDir = getStorageManager().getFileById(renamedFile.getParentId());
+
+            if (parentDir != null && parentDir.equals(getCurrentDir())) {
                 updateListOfFilesFragment(false);
             }
 

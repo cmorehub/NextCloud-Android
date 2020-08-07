@@ -1305,7 +1305,9 @@ public class OCFileListFragment extends ExtendedListFragment implements
         }
 
         // FAB
-        setFabEnabled(mFile.canWrite());
+        if (mFile != null) {
+            setFabEnabled(mFile.canWrite());
+        }
 
         invalidateActionMode();
     }
