@@ -53,6 +53,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
@@ -724,6 +725,17 @@ public class FileDisplayActivity extends FileActivity
         }
     }
 
+    private void doSearchString(String searchText){
+        isSearching = true;
+        // some issues come with search intent.
+        Intent searchIntent = new Intent(Intent.ACTION_SEARCH)
+            .setClass(FileDisplayActivity.this,FileDisplayActivity.class)
+            .putExtra(OCFileListFragment.SEARCH_EVENT, Parcels.wrap(new SearchEvent(searchText,
+                                                                                    SearchRemoteOperation.SearchType.FILE_SEARCH,
+                                                                                    SearchEvent.UnsetType.NO_UNSET)));
+        startActivity(searchIntent);
+    }
+
     protected void refreshSecondFragment(String downloadEvent, String downloadedRemotePath,
                                          boolean success) {
         FileFragment secondFragment = getSecondFragment();
@@ -795,6 +807,16 @@ public class FileDisplayActivity extends FileActivity
         menu.findItem(R.id.action_select_all).setVisible(false);
         searchActionMenuItem = menu.findItem(R.id.action_search);
         searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+        int searchCloseButtonId = searchView.getContext().getResources()
+            .getIdentifier("android:id/search_close_btn", null, null);
+        ImageView closeButton = (ImageView) searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchView.setIconified(true);
+                searchView.setQuery("",false);
+            }
+        });
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
@@ -803,8 +825,11 @@ public class FileDisplayActivity extends FileActivity
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Toast.makeText(FileDisplayActivity.this, "Submit " + query, Toast.LENGTH_LONG).show();
-                return false;
+                if (!TextUtils.isEmpty(query)){
+                    Toast.makeText(FileDisplayActivity.this, "Submit " + query, Toast.LENGTH_LONG).show();
+                    doSearchString(query);
+                }
+                return true;
             }
 
             @Override
@@ -815,10 +840,11 @@ public class FileDisplayActivity extends FileActivity
 
         searchView.setOnFocusChangeListener((v, focus) -> {
             // TODO : iconized didn't work?
+            Log.d("SearchDebug", String.format("searchView onFocus %s", focus));
             if (focus) {
 //                searchView.setIconified(false);
             } else {
-//                searchView.setIconified(true);
+                searchView.setIconified(true);
             }
         });
 
@@ -1007,14 +1033,6 @@ public class FileDisplayActivity extends FileActivity
                         setSearchQuery(searchText);
                         searchActionMenuItem.expandActionView();
                         searchView.setQuery(searchText, true);
-                        isSearching = true;
-                        // some issues come with search intent.
-//                        Intent searchIntent = new Intent(Intent.ACTION_SEARCH)
-//                            .setClass(FileDisplayActivity.this,FileDisplayActivity.class)
-//                            .putExtra(OCFileListFragment.SEARCH_EVENT, Parcels.wrap(new SearchEvent(searchText,
-//                                                                                                    SearchRemoteOperation.SearchType.FILE_SEARCH,
-//                                                                                                    SearchEvent.UnsetType.NO_UNSET)));
-//                        startActivity(searchIntent);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

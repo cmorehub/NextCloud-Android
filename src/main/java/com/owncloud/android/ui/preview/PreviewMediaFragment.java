@@ -78,6 +78,8 @@ import com.owncloud.android.ui.fragment.FileFragment;
 import com.owncloud.android.utils.MimeTypeUtil;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.inject.Inject;
 
@@ -375,57 +377,32 @@ public class PreviewMediaFragment extends FileFragment implements OnTouchListene
                       accountManager.isMediaStreamingSupported(currentAccount));
         }
 
-        // additional restriction for this fragment
-        // TODO allow renaming in PreviewImageFragment
-        MenuItem item = menu.findItem(R.id.action_rename_file);
-        if (item != null) {
-            item.setVisible(false);
-            item.setEnabled(false);
-        }
-
-        // additional restriction for this fragment
-        item = menu.findItem(R.id.action_select_all);
-        if (item != null) {
-            item.setVisible(false);
-            item.setEnabled(false);
-        }
-
-        // additional restriction for this fragment
-        item = menu.findItem(R.id.action_move);
-        if (item != null) {
-            item.setVisible(false);
-            item.setEnabled(false);
-        }
-
-        // additional restriction for this fragment
-        item = menu.findItem(R.id.action_copy);
-        if (item != null) {
-            item.setVisible(false);
-            item.setEnabled(false);
-        }
-
-        // additional restriction for this fragment
-        item = menu.findItem(R.id.action_favorite);
-        if (item != null) {
-            item.setVisible(false);
-            item.setEnabled(false);
-        }
-
-        // additional restriction for this fragment
-        item = menu.findItem(R.id.action_unset_favorite);
-        if (item != null) {
-            item.setVisible(false);
-            item.setEnabled(false);
-        }
+        // additional restrictions for this fragment
+        int[] itemsToHide = new int[]{
+            R.id.action_search,
+            R.id.action_voice,
+            R.id.action_unset_favorite,
+            R.id.action_favorite,
+            R.id.action_copy,
+            R.id.action_move,
+            R.id.action_select_all,
+            R.id.action_remove_file
+        };
 
         if(getFile().isSharedWithMe() && !getFile().canReshare()){
             // additional restriction for this fragment
-            item = menu.findItem(R.id.action_send_share_file);
-            if(item != null){
+            itemsToHide = Arrays.copyOf(itemsToHide,itemsToHide.length+1);
+            itemsToHide[itemsToHide.length-1] = R.id.action_send_share_file;
+        }
+
+        for (int id : itemsToHide){
+            MenuItem item = menu.findItem(id);
+            if(item!=null){
                 item.setVisible(false);
                 item.setEnabled(false);
             }
         }
+
     }
 
     @Override

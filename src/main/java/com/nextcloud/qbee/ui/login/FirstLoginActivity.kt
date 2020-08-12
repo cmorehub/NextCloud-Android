@@ -158,7 +158,7 @@ class FirstLoginActivity : AppCompatActivity() {
 //                    loginQBee("http://iottalk.cmoremap.com.tw:6325".toUri(),"iottalk","97497929")
                     val device = findQBeeDeviceOfName(it.success.device?.remote ?: return@launch)
                     if (device != null) {
-                        loginQBee(device,usePeerToPeer = false)
+                        loginQBee(device, usePeerToPeer = true)
                     } else {
                         Toast.makeText(this@FirstLoginActivity, it.error?.message ?: getString(R.string
                             .login_failed)
