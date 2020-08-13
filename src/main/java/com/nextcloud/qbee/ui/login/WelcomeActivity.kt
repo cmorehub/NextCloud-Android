@@ -65,8 +65,13 @@ class WelcomeActivity : AppCompatActivity() {
         progressWelcome = findViewById(R.id.progressWelcome)
         CoroutineScope(Dispatchers.Main).launch {
             val logged = getSharedPreferences(QBEE_LOGIN_DATA, 0).getString(QBEE_LOGIN_DATA_ACCT, "") != ""
+            val debug = false
 //            val logged = checkAskeyLogin()
-            if (logged) {
+            if (debug) {
+                val acctmail = getSharedPreferences(QBEE_LOGIN_DATA, 0).getString(QBEE_LOGIN_DATA_ACCT, "")
+                val pass = getSharedPreferences(QBEE_LOGIN_DATA, 0).getString(QBEE_LOGIN_DATA_PWD, "")
+                doLocalLogin(acctmail!!, pass!!)
+            } else if (logged) {
 //                doLogin()
                 val acctmail = getSharedPreferences(QBEE_LOGIN_DATA, 0).getString(QBEE_LOGIN_DATA_ACCT, "")
                 val pass = getSharedPreferences(QBEE_LOGIN_DATA, 0).getString(QBEE_LOGIN_DATA_PWD, "")
@@ -82,8 +87,8 @@ class WelcomeActivity : AppCompatActivity() {
                                     try {
                                         val remoteDevice = findQBeeDeviceOfName(deviceremote ?: return@launch)
                                         if (remoteDevice != null) {
-                                            loginQBee(remoteDevice, acctmail!!, pass!!)
-//                                            loginQBee(remoteDevice, acctmail!!, pass!!, true)
+//                                            loginQBee(remoteDevice, acctmail!!, pass!!)
+                                            loginQBee(remoteDevice, acctmail!!, pass!!, true)
                                         } else {
                                             Toast.makeText(this@WelcomeActivity, getString(R.string.qbee_setup_device_not_found_error), Toast.LENGTH_LONG).show()
                                             var intent = Intent(this@WelcomeActivity, QBeeLoginActivity::class.java)
@@ -225,27 +230,38 @@ class WelcomeActivity : AppCompatActivity() {
                 }
                 if (logedAccount != null) {
                     Log.d("QBeeDotCom", "logedAccount != null")
-                    accountManager.renameAccount(logedAccount, accountName, {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            val reacct = it.result
-                            Log.d("QBeeDotCom", "accountname B= ${reacct.name}")
-                            var addResult = accountManager.addAccountExplicitly(reacct, password, null)
-                            Log.d("QBeeDotCom", "check add =$addResult")
-                            if (!addResult) {
-                                accountManager.removeAccountExplicitly(reacct)
-                                addResult = accountManager.addAccountExplicitly(reacct, password, null)
-                                Log.d("QBeeDotCom", "check add =$addResult")
-                                if (!addResult) {
-                                    throw AccountsException("Account create failed")
-                                }
-                            }
-                            accountManager.setUserData(reacct, AccountUtils.Constants.KEY_OC_BASE_URL, qbeeUrl)
-                            accountManager.setUserData(reacct, AccountUtils.Constants.KEY_USER_ID, loginName)
-                            accountManager.setUserData(reacct, QBeeAccountUtils.ASKEY_USER_ID, bindAccount)
-                            accountManager.setUserData(reacct, QBeeAccountUtils.ASKEY_USER_TOKEN, bindPwd)
-                            addOwnCloudAccount(reacct, loginName)
-                        }
-                    }, null)
+                    accountManager.removeAccountExplicitly(logedAccount)
+                    val account = Account(accountName, "nextcloud")
+                    var addResult = accountManager.addAccountExplicitly(account, password, null)
+                    if (!addResult) {
+                        throw AccountsException("Account create failed")
+                    }
+                    accountManager.setUserData(account, AccountUtils.Constants.KEY_OC_BASE_URL, qbeeUrl)
+                    accountManager.setUserData(account, AccountUtils.Constants.KEY_USER_ID, loginName)
+                    accountManager.setUserData(account, QBeeAccountUtils.ASKEY_USER_ID, bindAccount)
+                    accountManager.setUserData(account, QBeeAccountUtils.ASKEY_USER_TOKEN, bindPwd)
+                    addOwnCloudAccount(account, loginName)
+//                    accountManager.renameAccount(logedAccount, accountName, {
+//                        CoroutineScope(Dispatchers.Main).launch {
+//                            val reacct = it.result
+//                            Log.d("QBeeDotCom", "accountname B= ${reacct.name}")
+//                            var addResult = accountManager.addAccountExplicitly(reacct, password, null)
+//                            Log.d("QBeeDotCom", "check add =$addResult")
+//                            if (!addResult) {
+//                                accountManager.removeAccountExplicitly(reacct)
+//                                addResult = accountManager.addAccountExplicitly(reacct, password, null)
+//                                Log.d("QBeeDotCom", "check add =$addResult")
+//                                if (!addResult) {
+//                                    throw AccountsException("Account create failed")
+//                                }
+//                            }
+//                            accountManager.setUserData(reacct, AccountUtils.Constants.KEY_OC_BASE_URL, qbeeUrl)
+//                            accountManager.setUserData(reacct, AccountUtils.Constants.KEY_USER_ID, loginName)
+//                            accountManager.setUserData(reacct, QBeeAccountUtils.ASKEY_USER_ID, bindAccount)
+//                            accountManager.setUserData(reacct, QBeeAccountUtils.ASKEY_USER_TOKEN, bindPwd)
+//                            addOwnCloudAccount(reacct, loginName)
+//                        }
+//                    }, null)
                 } else {
                     Log.d("QBeeDotCom", "logedAccount == null")
                     val account = Account(accountName, "nextcloud")
@@ -282,6 +298,97 @@ class WelcomeActivity : AppCompatActivity() {
                 this@WelcomeActivity.finish()
             }
         }
+
+    @Throws(Exception::class)
+    private suspend fun doLocalLogin(bindAccount: String, bindPwd: String) = withContext(Dispatchers.IO) {
+        addQBeeCert()
+        remoteItAuthToken = remoteItAuthToken ?: remoteItController.restGetAuthToken()
+        val qbeeUrl = "https://23.23.0.106"
+        Log.d("QBeeDotCom", "qbeeUrl = $qbeeUrl")
+        val loginName = "admin"//"nextcloud"//"iottalk"//"admin"
+        val password = "admin"//"Aa123456"//"97497929"//"admin"
+
+        val accountManager = AccountManager.get(this@WelcomeActivity)
+        val accountName = AccountUtils.buildAccountName(Uri.parse(qbeeUrl), loginName)
+        val accounts = accountManager.getAccountsByType("nextcloud")
+        if (accounts.isEmpty()) {
+            Log.d("QBeeDotCom", "accounts.isEmpty()")
+            val account = Account(accountName, "nextcloud")
+//                Log.d("QBeeDotCom", "check new account =${account == null}")
+            var addResult = accountManager.addAccountExplicitly(account, password, null)
+//                Log.d("QBeeDotCom", "check add =$addResult")
+            if (!addResult) {
+                accountManager.removeAccountExplicitly(account)
+                addResult = accountManager.addAccountExplicitly(account, password, null)
+//                    Log.d("QBeeDotCom", "check add =$addResult")
+                if (!addResult) {
+                    throw AccountsException("Account create failed")
+                }
+            }
+            accountManager.setUserData(account, AccountUtils.Constants.KEY_OC_BASE_URL, qbeeUrl)
+            accountManager.setUserData(account, AccountUtils.Constants.KEY_USER_ID, loginName)
+            accountManager.setUserData(account, QBeeAccountUtils.ASKEY_USER_ID, bindAccount)
+            accountManager.setUserData(account, QBeeAccountUtils.ASKEY_USER_TOKEN, bindPwd)
+            val url = accountManager.getUserData(account, AccountUtils.Constants.KEY_OC_BASE_URL)
+            Log.d("QBeeDotCom", "check add url=$url")
+            addOwnCloudAccount(account, loginName)
+        } else {
+            Log.d("QBeeDotCom", "accounts.isNotEmpty()")
+            var logedAccount: Account? = null
+            for (account in accounts) {
+                val qbeeAccount = accountManager.getUserData(account, QBeeAccountUtils.ASKEY_USER_ID)
+                if (bindAccount == qbeeAccount) {
+                    logedAccount = account
+                    break
+                }
+            }
+            if (logedAccount != null) {
+                Log.d("QBeeDotCom", "logedAccount != null")
+                accountManager.removeAccountExplicitly(logedAccount)
+                val account = Account(accountName, "nextcloud")
+                var addResult = accountManager.addAccountExplicitly(account, password, null)
+                if (!addResult) {
+                    throw AccountsException("Account create failed")
+                }
+                accountManager.setUserData(account, AccountUtils.Constants.KEY_OC_BASE_URL, qbeeUrl)
+                accountManager.setUserData(account, AccountUtils.Constants.KEY_USER_ID, loginName)
+                accountManager.setUserData(account, QBeeAccountUtils.ASKEY_USER_ID, bindAccount)
+                accountManager.setUserData(account, QBeeAccountUtils.ASKEY_USER_TOKEN, bindPwd)
+                addOwnCloudAccount(account, loginName)
+                Log.d("QBeeDotCom", "check add =$addResult")
+//                accountManager.renameAccount(logedAccount, accountName, {
+//                    CoroutineScope(Dispatchers.Main).launch {
+//                        val reacct = it.result
+//                        Log.d("QBeeDotCom", "accountname B= ${reacct.name}")
+//                        var addResult = accountManager.addAccountExplicitly(reacct, password, null)
+//                        Log.d("QBeeDotCom", "check add =$addResult")
+//                        if (!addResult) {
+//                            accountManager.removeAccountExplicitly(reacct)
+//                            addResult = accountManager.addAccountExplicitly(reacct, password, null)
+//                            Log.d("QBeeDotCom", "check add =$addResult")
+//                            if (!addResult) {
+//                                throw AccountsException("Account create failed")
+//                            }
+//                        }
+//                        accountManager.setUserData(reacct, AccountUtils.Constants.KEY_OC_BASE_URL, qbeeUrl)
+//                        accountManager.setUserData(reacct, AccountUtils.Constants.KEY_USER_ID, loginName)
+//                        accountManager.setUserData(reacct, QBeeAccountUtils.ASKEY_USER_ID, bindAccount)
+//                        accountManager.setUserData(reacct, QBeeAccountUtils.ASKEY_USER_TOKEN, bindPwd)
+//                        addOwnCloudAccount(reacct, loginName)
+//                    }
+//                }, null)
+            } else {
+                Log.d("QBeeDotCom", "logedAccount == null")
+                val account = Account(accountName, "nextcloud")
+                accountManager.addAccountExplicitly(account, password, null)
+                accountManager.setUserData(account, AccountUtils.Constants.KEY_OC_BASE_URL, qbeeUrl)
+                accountManager.setUserData(account, AccountUtils.Constants.KEY_USER_ID, loginName)
+                accountManager.setUserData(account, QBeeAccountUtils.ASKEY_USER_ID, bindAccount)
+                accountManager.setUserData(account, QBeeAccountUtils.ASKEY_USER_TOKEN, bindPwd)
+                addOwnCloudAccount(account, loginName)
+            }
+        }
+    }
 
     private fun doLogin() {
         val acctmail = getSharedPreferences(QBEE_LOGIN_DATA, 0).getString(QBEE_LOGIN_DATA_ACCT, "")
