@@ -1157,27 +1157,37 @@ public class FileDisplayActivity extends FileActivity
          */
 
         if (isSearchOpen && searchView != null) {
+//            Log.d("0813", "A");
             searchView.setQuery("", true);
             searchView.onActionViewCollapsed();
             setDrawerIndicatorEnabled(isDrawerIndicatorAvailable());
+            showFiles(false);
+            cleanSecondFragment();
         } else if (isDrawerOpen) {
+//            Log.d("0813", "B");
             // close drawer first
             super.onBackPressed();
         } else {
+//            Log.d("0813", "C");
             // all closed
 
             OCFileListFragment listOfFiles = getListOfFilesFragment();
             if (mDualPane || getSecondFragment() == null) {
                 OCFile currentDir = getCurrentDir();
                 if (currentDir == null || currentDir.getParentId() == FileDataStorageManager.ROOT_PARENT_ID) {
+//                    Log.d("0813", "C2");
+//                    Log.d("0813", "currentDir == null ->" + (currentDir == null));
+//                    Log.d("0813", "currentDir.getParentId()  ->" + (currentDir.getParentId()));
                     finish();
                     return;
                 }
                 if (listOfFiles != null) {  // should never be null, indeed
+//                    Log.d("0813", "C3");
                     listOfFiles.onBrowseUp();
                 }
             }
             if (listOfFiles != null) {  // should never be null, indeed
+//                Log.d("0813", "C4");
                 setFile(listOfFiles.getCurrentFile());
             }
             cleanSecondFragment();

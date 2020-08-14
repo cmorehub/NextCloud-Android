@@ -120,7 +120,12 @@ class RemoteItController(context: Context) {
             }
             return@withContext with(urlConnection.getResponseJson()) {
                 return@with if (this.get("status").asBoolean) {
-                    this.get("connection").asJsonObject.get("proxy").asString.replace("http", "https")
+                    var url = this.get("connection").asJsonObject.get("proxy").asString
+                    if (url.startsWith("https")) {
+                        url
+                    } else {
+                        url.replace("http", "https")
+                    }
                 } else null
             }
         }
