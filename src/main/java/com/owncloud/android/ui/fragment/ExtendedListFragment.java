@@ -333,6 +333,7 @@ public class ExtendedListFragment extends Fragment implements
                     FileDisplayActivity fileDisplayActivity = (FileDisplayActivity) activity;
                     fileDisplayActivity.resetSearchView();
                     fileDisplayActivity.updateListOfFilesFragment(true);
+                    fileDisplayActivity.setDrawerIndicatorEnabled(true);
                 } else if (activity instanceof UploadFilesActivity) {
                     LocalFileListAdapter localFileListAdapter = (LocalFileListAdapter) adapter;
                     localFileListAdapter.filter(query);
