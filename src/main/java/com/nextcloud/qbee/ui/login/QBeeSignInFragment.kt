@@ -65,6 +65,7 @@ class QBeeSignInFragment : Fragment() {
     lateinit var progressSignIn: ProgressBar
 
     val debug = false
+    val localaddr = "http://192.168.0.107"
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.activity_qbee_signin, container, false)
@@ -110,8 +111,8 @@ class QBeeSignInFragment : Fragment() {
                                     try {
                                         val remoteDevice = findQBeeDeviceOfName(deviceremote ?: return@launch)
                                         if (remoteDevice != null) {
-                                            loginQBee(remoteDevice, acctmail, pass)
-//                                        loginQBee(remoteDevice, acctmail, pass, true)
+//                                            loginQBee(remoteDevice, acctmail, pass)
+                                        loginQBee(remoteDevice, acctmail, pass, true)
                                         } else {
                                             Toast.makeText(context, getString(R.string.qbee_setup_device_not_found_error), Toast.LENGTH_LONG).show()
                                             btnSignIn.isEnabled = true
@@ -298,7 +299,7 @@ class QBeeSignInFragment : Fragment() {
     private suspend fun doLocalLogin(qbeeAcct: String, qbeePwd: String) = withContext(Dispatchers.IO) {
         addQBeeCert()
         remoteItAuthToken = remoteItAuthToken ?: remoteItController.restGetAuthToken()
-        val qbeeUrl = "https://23.23.0.106"
+        val qbeeUrl = localaddr
         Log.d("QBeeDotCom", "qbeeUrl = $qbeeUrl")
         val loginName = "admin"//"nextcloud"//"iottalk"//"admin"
         val password = "admin"//"Aa123456"//"97497929"//"admin"

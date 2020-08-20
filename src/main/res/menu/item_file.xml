@@ -26,7 +26,8 @@
         android:id="@+id/action_edit"
         android:title="@string/action_edit"
         app:showAsAction="never"
-        android:showAsAction="never" />
+        android:showAsAction="never"
+        android:enabled="false"/>
 
     <item
         android:id="@+id/action_favorite"

@@ -199,7 +199,7 @@ public class FileMenuFilter {
         OCCapability capability = componentsGetter.getStorageManager().getCapability(account.name);
         boolean endToEndEncryptionEnabled = capability.getEndToEndEncryption().isTrue();
 
-        filterEdit(toShow, toHide, capability);
+//        filterEdit(toShow, toHide, capability);
         filterDownload(toShow, toHide, synchronizing);
         filterRename(toShow, toHide, synchronizing);
         filterMoveCopy(toShow, toHide, synchronizing);

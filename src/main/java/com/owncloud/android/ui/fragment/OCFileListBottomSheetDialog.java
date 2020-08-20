@@ -127,7 +127,7 @@ public class OCFileListBottomSheetDialog extends BottomSheetDialog {
             DirectEditing directEditing = new Gson().fromJson(json, DirectEditing.class);
 
             if (!directEditing.getCreators().isEmpty()) {
-                creators.setVisibility(View.VISIBLE);
+//                creators.setVisibility(View.VISIBLE);
 
                 LayoutInflater vi = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 

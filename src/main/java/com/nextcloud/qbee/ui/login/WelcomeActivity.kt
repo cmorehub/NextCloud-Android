@@ -59,6 +59,8 @@ class WelcomeActivity : AppCompatActivity() {
 
     private lateinit var progressWelcome: ProgressBar
 
+    val localaddr = "http://192.168.0.107"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_qbee_welcome)
@@ -303,7 +305,7 @@ class WelcomeActivity : AppCompatActivity() {
     private suspend fun doLocalLogin(bindAccount: String, bindPwd: String) = withContext(Dispatchers.IO) {
         addQBeeCert()
         remoteItAuthToken = remoteItAuthToken ?: remoteItController.restGetAuthToken()
-        val qbeeUrl = "https://23.23.0.106"
+        val qbeeUrl = localaddr
         Log.d("QBeeDotCom", "qbeeUrl = $qbeeUrl")
         val loginName = "admin"//"nextcloud"//"iottalk"//"admin"
         val password = "admin"//"Aa123456"//"97497929"//"admin"

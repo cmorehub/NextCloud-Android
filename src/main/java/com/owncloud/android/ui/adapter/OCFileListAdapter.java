@@ -209,6 +209,7 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         for (OCFile file : mFiles) {
             if (file.getRemoteId().equals(fileId)) {
                 file.setFavorite(favorite);
+                mStorageManager.saveFile(file);
                 break;
             }
         }
@@ -216,6 +217,7 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         for (OCFile file : mFilesAll) {
             if (file.getRemoteId().equals(fileId)) {
                 file.setFavorite(favorite);
+                mStorageManager.saveFile(file);
                 break;
             }
         }
