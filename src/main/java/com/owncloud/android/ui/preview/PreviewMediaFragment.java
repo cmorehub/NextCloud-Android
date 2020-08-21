@@ -525,13 +525,13 @@ public class PreviewMediaFragment extends FileFragment implements OnTouchListene
                         Uri.Builder uriBuilder = uri.buildUpon();
                         uriBuilder.scheme(client.getBaseUri().getScheme());
                         uriBuilder.authority(client.getBaseUri().getAuthority());
-                        Log.d("benno-0805", "decode=" + URLDecoder.decode(client.getBaseUri().getAuthority(), "utf-8"));
+//                        Log.d("benno-0805", "decode=" + URLDecoder.decode(client.getBaseUri().getAuthority(), "utf-8"));
                         String newUrl = uriBuilder.build().toString();
                         Uri newUri = Uri.parse(URLDecoder.decode(newUrl, "utf-8"));
-                        Log.d("benno-0805", "newUri=" + newUri);
+//                        Log.d("benno-0805", "newUri=" + newUri);
                         previewMediaFragment.mVideoUri = newUri;
                         previewMediaFragment.mVideoPreview.setVideoURI(newUri);
-                        Log.d("benno-0805", "mVideoUri=" + uri);
+//                        Log.d("benno-0805", "mVideoUri=" + uri);
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }

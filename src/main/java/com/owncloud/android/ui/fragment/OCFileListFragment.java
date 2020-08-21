@@ -1536,7 +1536,7 @@ public class OCFileListFragment extends ExtendedListFragment implements
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onMessageEvent(final SearchEvent event) {
-        Log_OC.d("benno-0807", "onMessageEvent=" + event.searchType.name());
+//        Log_OC.d("benno-0807", "onMessageEvent=" + event.searchType.name());
         if (SearchRemoteOperation.SearchType.PHOTO_SEARCH == event.searchType) {
             return;
         }

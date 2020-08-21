@@ -286,7 +286,7 @@ public class ExtendedListFragment extends Fragment implements
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        Log.d("benno-0807", "onQueryTextSubmit=" + query);
+//        Log.d("benno-0807", "onQueryTextSubmit=" + query);
         performSearch(query, true);
         return true;
     }
