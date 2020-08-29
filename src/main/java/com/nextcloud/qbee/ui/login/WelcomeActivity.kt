@@ -89,8 +89,8 @@ class WelcomeActivity : AppCompatActivity() {
                                     try {
                                         val remoteDevice = findQBeeDeviceOfName(deviceremote ?: return@launch)
                                         if (remoteDevice != null) {
-//                                            loginQBee(remoteDevice, acctmail!!, pass!!)
-                                            loginQBee(remoteDevice, acctmail!!, pass!!, true)
+                                            loginQBee(remoteDevice, acctmail!!, pass!!)
+//                                            loginQBee(remoteDevice, acctmail!!, pass!!, true)
                                         } else {
                                             Toast.makeText(this@WelcomeActivity, getString(R.string.qbee_setup_device_not_found_error), Toast.LENGTH_LONG).show()
                                             var intent = Intent(this@WelcomeActivity, QBeeLoginActivity::class.java)
