@@ -316,13 +316,17 @@ public final class ThemeUtils {
     }
 
     public static String getDefaultDisplayNameForRootFolder(Context context) {
-        OCCapability capability = getCapability(context);
+        String defaultDisplayName =
+            MainApp.getAppContext().getResources().getString(R.string.default_display_name_for_root_folder);
 
-        if (MainApp.isOnlyOnDevice()) {
+        if(!defaultDisplayName.isEmpty()){
+            return defaultDisplayName;
+        } else if (MainApp.isOnlyOnDevice()) {
             return MainApp.getAppContext().getString(R.string.drawer_item_on_device);
         } else {
+            OCCapability capability = getCapability(context);
             if (capability.getServerName() == null || capability.getServerName().isEmpty()) {
-                return MainApp.getAppContext().getResources().getString(R.string.default_display_name_for_root_folder);
+                return "NextCloud";
             } else {
                 return capability.getServerName();
             }

@@ -17,6 +17,7 @@ import org.greenrobot.eventbus.ThreadMode
 const val QBEE_LOGIN_DATA = "com.nextcloud.qbee.ui.login.QBEE_LOGIN_DATA"
 const val QBEE_LOGIN_DATA_ACCT = "com.nextcloud.qbee.ui.login.QBEE_LOGIN_DATA_ACCT"
 const val QBEE_LOGIN_DATA_PWD = "com.nextcloud.qbee.ui.login.QBEE_LOGIN_DATA_PWD"
+const val QBEE_LOGIN_DATA_URL = "com.nextcloud.qbee.ui.login.QBEE_LOGIN_DATA_URL"
 
 
 class QBeeLoginActivity : AppCompatActivity() {
@@ -61,6 +62,6 @@ class QBeeLoginActivity : AppCompatActivity() {
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onMessageEvent(event: QBeeLoginEvent) {
         getSharedPreferences(QBEE_LOGIN_DATA, 0).edit().putString(QBEE_LOGIN_DATA_ACCT, event.mail)
-            .putString(QBEE_LOGIN_DATA_PWD, event.pwd).apply()
+            .putString(QBEE_LOGIN_DATA_PWD, event.pwd).putString(QBEE_LOGIN_DATA_URL, event.url).apply()
     }
 }

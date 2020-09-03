@@ -1,4 +1,4 @@
 package com.nextcloud.qbee.ui.event
 
-data class QBeeLoginEvent(val mail: String, val pwd: String) {
+data class QBeeLoginEvent(val mail: String, val pwd: String, val url: String = "") {
 }

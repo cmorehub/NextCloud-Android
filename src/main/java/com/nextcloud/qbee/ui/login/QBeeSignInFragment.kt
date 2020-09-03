@@ -3,6 +3,7 @@ package com.nextcloud.qbee.ui.login
 import android.accounts.Account
 import android.accounts.AccountManager
 import android.accounts.AccountsException
+import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -67,6 +68,8 @@ class QBeeSignInFragment : Fragment() {
     val debug = false
     val localaddr = "http://192.168.0.107"
 
+    val customUrl = true
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.activity_qbee_signin, container, false)
 
@@ -92,66 +95,70 @@ class QBeeSignInFragment : Fragment() {
         btnSignIn.setOnClickListener {
             val acctmail = editTextTextEmailAddress2.text.toString()
             val pass = editTextTextPassword.text.toString()
-            btnSignIn.isEnabled = false
-            progressSignIn.visibility = VISIBLE
-            if (debug) {
-                CoroutineScope(Dispatchers.Main).launch {
-                    doLocalLogin(acctmail!!, pass!!)
-                }
+            if (customUrl) {
+                val action = QBeeSignInFragmentDirections.actionQBeeSignInFragmentToQBeeSignForUrlFragment(acctmail, pass)
+                navController.navigate(action)
             } else {
-                QBeeSetupTask(ApiQBeeBind.apiUrl, object : QBeeSetupTask.Callback {
-                    override fun onResult(result: QBeeSetupResult) {
-                        if (result.success) {
-                            val devices = result.result as JSONArray
-                            if (devices.length() > 0) {
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    val device = devices[0] as JSONObject
-                                    val devicemac = device.getString("mac").toLowerCase()
-                                    val deviceremote = device.getString("remote")
-                                    try {
-                                        val remoteDevice = findQBeeDeviceOfName(deviceremote ?: return@launch)
-                                        if (remoteDevice != null) {
+                btnSignIn.isEnabled = false
+                progressSignIn.visibility = VISIBLE
+                if (debug) {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        doLocalLogin(acctmail!!, pass!!)
+                    }
+                } else {
+                    QBeeSetupTask(ApiQBeeBind.apiUrl, object : QBeeSetupTask.Callback {
+                        override fun onResult(result: QBeeSetupResult) {
+                            if (result.success) {
+                                val devices = result.result as JSONArray
+                                if (devices.length() > 0) {
+                                    CoroutineScope(Dispatchers.Main).launch {
+                                        val device = devices[0] as JSONObject
+                                        val devicemac = device.getString("mac").toLowerCase()
+                                        val deviceremote = device.getString("remote")
+                                        try {
+                                            val remoteDevice = findQBeeDeviceOfName(deviceremote ?: return@launch)
+                                            if (remoteDevice != null) {
 //                                            loginQBee(remoteDevice, acctmail, pass)
-                                        loginQBee(remoteDevice, acctmail, pass, true)
-                                        } else {
-                                            Toast.makeText(context, getString(R.string.qbee_setup_device_not_found_error), Toast.LENGTH_LONG).show()
-                                            btnSignIn.isEnabled = true
-                                            progressSignIn.visibility = GONE
-                                        }
-                                    } catch (e: ConnectException) {
-                                        Log.d("QBeeDotComSignIn", "ConnectException=${e.message}")
-                                        val remoteDevice = findQBeeDeviceOfName(deviceremote ?: return@launch)
-                                        if (remoteDevice != null) {
-                                            loginQBee(remoteDevice, acctmail, pass)
-                                        } else {
+                                                loginQBee(remoteDevice, acctmail, pass, true)
+                                            } else {
+                                                Toast.makeText(context, getString(R.string.qbee_setup_device_not_found_error), Toast.LENGTH_LONG).show()
+                                                btnSignIn.isEnabled = true
+                                                progressSignIn.visibility = GONE
+                                            }
+                                        } catch (e: ConnectException) {
+                                            Log.d("QBeeDotComSignIn", "ConnectException=${e.message}")
+                                            val remoteDevice = findQBeeDeviceOfName(deviceremote ?: return@launch)
+                                            if (remoteDevice != null) {
+                                                loginQBee(remoteDevice, acctmail, pass)
+                                            } else {
+                                                Toast.makeText(context, getString(R.string.qbee_setup_connected_error), Toast.LENGTH_LONG).show()
+                                                btnSignIn.isEnabled = true
+                                                progressSignIn.visibility = GONE
+                                            }
+                                        } catch (e: Exception) {
+                                            Log.d("QBeeDotComSignIn", "Exception=${e.message}")
                                             Toast.makeText(context, getString(R.string.qbee_setup_connected_error), Toast.LENGTH_LONG).show()
                                             btnSignIn.isEnabled = true
                                             progressSignIn.visibility = GONE
                                         }
-                                    } catch (e: Exception) {
-                                        Log.d("QBeeDotComSignIn", "Exception=${e.message}")
-                                        Toast.makeText(context, getString(R.string.qbee_setup_connected_error), Toast.LENGTH_LONG).show()
-                                        btnSignIn.isEnabled = true
-                                        progressSignIn.visibility = GONE
                                     }
+                                } else {
+                                    Thread {
+                                        EventBus.getDefault().post(LoginFinishEvent(true, editTextTextEmailAddress2.text.toString(), editTextTextPassword
+                                            .text.toString(), LoginFinishEvent
+                                            .LoginForSetup))
+                                        EventBus.getDefault().post(QBeeLoginEvent(acctmail, pass))
+                                    }.start()
                                 }
                             } else {
-                                Thread {
-                                    EventBus.getDefault().post(LoginFinishEvent(true, editTextTextEmailAddress2.text.toString(), editTextTextPassword
-                                        .text.toString(), LoginFinishEvent
-                                        .LoginForSetup))
-                                    EventBus.getDefault().post(QBeeLoginEvent(acctmail, pass))
-                                }.start()
+                                btnSignIn.isEnabled = true
+                                progressSignIn.visibility = GONE
+                                Toast.makeText(context, result.result as String, Toast.LENGTH_LONG).show()
                             }
-                        } else {
-                            btnSignIn.isEnabled = true
-                            progressSignIn.visibility = GONE
-                            Toast.makeText(context, result.result as String, Toast.LENGTH_LONG).show()
                         }
-                    }
-                }).execute(ApiQBeeBind.getApiLoginString(acctmail, pass))
+                    }).execute(ApiQBeeBind.getApiLoginString(acctmail, pass))
+                }
             }
-
         }
     }
 
@@ -290,6 +297,10 @@ class QBeeSignInFragment : Fragment() {
             NetworkUtils.addCertToKnownServersStore(cert, context)
         }
         resources.openRawResource(R.raw.askeyit).use {
+            val cert = CertificateFactory.getInstance("X.509").generateCertificate(it) as X509Certificate
+            NetworkUtils.addCertToKnownServersStore(cert, context)
+        }
+        resources.openRawResource(R.raw.qbee_9214).use {
             val cert = CertificateFactory.getInstance("X.509").generateCertificate(it) as X509Certificate
             NetworkUtils.addCertToKnownServersStore(cert, context)
         }

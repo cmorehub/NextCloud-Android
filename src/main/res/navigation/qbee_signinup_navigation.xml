@@ -23,6 +23,9 @@
             android:id="@+id/action_QBeeSignInFragment_to_QBeeSignUpFragment"
             app:destination="@id/QBeeSignUpFragment"
             app:popUpTo="@id/QBeeSignUpFragment" />
+        <action
+            android:id="@+id/action_QBeeSignInFragment_to_QBeeSignForUrlFragment"
+            app:destination="@id/QBeeSignForUrlFragment" />
     </fragment>
     <fragment
         android:id="@+id/QBeeSignUpFragment"
@@ -47,6 +50,21 @@
         <argument
             android:name="verified"
             app:argType="boolean"
+            app:nullable="false" />
+    </fragment>
+    <fragment
+        android:id="@+id/QBeeSignForUrlFragment"
+        android:name="com.nextcloud.qbee.ui.login.QBeeSignForUrlFragment"
+        android:label="QBeeSignForUrlFragment">
+        <argument
+            android:name="mail"
+            android:defaultValue=""
+            app:argType="string"
+            app:nullable="false" />
+        <argument
+            android:name="pwd"
+            android:defaultValue=""
+            app:argType="string"
             app:nullable="false" />
     </fragment>
 </navigation>

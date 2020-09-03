@@ -67,12 +67,12 @@ class WelcomeActivity : AppCompatActivity() {
         progressWelcome = findViewById(R.id.progressWelcome)
         CoroutineScope(Dispatchers.Main).launch {
             val logged = getSharedPreferences(QBEE_LOGIN_DATA, 0).getString(QBEE_LOGIN_DATA_ACCT, "") != ""
-            val debug = false
-//            val logged = checkAskeyLogin()
-            if (debug) {
+            val debug = true
+            if (logged && debug) {
                 val acctmail = getSharedPreferences(QBEE_LOGIN_DATA, 0).getString(QBEE_LOGIN_DATA_ACCT, "")
                 val pass = getSharedPreferences(QBEE_LOGIN_DATA, 0).getString(QBEE_LOGIN_DATA_PWD, "")
-                doLocalLogin(acctmail!!, pass!!)
+                val url = getSharedPreferences(QBEE_LOGIN_DATA, 0).getString(QBEE_LOGIN_DATA_URL, localaddr)
+                doLocalLogin(acctmail!!, pass!!, url!!)
             } else if (logged) {
 //                doLogin()
                 val acctmail = getSharedPreferences(QBEE_LOGIN_DATA, 0).getString(QBEE_LOGIN_DATA_ACCT, "")
@@ -243,27 +243,6 @@ class WelcomeActivity : AppCompatActivity() {
                     accountManager.setUserData(account, QBeeAccountUtils.ASKEY_USER_ID, bindAccount)
                     accountManager.setUserData(account, QBeeAccountUtils.ASKEY_USER_TOKEN, bindPwd)
                     addOwnCloudAccount(account, loginName)
-//                    accountManager.renameAccount(logedAccount, accountName, {
-//                        CoroutineScope(Dispatchers.Main).launch {
-//                            val reacct = it.result
-//                            Log.d("QBeeDotCom", "accountname B= ${reacct.name}")
-//                            var addResult = accountManager.addAccountExplicitly(reacct, password, null)
-//                            Log.d("QBeeDotCom", "check add =$addResult")
-//                            if (!addResult) {
-//                                accountManager.removeAccountExplicitly(reacct)
-//                                addResult = accountManager.addAccountExplicitly(reacct, password, null)
-//                                Log.d("QBeeDotCom", "check add =$addResult")
-//                                if (!addResult) {
-//                                    throw AccountsException("Account create failed")
-//                                }
-//                            }
-//                            accountManager.setUserData(reacct, AccountUtils.Constants.KEY_OC_BASE_URL, qbeeUrl)
-//                            accountManager.setUserData(reacct, AccountUtils.Constants.KEY_USER_ID, loginName)
-//                            accountManager.setUserData(reacct, QBeeAccountUtils.ASKEY_USER_ID, bindAccount)
-//                            accountManager.setUserData(reacct, QBeeAccountUtils.ASKEY_USER_TOKEN, bindPwd)
-//                            addOwnCloudAccount(reacct, loginName)
-//                        }
-//                    }, null)
                 } else {
                     Log.d("QBeeDotCom", "logedAccount == null")
                     val account = Account(accountName, "nextcloud")
@@ -302,13 +281,11 @@ class WelcomeActivity : AppCompatActivity() {
         }
 
     @Throws(Exception::class)
-    private suspend fun doLocalLogin(bindAccount: String, bindPwd: String) = withContext(Dispatchers.IO) {
+    private suspend fun doLocalLogin(bindAccount: String, bindPwd: String, qbeeUrl: String) = withContext(Dispatchers.IO) {
         addQBeeCert()
-        remoteItAuthToken = remoteItAuthToken ?: remoteItController.restGetAuthToken()
-        val qbeeUrl = localaddr
         Log.d("QBeeDotCom", "qbeeUrl = $qbeeUrl")
-        val loginName = "admin"//"nextcloud"//"iottalk"//"admin"
-        val password = "admin"//"Aa123456"//"97497929"//"admin"
+        val loginName = bindAccount//"admin"//"nextcloud"//"iottalk"//"admin"
+        val password = bindPwd//"admin"//"Aa123456"//"97497929"//"admin"
 
         val accountManager = AccountManager.get(this@WelcomeActivity)
         val accountName = AccountUtils.buildAccountName(Uri.parse(qbeeUrl), loginName)
@@ -358,27 +335,6 @@ class WelcomeActivity : AppCompatActivity() {
                 accountManager.setUserData(account, QBeeAccountUtils.ASKEY_USER_TOKEN, bindPwd)
                 addOwnCloudAccount(account, loginName)
                 Log.d("QBeeDotCom", "check add =$addResult")
-//                accountManager.renameAccount(logedAccount, accountName, {
-//                    CoroutineScope(Dispatchers.Main).launch {
-//                        val reacct = it.result
-//                        Log.d("QBeeDotCom", "accountname B= ${reacct.name}")
-//                        var addResult = accountManager.addAccountExplicitly(reacct, password, null)
-//                        Log.d("QBeeDotCom", "check add =$addResult")
-//                        if (!addResult) {
-//                            accountManager.removeAccountExplicitly(reacct)
-//                            addResult = accountManager.addAccountExplicitly(reacct, password, null)
-//                            Log.d("QBeeDotCom", "check add =$addResult")
-//                            if (!addResult) {
-//                                throw AccountsException("Account create failed")
-//                            }
-//                        }
-//                        accountManager.setUserData(reacct, AccountUtils.Constants.KEY_OC_BASE_URL, qbeeUrl)
-//                        accountManager.setUserData(reacct, AccountUtils.Constants.KEY_USER_ID, loginName)
-//                        accountManager.setUserData(reacct, QBeeAccountUtils.ASKEY_USER_ID, bindAccount)
-//                        accountManager.setUserData(reacct, QBeeAccountUtils.ASKEY_USER_TOKEN, bindPwd)
-//                        addOwnCloudAccount(reacct, loginName)
-//                    }
-//                }, null)
             } else {
                 Log.d("QBeeDotCom", "logedAccount == null")
                 val account = Account(accountName, "nextcloud")
@@ -536,6 +492,10 @@ class WelcomeActivity : AppCompatActivity() {
         }
         Log.d("QBeeDotCom", "addQBeeCert")
         resources.openRawResource(R.raw.askeyit).use {
+            val cert = CertificateFactory.getInstance("X.509").generateCertificate(it) as X509Certificate
+            NetworkUtils.addCertToKnownServersStore(cert, this@WelcomeActivity)
+        }
+        resources.openRawResource(R.raw.qbee_9214).use {
             val cert = CertificateFactory.getInstance("X.509").generateCertificate(it) as X509Certificate
             NetworkUtils.addCertToKnownServersStore(cert, this@WelcomeActivity)
         }
