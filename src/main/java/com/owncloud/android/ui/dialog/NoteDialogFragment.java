@@ -32,7 +32,7 @@ import android.view.WindowManager.LayoutParams;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.lib.resources.shares.OCShare;
 import com.owncloud.android.ui.activity.ComponentsGetter;
 import com.owncloud.android.utils.DisplayUtils;

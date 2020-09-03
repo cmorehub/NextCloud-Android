@@ -25,7 +25,7 @@ package com.owncloud.android.features;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 
 import lombok.Getter;
 

@@ -24,7 +24,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.webkit.WebView;
 
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;

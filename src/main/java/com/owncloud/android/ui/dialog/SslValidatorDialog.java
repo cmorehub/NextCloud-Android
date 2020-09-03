@@ -28,7 +28,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.lib.common.network.CertificateCombinedException;
 import com.owncloud.android.lib.common.network.NetworkUtils;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
@@ -56,12 +56,12 @@ public class SslValidatorDialog extends Dialog {
     private OnSslValidatorListener mListener;
     private CertificateCombinedException mException;
     private View mView;
-    
-    
+
+
     /**
      * Creates a new SslValidatorDialog to ask the user if an untrusted certificate from a server should
      * be trusted.
-     * 
+     *
      * @param context       Android context where the dialog will live.
      * @param result        Result of a failed remote operation.
      * @param listener      Object to notice when the server certificate was added to the local certificates store.
@@ -77,10 +77,10 @@ public class SslValidatorDialog extends Dialog {
     }
 
     /**
-     * Private constructor. 
-     * 
+     * Private constructor.
+     *
      * Instances have to be created through static {@link SslValidatorDialog#newInstance}.
-     * 
+     *
      * @param context       Android context where the dialog will live
      * @param listener      Object to notice when the server certificate was added to the local certificates store.
      */
@@ -88,7 +88,7 @@ public class SslValidatorDialog extends Dialog {
         super(context);
         mListener = listener;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -96,9 +96,9 @@ public class SslValidatorDialog extends Dialog {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         mView = getLayoutInflater().inflate(R.layout.ssl_validator_layout, null);
-        setContentView(mView); 
-        
-        mView.findViewById(R.id.ok).setOnClickListener( 
+        setContentView(mView);
+
+        mView.findViewById(R.id.ok).setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -110,18 +110,18 @@ public class SslValidatorDialog extends Dialog {
                             } else {
                                 Log_OC.d(TAG, "Nobody there to notify the certificate was saved");
                             }
-                            
+
                         } catch (GeneralSecurityException | IOException e) {
                             dismiss();
                             if (mListener != null) {
                                 mListener.onFailedSavingCertificate();
                             }
                             Log_OC.e(TAG, "Server certificate could not be saved in the known servers trust store ", e);
-                            
+
                         }
                     }
                 });
-        
+
         mView.findViewById(R.id.cancel).setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -129,7 +129,7 @@ public class SslValidatorDialog extends Dialog {
                         cancel();
                     }
                 });
-        
+
         mView.findViewById(R.id.details_btn).setOnClickListener(
                 new View.OnClickListener() {
                    @Override
@@ -145,12 +145,12 @@ public class SslValidatorDialog extends Dialog {
                     }
                 });
     }
-    
-    
+
+
     public void updateResult(RemoteOperationResult result) {
         if (result.isSslRecoverableException()) {
             mException = (CertificateCombinedException) result.getException();
-            
+
             /// clean
             mView.findViewById(R.id.reason_cert_not_trusted).setVisibility(View.GONE);
             mView.findViewById(R.id.reason_cert_expired).setVisibility(View.GONE);
@@ -162,23 +162,23 @@ public class SslValidatorDialog extends Dialog {
             if (mException.getCertPathValidatorException() != null) {
                 mView.findViewById(R.id.reason_cert_not_trusted).setVisibility(View.VISIBLE);
             }
-            
+
             if (mException.getCertificateExpiredException() != null) {
                 mView.findViewById(R.id.reason_cert_expired).setVisibility(View.VISIBLE);
             }
-            
+
             if (mException.getCertificateNotYetValidException() != null) {
                 mView.findViewById(R.id.reason_cert_not_yet_valid).setVisibility(View.VISIBLE);
-            } 
+            }
 
             if (mException.getSslPeerUnverifiedException() != null ) {
                 mView.findViewById(R.id.reason_hostname_not_verified).setVisibility(View.VISIBLE);
             }
-            
+
             showCertificateData(mException.getServerCertificate());
         }
     }
-    
+
     private void showCertificateData(X509Certificate cert) {
 
         if (cert != null) {
@@ -186,7 +186,7 @@ public class SslValidatorDialog extends Dialog {
             showIssuer(cert.getIssuerX500Principal());
             showValidity(cert.getNotBefore(), cert.getNotAfter());
             showSignature(cert);
-            
+
         } else {
             // this should not happen, TODO
             Log_OC.d("certNull", "This should not happen");
@@ -199,7 +199,7 @@ public class SslValidatorDialog extends Dialog {
         sigView.setText(getHex(cert.getSignature()));
         algorithmView.setText(cert.getSigAlgName());
     }
-    
+
     public String getHex(final byte [] raw) {
         if (raw == null) {
            return null;
@@ -212,7 +212,7 @@ public class SslValidatorDialog extends Dialog {
            hex.append((char) ('0' + (loVal + (loVal / 10 * 7))));
         }
         return hex.toString();
-     }    
+     }
 
     @SuppressWarnings("deprecation")
     private void showValidity(Date notBefore, Date notAfter) {
@@ -230,7 +230,7 @@ public class SslValidatorDialog extends Dialog {
         TextView cView = mView.findViewById(R.id.value_subject_C);
         TextView stView = mView.findViewById(R.id.value_subject_ST);
         TextView lView = mView.findViewById(R.id.value_subject_L);
-        
+
         if (s.get("CN") != null) {
             cnView.setText(s.get("CN"));
             cnView.setVisibility(View.VISIBLE);
@@ -268,7 +268,7 @@ public class SslValidatorDialog extends Dialog {
             lView.setVisibility(View.GONE);
         }
     }
-    
+
     private void showIssuer(X500Principal issuer) {
         Map<String, String> s = parsePrincipal(issuer);
         TextView cnView = mView.findViewById(R.id.value_issuer_CN);
@@ -277,7 +277,7 @@ public class SslValidatorDialog extends Dialog {
         TextView cView = mView.findViewById(R.id.value_issuer_C);
         TextView stView = mView.findViewById(R.id.value_issuer_ST);
         TextView lView = mView.findViewById(R.id.value_issuer_L);
-        
+
         if (s.get("CN") != null) {
             cnView.setText(s.get("CN"));
             cnView.setVisibility(View.VISIBLE);
@@ -315,7 +315,7 @@ public class SslValidatorDialog extends Dialog {
             lView.setVisibility(View.GONE);
         }
     }
-    
+
 
     private Map<String, String> parsePrincipal(X500Principal principal) {
         Map<String, String> result = new HashMap<>();
@@ -338,7 +338,7 @@ public class SslValidatorDialog extends Dialog {
             NetworkUtils.addCertToKnownServersStore(mException.getServerCertificate(), getContext());
         }
     }
-    
+
     public interface OnSslValidatorListener {
         public void onSavedCertificate();
         public void onFailedSavingCertificate();

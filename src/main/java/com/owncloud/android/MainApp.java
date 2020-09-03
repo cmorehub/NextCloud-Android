@@ -124,6 +124,9 @@ import de.cotech.hw.SecurityKeyManager;
 import de.cotech.hw.SecurityKeyManagerConfig;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import com.askey.qbee.atv.R;
+import com.askey.qbee.atv.BuildConfig;
+
 import static com.owncloud.android.ui.activity.ContactsPreferenceActivity.PREFERENCE_CONTACTS_AUTOMATIC_BACKUP;
 
 

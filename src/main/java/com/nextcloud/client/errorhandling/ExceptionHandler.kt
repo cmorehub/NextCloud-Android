@@ -28,8 +28,8 @@ package com.nextcloud.client.errorhandling
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.owncloud.android.BuildConfig
-import com.owncloud.android.R
+import com.askey.qbee.atv.BuildConfig
+import com.askey.qbee.atv.R
 import java.io.PrintWriter
 import java.io.StringWriter
 

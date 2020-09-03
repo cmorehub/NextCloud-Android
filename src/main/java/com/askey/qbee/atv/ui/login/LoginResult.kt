@@ -1,6 +1,6 @@
-package com.nextcloud.qbee.ui.login
+package com.askey.qbee.atv.ui.login
 
-import com.nextcloud.qbee.data.LoginRepository
+import com.askey.qbee.atv.data.LoginRepository
 
 /**
  * Authentication result : success (user details) or error message.

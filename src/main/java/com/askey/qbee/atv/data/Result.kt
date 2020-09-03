@@ -1,4 +1,4 @@
-package com.nextcloud.qbee.data
+package com.askey.qbee.atv.data
 
 /**
  * A generic class that holds a value with its loading status.

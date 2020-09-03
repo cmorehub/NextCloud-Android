@@ -36,7 +36,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.datamodel.MediaFolderType;
 import com.owncloud.android.datamodel.SyncedFolderDisplayItem;
 import com.owncloud.android.lib.common.utils.Log_OC;

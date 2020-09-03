@@ -47,7 +47,7 @@ import android.widget.ImageView;
 
 import com.nextcloud.client.network.ConnectivityService;
 import com.owncloud.android.MainApp;
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.lib.common.OwnCloudAccount;
 import com.owncloud.android.lib.common.OwnCloudClient;
 import com.owncloud.android.lib.common.OwnCloudClientManagerFactory;

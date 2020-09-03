@@ -66,7 +66,7 @@ import com.nextcloud.client.network.ConnectivityService;
 import com.nextcloud.client.preferences.AppPreferences;
 import com.nextcloud.java.util.Optional;
 import com.owncloud.android.MainApp;
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.datamodel.FileDataStorageManager;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.datamodel.VirtualFolderType;
@@ -807,12 +807,12 @@ public class FileDisplayActivity extends FileActivity
         menu.findItem(R.id.action_select_all).setVisible(false);
         searchActionMenuItem = menu.findItem(R.id.action_search);
         searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-        int searchCloseButtonId = searchView.getContext().getResources()
-            .getIdentifier("android:id/search_close_btn", null, null);
+
         ImageView closeButton = (ImageView) searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d("TEST", "closeButton onClick()");
                 searchView.setIconified(true);
                 searchView.setQuery("",false);
             }
@@ -926,6 +926,9 @@ public class FileDisplayActivity extends FileActivity
         boolean retval = true;
         switch (item.getItemId()) {
             case R.id.action_voice:
+                searchView.setIconified(false);
+                searchView.setQuery("",false);
+                searchView.requestFocus();
                 Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
                 intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
                 intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.enter_filename));

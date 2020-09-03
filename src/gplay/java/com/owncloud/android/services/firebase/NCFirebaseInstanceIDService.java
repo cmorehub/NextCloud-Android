@@ -25,7 +25,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.preferences.AppPreferences;
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.utils.PushUtils;
 
 import javax.inject.Inject;

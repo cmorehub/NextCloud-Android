@@ -29,7 +29,7 @@ import android.os.IBinder
 import android.widget.MediaController
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
-import com.owncloud.android.R
+import com.askey.qbee.atv.R
 import com.owncloud.android.datamodel.OCFile
 import com.owncloud.android.ui.notifications.NotificationUtils
 import com.owncloud.android.utils.ThemeUtils

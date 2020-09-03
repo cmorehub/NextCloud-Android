@@ -24,7 +24,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.nextcloud.client.etm.pages.EtmPreferencesFragment
-import com.owncloud.android.R
+import com.askey.qbee.atv.R
 import javax.inject.Inject
 
 class EtmViewModel @Inject constructor(

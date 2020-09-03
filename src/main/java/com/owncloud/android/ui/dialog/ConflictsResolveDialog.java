@@ -25,7 +25,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;

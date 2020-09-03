@@ -33,7 +33,7 @@ import android.widget.TextView;
 
 import com.nextcloud.client.account.CurrentAccountProvider;
 import com.nextcloud.common.NextcloudClient;
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.datamodel.FileDataStorageManager;
 import com.owncloud.android.lib.resources.activities.model.Activity;
 import com.owncloud.android.lib.resources.files.model.FileVersion;

@@ -1,7 +1,6 @@
-package com.nextcloud.qbee.data
+package com.askey.qbee.atv.data
 
-import com.nextcloud.qbee.data.model.LoggedInUser
-import com.nextcloud.qbee.qbeecom.QBeeDotCom
+import com.askey.qbee.atv.qbeecom.QBeeDotCom
 
 /**
  * Class that requests authentication and user information from the remote data source and

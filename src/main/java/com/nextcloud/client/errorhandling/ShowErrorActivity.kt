@@ -27,7 +27,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
-import com.owncloud.android.R
+import com.askey.qbee.atv.R
 import com.owncloud.android.utils.ClipboardUtil
 import com.owncloud.android.utils.DisplayUtils
 import kotlinx.android.synthetic.main.activity_show_error.*

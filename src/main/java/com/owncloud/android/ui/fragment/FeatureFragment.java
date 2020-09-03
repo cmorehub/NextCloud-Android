@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.features.FeatureItem;
 import com.owncloud.android.utils.ThemeUtils;
 

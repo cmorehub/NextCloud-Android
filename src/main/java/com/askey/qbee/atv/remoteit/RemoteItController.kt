@@ -1,4 +1,4 @@
-package com.nextcloud.qbee.remoteit
+package com.askey.qbee.atv.remoteit
 
 import android.content.Context
 import android.util.Log
@@ -140,21 +140,25 @@ class RemoteItController(context: Context) {
             return@withContext suspendCoroutine<String> { continuation ->
                 p2PManager.setP2PEventListener(object : P2PManager.P2PEventListener {
                     override fun p2pSignedOut(userName: String?) {
+                        Log.d("Remote.it", "p2pSignedOut(${userName}")
                         // Empty : Not required?
                     }
 
                     override fun p2pConnectionSucceeded(deviceAddress: String, url: String) {
+                        Log.d("Remote.it", "p2pConnectionSucceeded(${deviceAddress},${url})")
                         p2PManager.setP2PEventListener(null)
                         continuation.resume(url)
                     }
 
                     override fun p2pConnectionFailed(deviceAddress: String, reason: String) {
+                        Log.d("Remote.it", "p2pConnectionFailed(${deviceAddress},${reason})")
                         p2PManager.setP2PEventListener(null)
                         continuation.resumeWithException(Exception(reason))
                     }
 
                     override fun p2pConnectionDestroyed(deviceAddress: String, reason: String) {
                         // Empty : Not required?
+                        Log.d("Remote.it", "p2pConnectionDestroyed(${deviceAddress},${reason})")
                     }
                 })
                 p2PManager.connectDevice(deviceId, hashMapOf())

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.owncloud.android">
-
+    package="com.askey.qbee.atv">
     <uses-sdk tools:overrideLibrary="com.blikoon.qrcodescanner, io.noties.markwon.ext.latex, io.noties.markwon.ext.strikethrough, io.noties.markwon.ext.tables, io.noties.markwon.ext.tasklist, io.noties.markwon.html, io.noties.markwon.linkify, io.noties.markwon.syntax, io.noties.markwon, ru.noties.jlatexmath.android" />
     <!--
      GET_ACCOUNTS is needed for API <= 22.
@@ -68,7 +67,7 @@
         android:required="false" /><!-- Android Studio suggests somehow -->
 
     <application
-        android:name=".MainApp"
+        android:name="com.owncloud.android.MainApp"
         android:banner="@drawable/qbee_atv_banner"
         android:fullBackupContent="@xml/backup_config"
         android:icon="@mipmap/ic_qbee_launcher"
@@ -83,7 +82,7 @@
         android:usesCleartextTraffic="true"
         tools:ignore="UnusedAttribute">
         <activity
-            android:name="com.nextcloud.qbee.ui.login.FirstLoginActivity"
+            android:name="com.askey.qbee.atv.ui.login.FirstLoginActivity"
             android:label="@string/title_activity_login">
             <!--            <intent-filter>-->
             <!--                <action android:name="android.intent.action.MAIN" />-->
@@ -97,7 +96,7 @@
             android:required="false" />
 
         <activity
-            android:name=".ui.activity.FileDisplayActivity"
+            android:name="com.owncloud.android.ui.activity.FileDisplayActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
             android:launchMode="singleTop"
@@ -113,33 +112,33 @@
             </intent-filter>
 
         </activity>
-        <activity android:name=".ui.activity.ManageAccountsActivity" />
-        <activity android:name=".ui.activity.UserInfoActivity" />
-        <activity android:name=".ui.activity.NotificationsActivity" />
-        <activity android:name=".ui.activity.CommunityActivity" />
+        <activity android:name="com.owncloud.android.ui.activity.ManageAccountsActivity" />
+        <activity android:name="com.owncloud.android.ui.activity.UserInfoActivity" />
+        <activity android:name="com.owncloud.android.ui.activity.NotificationsActivity" />
+        <activity android:name="com.owncloud.android.ui.activity.CommunityActivity" />
         <activity
-            android:name=".ui.activities.ActivitiesActivity"
+            android:name="com.owncloud.android.ui.activities.ActivitiesActivity"
             android:configChanges="orientation|screenSize|keyboardHidden" />
-        <activity android:name=".ui.activity.SyncedFoldersActivity" />
+        <activity android:name="com.owncloud.android.ui.activity.SyncedFoldersActivity" />
 
-        <receiver android:name=".jobs.MediaFoldersDetectionJob$NotificationReceiver" />
-        <receiver android:name=".jobs.NotificationJob$NotificationReceiver" />
+        <receiver android:name="com.owncloud.android.jobs.MediaFoldersDetectionJob$NotificationReceiver" />
+        <receiver android:name="com.owncloud.android.jobs.NotificationJob$NotificationReceiver" />
 
-        <activity android:name=".ui.activity.UploadFilesActivity" />
+        <activity android:name="com.owncloud.android.ui.activity.UploadFilesActivity" />
         <activity
-            android:name=".ui.activity.ExternalSiteWebView"
+            android:name="com.owncloud.android.ui.activity.ExternalSiteWebView"
             android:configChanges="orientation|screenSize|keyboardHidden" />
         <activity
-            android:name=".ui.activity.RichDocumentsEditorWebView"
+            android:name="com.owncloud.android.ui.activity.RichDocumentsEditorWebView"
             android:configChanges="orientation|screenSize|keyboardHidden" />
         <activity
-            android:name=".ui.activity.TextEditorWebView"
+            android:name="com.owncloud.android.ui.activity.TextEditorWebView"
             android:configChanges="orientation|screenSize|keyboardHidden" />
         <activity
-            android:name=".ui.activity.ContactsPreferenceActivity"
+            android:name="com.owncloud.android.ui.activity.ContactsPreferenceActivity"
             android:launchMode="singleInstance" />
         <activity
-            android:name=".ui.activity.ReceiveExternalFilesActivity"
+            android:name="com.owncloud.android.ui.activity.ReceiveExternalFilesActivity"
             android:excludeFromRecents="true"
             android:taskAffinity=""
             android:theme="@style/Theme.ownCloud.NoActionBar">
@@ -159,18 +158,18 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activity.SettingsActivity"
+            android:name="com.owncloud.android.ui.activity.SettingsActivity"
             android:theme="@style/Theme.ownCloud"></activity>
         <activity
-            android:name=".ui.preview.PreviewImageActivity"
+            android:name="com.owncloud.android.ui.preview.PreviewImageActivity"
             android:theme="@style/Theme.ownCloud.Overlay" />
         <activity
-            android:name=".ui.preview.PreviewVideoActivity"
+            android:name="com.owncloud.android.ui.preview.PreviewVideoActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.ownCloud.Fullscreen" />
 
         <service
-            android:name=".authentication.AccountAuthenticatorService"
+            android:name="com.owncloud.android.authentication.AccountAuthenticatorService"
             android:exported="true">
             <intent-filter android:priority="100">
                 <action android:name="android.accounts.AccountAuthenticator" />
@@ -181,7 +180,7 @@
                 android:resource="@xml/authenticator" />
         </service>
         <service
-            android:name=".syncadapter.FileSyncService"
+            android:name="com.owncloud.android.syncadapter.FileSyncService"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
@@ -193,7 +192,7 @@
         </service>
 
         <provider
-            android:name=".providers.FileContentProvider"
+            android:name="com.owncloud.android.providers.FileContentProvider"
             android:authorities="@string/authority"
             android:enabled="true"
             android:exported="true"
@@ -233,13 +232,13 @@
                 android:writePermission="false" />
         </provider>
         <provider
-            android:name=".providers.UsersAndGroupsSearchProvider"
+            android:name="com.owncloud.android.providers.UsersAndGroupsSearchProvider"
             android:authorities="@string/users_and_groups_search_authority"
             android:enabled="true"
             android:exported="false"
             android:label="@string/search_users_and_groups_hint" />
         <provider
-            android:name=".providers.DocumentsStorageProvider"
+            android:name="com.owncloud.android.providers.DocumentsStorageProvider"
             android:authorities="@string/document_provider_authority"
             android:enabled="@bool/atLeastKitKat"
             android:exported="true"
@@ -259,7 +258,7 @@
                 android:resource="@xml/exposed_filepaths" />
         </provider>
         <provider
-            android:name=".providers.DiskLruImageCacheFileProvider"
+            android:name="com.owncloud.android.providers.DiskLruImageCacheFileProvider"
             android:authorities="@string/image_cache_provider_authority"
             android:exported="true"
             android:grantUriPermissions="true"
@@ -272,7 +271,7 @@
             tools:node="remove" />
 
         <activity
-            android:name=".authentication.AuthenticatorActivity"
+            android:name="com.owncloud.android.authentication.AuthenticatorActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="true"
             android:launchMode="singleTask"
@@ -284,7 +283,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".authentication.DeepLinkLoginActivity"
+            android:name="com.owncloud.android.authentication.DeepLinkLoginActivity"
             android:clearTaskOnLaunch="true"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="true"
@@ -302,19 +301,19 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".services.OperationsService" />
-        <service android:name=".files.services.FileDownloader" />
-        <service android:name=".files.services.FileUploader" />
+        <service android:name="com.owncloud.android.services.OperationsService" />
+        <service android:name="com.owncloud.android.files.services.FileDownloader" />
+        <service android:name="com.owncloud.android.files.services.FileUploader" />
         <service android:name="com.nextcloud.client.media.PlayerService" />
 
         <activity
-            android:name=".ui.activity.PassCodeActivity"
+            android:name="com.owncloud.android.ui.activity.PassCodeActivity"
             android:launchMode="singleTask" />
         <activity
-            android:name=".ui.activity.RequestCredentialsActivity"
+            android:name="com.owncloud.android.ui.activity.RequestCredentialsActivity"
             android:launchMode="singleTask" />
-        <activity android:name=".ui.activity.ConflictsResolveActivity" />
-        <activity android:name=".ui.activity.ErrorsWhileCopyingHandlerActivity" />
+        <activity android:name="com.owncloud.android.ui.activity.ConflictsResolveActivity" />
+        <activity android:name="com.owncloud.android.ui.activity.ErrorsWhileCopyingHandlerActivity" />
         <activity android:name="com.nextcloud.client.logger.ui.LogsActivity" />
         <activity
             android:name="com.nextcloud.client.errorhandling.ShowErrorActivity"
@@ -323,9 +322,9 @@
             android:launchMode="singleInstance"
             android:process=":crash"
             android:theme="@style/Theme.ownCloud.Toolbar" />
-        <activity android:name=".ui.activity.UploadListActivity" />
+        <activity android:name="com.owncloud.android.ui.activity.UploadListActivity" />
         <activity
-            android:name=".ui.trashbin.TrashbinActivity"
+            android:name="com.owncloud.android.ui.trashbin.TrashbinActivity"
             android:configChanges="orientation|screenSize|keyboardHidden" />
         <activity
             android:name="com.nextcloud.client.onboarding.WhatsNewActivity"
@@ -335,7 +334,7 @@
             android:configChanges="orientation|screenSize"
             android:theme="@style/Theme.ownCloud.noActionBar.Login" />
 
-        <receiver android:name=".files.BootupBroadcastReceiver">
+        <receiver android:name="com.owncloud.android.files.BootupBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
@@ -345,20 +344,20 @@
         </receiver>
 
         <activity
-            android:name=".ui.activity.CopyToClipboardActivity"
+            android:name="com.owncloud.android.ui.activity.CopyToClipboardActivity"
             android:icon="@drawable/shared_via_link"
             android:label="@string/copy_link" />
         <activity
-            android:name=".ui.activity.FolderPickerActivity"
+            android:name="com.owncloud.android.ui.activity.FolderPickerActivity"
             android:label="@string/app_name" />
         <activity
-            android:name=".ui.activity.FilePickerActivity"
+            android:name="com.owncloud.android.ui.activity.FilePickerActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:theme="@style/Theme.ownCloud.Dialog.NoTitle"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.activity.ShareActivity"
+            android:name="com.owncloud.android.ui.activity.ShareActivity"
             android:exported="false"
             android:label="@string/share_dialog_title"
             android:launchMode="singleTop"
@@ -373,7 +372,7 @@
                 android:resource="@xml/users_and_groups_searchable" />
         </activity>
         <activity
-            android:name=".ui.activity.ManageSpaceActivity"
+            android:name="com.owncloud.android.ui.activity.ManageSpaceActivity"
             android:label="@string/manage_space_title"
             android:theme="@style/Theme.ownCloud" />
 
@@ -383,7 +382,7 @@
             android:exported="true"></service>
 
         <activity
-            android:name=".ui.activity.SsoGrantPermissionActivity"
+            android:name="com.owncloud.android.ui.activity.SsoGrantPermissionActivity"
             android:exported="true"
             android:theme="@style/Theme.ownCloud.Dialog.NoTitle" />
         <activity

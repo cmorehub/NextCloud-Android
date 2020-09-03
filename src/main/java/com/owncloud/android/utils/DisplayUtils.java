@@ -57,7 +57,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.nextcloud.client.account.CurrentAccountProvider;
 import com.nextcloud.client.network.ClientFactory;
 import com.owncloud.android.MainApp;
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.datamodel.ArbitraryDataProvider;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.datamodel.ThumbnailsCacheManager;
@@ -145,7 +145,7 @@ public final class DisplayUtils {
      * </ul>
      *
      * @param bytes Input file size
-     * @return something readable like "12 MB", {@link com.owncloud.android.R.string#common_pending} for negative
+     * @return something readable like "12 MB", {@link com.askey.qbee.atv.R.string#common_pending} for negative
      * byte values
      */
     public static String bytesToHumanReadable(long bytes) {

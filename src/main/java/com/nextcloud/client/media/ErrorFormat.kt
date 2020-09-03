@@ -25,7 +25,7 @@ package com.nextcloud.client.media
 
 import android.content.Context
 import android.media.MediaPlayer
-import com.owncloud.android.R
+import com.askey.qbee.atv.R
 
 /**
  * This code has been moved from legacy media player service.

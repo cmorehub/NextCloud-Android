@@ -27,7 +27,7 @@ import android.app.Activity;
 
 import com.facebook.testing.screenshot.Screenshot;
 import com.owncloud.android.AbstractIT;
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.ui.activity.FileDisplayActivity;
 
 import org.junit.Rule;

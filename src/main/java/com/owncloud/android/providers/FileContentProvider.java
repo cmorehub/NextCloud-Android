@@ -44,7 +44,7 @@ import android.text.TextUtils;
 
 import com.nextcloud.client.core.Clock;
 import com.owncloud.android.MainApp;
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.datamodel.SyncedFolder;
 import com.owncloud.android.db.ProviderMeta;

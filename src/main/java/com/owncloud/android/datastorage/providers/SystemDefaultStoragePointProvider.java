@@ -22,7 +22,7 @@
 package com.owncloud.android.datastorage.providers;
 
 import com.owncloud.android.MainApp;
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.datastorage.StoragePoint;
 
 import java.util.Vector;

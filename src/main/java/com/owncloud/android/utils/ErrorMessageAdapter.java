@@ -24,7 +24,7 @@ package com.owncloud.android.utils;
 import android.content.res.Resources;
 import android.text.TextUtils;
 
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.lib.common.operations.RemoteOperation;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult.ResultCode;

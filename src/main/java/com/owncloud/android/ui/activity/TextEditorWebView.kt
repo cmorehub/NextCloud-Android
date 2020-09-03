@@ -28,7 +28,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.nextcloud.client.appinfo.AppInfo
 import com.nextcloud.client.device.DeviceInfo
-import com.owncloud.android.R
+import com.askey.qbee.atv.R
 import com.owncloud.android.files.FileMenuFilter
 import com.owncloud.android.ui.asynctasks.TextEditorLoadUrlTask
 import javax.inject.Inject

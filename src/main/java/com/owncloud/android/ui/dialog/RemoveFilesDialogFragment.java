@@ -24,7 +24,7 @@ import android.os.Bundle;
 import android.view.ActionMode;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.ui.activity.ComponentsGetter;
 import com.owncloud.android.ui.dialog.ConfirmationDialogFragment.ConfirmationDialogFragmentListener;

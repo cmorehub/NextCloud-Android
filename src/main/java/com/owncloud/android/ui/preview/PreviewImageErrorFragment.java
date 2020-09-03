@@ -5,7 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.ui.fragment.FileFragment;
 
 import androidx.annotation.Nullable;

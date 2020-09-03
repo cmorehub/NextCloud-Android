@@ -28,7 +28,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import com.nextcloud.client.etm.EtmBaseFragment
-import com.owncloud.android.R
+import com.askey.qbee.atv.R
 import kotlinx.android.synthetic.main.fragment_etm_preferences.*
 
 class EtmPreferencesFragment : EtmBaseFragment() {

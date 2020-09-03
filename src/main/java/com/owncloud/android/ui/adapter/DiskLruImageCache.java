@@ -26,7 +26,7 @@ import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 
 import com.jakewharton.disklrucache.DiskLruCache;
-import com.owncloud.android.BuildConfig;
+import com.askey.qbee.atv.BuildConfig;
 import com.owncloud.android.lib.common.utils.Log_OC;
 
 import java.io.BufferedInputStream;

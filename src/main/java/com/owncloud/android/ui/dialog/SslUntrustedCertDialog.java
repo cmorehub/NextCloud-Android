@@ -32,7 +32,7 @@ import android.view.Window;
 import android.webkit.SslErrorHandler;
 import android.widget.Button;
 
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.lib.common.network.CertificateCombinedException;
 import com.owncloud.android.lib.common.network.NetworkUtils;
 import com.owncloud.android.lib.common.utils.Log_OC;

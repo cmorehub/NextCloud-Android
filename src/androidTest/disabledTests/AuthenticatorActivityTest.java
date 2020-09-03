@@ -30,7 +30,7 @@
 //import android.support.test.uiautomator.UiDevice;
 //import android.test.suitebuilder.annotation.LargeTest;
 //
-//import com.owncloud.android.R;
+//import com.askey.qbee.atv.R;
 //
 //import org.junit.Before;
 //import org.junit.Rule;

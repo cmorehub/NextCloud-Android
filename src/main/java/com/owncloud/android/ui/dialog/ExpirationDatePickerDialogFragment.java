@@ -28,7 +28,7 @@ import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.widget.DatePicker;
 
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.lib.resources.shares.OCShare;
 import com.owncloud.android.ui.activity.FileActivity;

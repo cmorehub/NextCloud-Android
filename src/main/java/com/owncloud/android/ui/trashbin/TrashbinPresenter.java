@@ -20,7 +20,7 @@
  */
 package com.owncloud.android.ui.trashbin;
 
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.lib.resources.trashbin.model.TrashbinFile;
 
 import java.io.File;

@@ -33,7 +33,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.nextcloud.client.account.UserAccountManager;
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.files.FileMenuFilter;
 import com.owncloud.android.lib.common.utils.Log_OC;

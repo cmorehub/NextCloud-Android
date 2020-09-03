@@ -31,7 +31,7 @@ import android.util.Log;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.owncloud.android.MainApp;
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.utils.PermissionUtil;
 import com.owncloud.android.utils.ThemeUtils;
 

@@ -24,7 +24,7 @@ import android.accounts.Account
 import android.content.Context
 import android.net.Uri
 import com.owncloud.android.MainApp
-import com.owncloud.android.R
+import com.askey.qbee.atv.R
 import com.owncloud.android.lib.common.OwnCloudAccount
 import com.owncloud.android.lib.common.OwnCloudBasicCredentials
 import java.net.URI

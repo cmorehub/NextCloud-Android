@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.utils.ThemeUtils;
 
 public class DeepLinkLoginActivity extends AuthenticatorActivity {

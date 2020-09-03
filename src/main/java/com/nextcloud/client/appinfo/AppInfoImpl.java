@@ -23,7 +23,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
-import com.owncloud.android.BuildConfig;
+import com.askey.qbee.atv.BuildConfig;
 import com.owncloud.android.lib.common.utils.Log_OC;
 
 class AppInfoImpl implements AppInfo {

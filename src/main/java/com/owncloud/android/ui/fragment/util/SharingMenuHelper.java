@@ -23,7 +23,7 @@ package com.owncloud.android.ui.fragment.util;
 import android.content.res.Resources;
 import android.view.MenuItem;
 
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.lib.resources.shares.OCShare;
 import com.owncloud.android.lib.resources.status.OCCapability;
 

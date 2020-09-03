@@ -1,12 +1,12 @@
-package com.nextcloud.qbee.ui.login
+package com.askey.qbee.atv.ui.login
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import android.util.Patterns
-import com.nextcloud.qbee.data.LoginRepository
-import com.nextcloud.qbee.data.Result
-import com.owncloud.android.R
+import com.askey.qbee.atv.data.LoginRepository
+import com.askey.qbee.atv.data.Result
+import com.askey.qbee.atv.R
 
 class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel() {
 

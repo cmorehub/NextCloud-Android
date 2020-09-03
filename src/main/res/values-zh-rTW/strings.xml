@@ -789,4 +789,5 @@
     <plurals name="items_selected_count">
         <item quantity="other">已選取 %d 個</item>
     </plurals>
+    <string name="drawer_item_cmore_media">USB 撥放</string>
 </resources>

@@ -166,24 +166,24 @@ android {
         productFlavors {
             // used for f-droid
             generic {
-                applicationId 'com.nextcloud.client'
+                applicationId 'com.askey.qbee.atv'
                 dimension "default"
             }
 
             gplay {
-                applicationId 'com.nextcloud.client'
+                applicationId 'com.askey.qbee.atv'
                 dimension "default"
             }
 
             versionDev {
-                applicationId "com.nextcloud.android.beta"
+                applicationId "com.askey.qbee.atv.beta"
                 dimension "default"
                 versionCode 20200108
                 versionName "20200108"
             }
 
             qa {
-                applicationId "com.nextcloud.android.qa"
+                applicationId "com.askey.qbee.atv.qa"
                 dimension "default"
                 versionCode 1
                 versionName "1"

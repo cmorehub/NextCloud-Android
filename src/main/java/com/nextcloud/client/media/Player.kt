@@ -27,7 +27,7 @@ import android.os.PowerManager
 import android.widget.MediaController
 import com.nextcloud.client.media.PlayerStateMachine.Event
 import com.nextcloud.client.media.PlayerStateMachine.State
-import com.owncloud.android.R
+import com.askey.qbee.atv.R
 import com.owncloud.android.datamodel.OCFile
 import com.owncloud.android.lib.common.OwnCloudAccount
 import com.owncloud.android.lib.common.OwnCloudClient

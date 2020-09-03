@@ -29,7 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Switch;
 
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.utils.ThemeUtils;
 
 import androidx.core.graphics.drawable.DrawableCompat;

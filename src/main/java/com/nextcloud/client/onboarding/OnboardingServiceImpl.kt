@@ -24,8 +24,8 @@ import android.content.Intent
 import android.content.res.Resources
 import com.nextcloud.client.account.CurrentAccountProvider
 import com.nextcloud.client.preferences.AppPreferences
-import com.owncloud.android.BuildConfig
-import com.owncloud.android.R
+import com.askey.qbee.atv.BuildConfig
+import com.askey.qbee.atv.R
 import com.owncloud.android.authentication.AuthenticatorActivity
 import com.owncloud.android.features.FeatureItem
 import com.owncloud.android.ui.activity.PassCodeActivity

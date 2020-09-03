@@ -26,7 +26,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.nextcloud.client.logger.LogEntry
-import com.owncloud.android.R
+import com.askey.qbee.atv.R
 import java.text.SimpleDateFormat
 import java.util.Locale
 

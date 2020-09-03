@@ -27,7 +27,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.nextcloud.client.di.Injectable
 import com.nextcloud.client.di.ViewModelFactory
-import com.owncloud.android.R
+import com.askey.qbee.atv.R
 import com.owncloud.android.ui.activity.ToolbarActivity
 import javax.inject.Inject
 

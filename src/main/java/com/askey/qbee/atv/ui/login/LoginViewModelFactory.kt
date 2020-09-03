@@ -1,9 +1,9 @@
-package com.nextcloud.qbee.ui.login
+package com.askey.qbee.atv.ui.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.nextcloud.qbee.data.LoginDataSource
-import com.nextcloud.qbee.data.LoginRepository
+import com.askey.qbee.atv.data.LoginDataSource
+import com.askey.qbee.atv.data.LoginRepository
 
 /**
  * ViewModel provider factory to instantiate LoginViewModel.

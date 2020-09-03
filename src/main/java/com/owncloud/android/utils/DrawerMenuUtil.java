@@ -25,7 +25,7 @@ import android.content.res.Resources;
 import android.view.Menu;
 
 import com.nextcloud.client.account.UserAccountManager;
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.lib.resources.status.OCCapability;
 import com.owncloud.android.lib.resources.status.OwnCloudVersion;
 

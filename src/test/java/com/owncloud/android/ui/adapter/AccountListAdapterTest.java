@@ -20,7 +20,7 @@
 
 package com.owncloud.android.ui.adapter;
 
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.ui.activity.ManageAccountsActivity;
 
 import org.junit.Before;

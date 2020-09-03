@@ -28,7 +28,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.lib.common.OwnCloudAccount;
 import com.owncloud.android.lib.common.accounts.AccountUtils;

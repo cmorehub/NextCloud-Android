@@ -20,7 +20,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
 
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.utils.ThemeUtils;
 
 import androidx.annotation.NonNull;

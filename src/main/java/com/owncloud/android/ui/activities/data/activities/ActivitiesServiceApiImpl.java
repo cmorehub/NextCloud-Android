@@ -31,7 +31,7 @@ import android.os.AsyncTask;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.common.NextcloudClient;
 import com.owncloud.android.MainApp;
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.lib.common.OwnCloudAccount;
 import com.owncloud.android.lib.common.OwnCloudClientManagerFactory;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;

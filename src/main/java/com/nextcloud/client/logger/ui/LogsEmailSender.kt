@@ -30,7 +30,7 @@ import com.nextcloud.client.core.AsyncRunner
 import com.nextcloud.client.core.Cancellable
 import com.nextcloud.client.core.Clock
 import com.nextcloud.client.logger.LogEntry
-import com.owncloud.android.R
+import com.askey.qbee.atv.R
 import java.io.File
 import java.io.FileWriter
 import java.util.TimeZone

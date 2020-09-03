@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

@@ -1,4 +1,4 @@
-package com.nextcloud.qbee.qbeecom
+package com.askey.qbee.atv.qbeecom
 
 import android.util.Log
 import com.google.gson.Gson

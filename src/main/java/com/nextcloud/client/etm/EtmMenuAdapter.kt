@@ -26,7 +26,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.owncloud.android.R
+import com.askey.qbee.atv.R
 
 class EtmMenuAdapter(
     context: Context,

@@ -27,7 +27,7 @@ import com.nextcloud.client.core.AsyncRunner
 import com.nextcloud.client.core.Clock
 import com.nextcloud.client.logger.LogEntry
 import com.nextcloud.client.logger.LogsRepository
-import com.owncloud.android.R
+import com.askey.qbee.atv.R
 import javax.inject.Inject
 
 class LogsViewModel @Inject constructor(

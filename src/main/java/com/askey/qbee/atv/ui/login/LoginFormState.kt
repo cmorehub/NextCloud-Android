@@ -1,4 +1,4 @@
-package com.nextcloud.qbee.ui.login
+package com.askey.qbee.atv.ui.login
 
 /**
  * Data validation state of the login form.

@@ -1,4 +1,4 @@
-package com.nextcloud.qbee.ui.login
+package com.askey.qbee.atv.ui.login
 
 import android.accounts.Account
 import android.accounts.AccountManager
@@ -18,10 +18,9 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.net.toUri
 import androidx.lifecycle.Observer
-import com.nextcloud.qbee.remoteit.RemoteItController
-import com.owncloud.android.R
+import com.askey.qbee.atv.remoteit.RemoteItController
+import com.askey.qbee.atv.R
 import com.owncloud.android.lib.common.OwnCloudAccount
 import com.owncloud.android.lib.common.OwnCloudClientManager
 import com.owncloud.android.lib.common.accounts.AccountUtils
@@ -158,7 +157,7 @@ class FirstLoginActivity : AppCompatActivity() {
 //                    loginQBee("http://iottalk.cmoremap.com.tw:6325".toUri(),"iottalk","97497929")
                     val device = findQBeeDeviceOfName(it.success.device?.remote ?: return@launch)
                     if (device != null) {
-                        loginQBee(device, usePeerToPeer = true)
+                        loginQBee(device)
                     } else {
                         Toast.makeText(this@FirstLoginActivity, it.error?.message ?: getString(R.string
                             .login_failed)
@@ -175,6 +174,9 @@ class FirstLoginActivity : AppCompatActivity() {
         })
 
         usernameEditText.setText(getString(R.string.default_email))
+//        CoroutineScope(Dispatchers.Main).launch {
+//            loginQBee("http://iottalk.cmoremap.com.tw:6325".toUri(),"iottalk","97497929")
+//        }
 
         usernameEditText.afterTextChanged {
             loginViewModel.loginDataChanged(

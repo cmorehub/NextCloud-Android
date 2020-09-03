@@ -30,7 +30,7 @@ import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.authentication.AuthenticatorActivity;
 
 import androidx.appcompat.app.AlertDialog;

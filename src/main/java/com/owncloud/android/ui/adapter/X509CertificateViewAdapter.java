@@ -24,7 +24,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.ui.dialog.SslUntrustedCertDialog;
 
 import java.security.MessageDigest;

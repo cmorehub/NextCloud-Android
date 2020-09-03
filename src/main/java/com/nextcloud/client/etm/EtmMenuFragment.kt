@@ -25,7 +25,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.owncloud.android.R
+import com.askey.qbee.atv.R
 
 class EtmMenuFragment : EtmBaseFragment() {
 

@@ -1,9 +1,7 @@
-package com.nextcloud.qbee.data
+package com.askey.qbee.atv.data
 
 import android.accounts.AuthenticatorException
-import android.util.Log
-import com.nextcloud.qbee.data.model.LoggedInUser
-import com.nextcloud.qbee.qbeecom.QBeeDotCom
+import com.askey.qbee.atv.qbeecom.QBeeDotCom
 import java.io.IOException
 
 /**

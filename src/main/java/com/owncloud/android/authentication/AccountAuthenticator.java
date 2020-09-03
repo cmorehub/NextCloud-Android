@@ -33,7 +33,7 @@ import android.os.Handler;
 import android.widget.Toast;
 
 import com.owncloud.android.MainApp;
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.lib.common.accounts.AccountTypeUtils;
 import com.owncloud.android.lib.common.utils.Log_OC;
 

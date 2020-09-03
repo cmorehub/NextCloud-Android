@@ -1,4 +1,4 @@
-package com.nextcloud.qbee.data.model
+package com.askey.qbee.atv.data.model
 
 /**
  * Data class that captures user information for logged in users retrieved from LoginRepository

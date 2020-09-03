@@ -23,7 +23,7 @@ import android.content.ContentResolver;
 import android.net.Uri;
 import android.os.Parcelable;
 
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.files.services.FileUploader;
 import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.operations.UploadFileOperation;

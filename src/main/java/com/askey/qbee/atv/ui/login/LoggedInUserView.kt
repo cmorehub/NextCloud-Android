@@ -1,4 +1,4 @@
-package com.nextcloud.qbee.ui.login
+package com.askey.qbee.atv.ui.login
 
 /**
  * User details post authentication that is exposed to the UI

@@ -24,7 +24,7 @@ package com.owncloud.android.ui.activity;
 import android.os.Bundle;
 import android.view.View;
 
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.ui.dialog.SortingOrderDialogFragment;
 import com.owncloud.android.ui.fragment.OCFileListFragment;
 import com.owncloud.android.utils.FileSortOrder;

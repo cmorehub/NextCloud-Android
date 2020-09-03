@@ -27,7 +27,7 @@ import android.database.MatrixCursor;
 import android.os.Build;
 import android.provider.DocumentsContract.Root;
 
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.providers.DocumentsStorageProvider;
 
 

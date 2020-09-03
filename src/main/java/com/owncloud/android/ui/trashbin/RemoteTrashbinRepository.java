@@ -29,7 +29,7 @@ import android.os.AsyncTask;
 
 import com.nextcloud.client.account.User;
 import com.nextcloud.client.network.ClientFactory;
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.lib.common.OwnCloudAccount;
 import com.owncloud.android.lib.common.OwnCloudClient;
 import com.owncloud.android.lib.common.OwnCloudClientManagerFactory;

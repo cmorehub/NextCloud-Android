@@ -40,7 +40,7 @@ import com.nextcloud.client.account.User;
 import com.nextcloud.client.account.UserAccountManager;
 import com.nextcloud.client.network.ClientFactory;
 import com.nextcloud.java.util.Optional;
-import com.owncloud.android.R;
+import com.askey.qbee.atv.R;
 import com.owncloud.android.datamodel.ArbitraryDataProvider;
 import com.owncloud.android.jobs.NotificationJob;
 import com.owncloud.android.lib.common.OwnCloudClient;
