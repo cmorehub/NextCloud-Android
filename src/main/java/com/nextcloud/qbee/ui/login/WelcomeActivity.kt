@@ -67,7 +67,7 @@ class WelcomeActivity : AppCompatActivity() {
         progressWelcome = findViewById(R.id.progressWelcome)
         CoroutineScope(Dispatchers.Main).launch {
             val logged = getSharedPreferences(QBEE_LOGIN_DATA, 0).getString(QBEE_LOGIN_DATA_ACCT, "") != ""
-            val debug = true
+            val debug = false
             if (logged && debug) {
                 val acctmail = getSharedPreferences(QBEE_LOGIN_DATA, 0).getString(QBEE_LOGIN_DATA_ACCT, "")
                 val pass = getSharedPreferences(QBEE_LOGIN_DATA, 0).getString(QBEE_LOGIN_DATA_PWD, "")

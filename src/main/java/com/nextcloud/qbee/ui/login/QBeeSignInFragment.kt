@@ -68,7 +68,7 @@ class QBeeSignInFragment : Fragment() {
     val debug = false
     val localaddr = "http://192.168.0.107"
 
-    val customUrl = true
+    val customUrl = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = inflater.inflate(R.layout.activity_qbee_signin, container, false)
@@ -118,8 +118,8 @@ class QBeeSignInFragment : Fragment() {
                                         try {
                                             val remoteDevice = findQBeeDeviceOfName(deviceremote ?: return@launch)
                                             if (remoteDevice != null) {
-//                                            loginQBee(remoteDevice, acctmail, pass)
-                                                loginQBee(remoteDevice, acctmail, pass, true)
+                                            loginQBee(remoteDevice, acctmail, pass)
+//                                                loginQBee(remoteDevice, acctmail, pass, true)
                                             } else {
                                                 Toast.makeText(context, getString(R.string.qbee_setup_device_not_found_error), Toast.LENGTH_LONG).show()
                                                 btnSignIn.isEnabled = true
