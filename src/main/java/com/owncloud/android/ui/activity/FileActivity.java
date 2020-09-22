@@ -411,6 +411,10 @@ public abstract class FileActivity extends DrawerActivity
     }
 
     public void performCredentialsUpdate(Account account, Context context) {
+        if(getResources().getBoolean(R.bool.is_tv_build)){
+            ((MainApp) getApplication()).onAccountCredentialNeedsUpdate();
+            return;
+        }
         try {
             /// step 1 - invalidate credentials of current account
             OwnCloudAccount ocAccount = new OwnCloudAccount(account, context);

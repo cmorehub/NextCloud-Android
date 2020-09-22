@@ -832,7 +832,11 @@ public class FileUploader extends Service
                 // since the operation will not get to be run by FileUploader#uploadFile
                 if (resultCode != null) {
                     mUploadsStorageManager.updateDatabaseUploadResult(new RemoteOperationResult(resultCode), upload);
-                    notifyUploadResult(upload, new RemoteOperationResult(resultCode));
+                    if(getApplicationContext().getResources().getBoolean(R.bool.is_tv_build)){
+                        dispatchUploadResult(upload, new RemoteOperationResult(resultCode));
+                    } else {
+                        notifyUploadResult(upload, new RemoteOperationResult(resultCode));
+                    }
                 } else {
                     mUploadsStorageManager.removeUpload(accountName, remotePath);
                 }
@@ -1132,7 +1136,11 @@ public class FileUploader extends Service
                 mUploadsStorageManager.updateDatabaseUploadResult(uploadResult, mCurrentUpload);
 
                 /// notify result
-                notifyUploadResult(mCurrentUpload, uploadResult);
+                if(getApplicationContext().getResources().getBoolean(R.bool.is_tv_build)){
+                    dispatchUploadResult(mCurrentUpload, uploadResult);
+                } else{
+                    notifyUploadResult(mCurrentUpload, uploadResult);
+                }
 
                 sendBroadcastUploadFinished(mCurrentUpload, uploadResult, removeResult.second);
             }
@@ -1284,6 +1292,13 @@ public class FileUploader extends Service
             mNotificationBuilder.setContentText(content);
             mNotificationManager.notify(tickerId, mNotificationBuilder.build());
         }
+    }
+
+    /*
+    Dispatch Event instead of notifying on tv
+ */
+    private void dispatchUploadResult(UploadFileOperation upload, RemoteOperationResult uploadResult){
+        ((MainApp) getApplication()).onAccountCredentialNeedsUpdate();
     }
 
     /**

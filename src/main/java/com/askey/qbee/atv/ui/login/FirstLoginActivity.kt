@@ -17,7 +17,9 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.lifecycle.Observer
 import com.askey.qbee.atv.remoteit.RemoteItController
 import com.askey.qbee.atv.R
@@ -26,8 +28,11 @@ import com.owncloud.android.lib.common.OwnCloudClientManager
 import com.owncloud.android.lib.common.accounts.AccountUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class FirstLoginActivity : AppCompatActivity() {
 
@@ -66,9 +71,19 @@ class FirstLoginActivity : AppCompatActivity() {
                 if (usePeerToPeer) {
                     remoteItController.peerToPeerLogin()
                     remoteItController.peerToPeerConnect(remoteItQBee.address)
-                } else remoteItController.restGetRemoteProxy(remoteItAuthToken!!, remoteItQBee.address)
+                } else {
+                    val proxyConnection = remoteItController.restConnectRemoteProxy(remoteItAuthToken!!, remoteItQBee.address)
+//                    Log.d("QBeeDotCom", proxyConnection.toString())
+//                    CoroutineScope(Dispatchers.IO).launch{
+//                        delay(30000)
+//                        val removeResult = remoteItController.restStopRemoteProxy(remoteItAuthToken!!,proxyConnection
+//                            .connection!!)
+//                        Log.d("QBeeDotCom", removeResult.toString())
+//                    }
+                    proxyConnection.connection?.proxy
+                }
             Log.d("QBeeDotCom", "qbeeUrl = $qBeeUrl")
-            loginQBee(android.net.Uri.parse(qBeeUrl!!.replace("http:", "https:")), "admin", "admin")
+            loginQBee(qBeeUrl!!.replace("http:", "https:").toUri(), "admin", "admin")
         }
 
     private suspend fun loginQBee(url: Uri, loginName: String, password: String) = withContext(Dispatchers.Main) {
@@ -174,9 +189,12 @@ class FirstLoginActivity : AppCompatActivity() {
         })
 
         usernameEditText.setText(getString(R.string.default_email))
-//        CoroutineScope(Dispatchers.Main).launch {
+        passwordEditText.setText(getString(R.string.default_password))
+
+        CoroutineScope(Dispatchers.Main).launch {
+//            askeyDemoSetup()
 //            loginQBee("http://iottalk.cmoremap.com.tw:6325".toUri(),"iottalk","97497929")
-//        }
+        }
 
         usernameEditText.afterTextChanged {
             loginViewModel.loginDataChanged(
@@ -217,6 +235,27 @@ class FirstLoginActivity : AppCompatActivity() {
         }
     }
 
+    private suspend fun askeyDemoSetup() = withContext(Dispatchers.Main){
+        var ipAddress : String? = null
+        while (ipAddress==null){
+            val dialogView = layoutInflater.inflate(R.layout.askey_demo,null)
+            ipAddress = suspendCoroutine {
+                val dialog = AlertDialog.Builder(this@FirstLoginActivity)
+                    .setTitle("Askey Demo")
+                    .setView(dialogView)
+                    .setCancelable(false).show().apply {
+                        setCanceledOnTouchOutside(false)
+                    }
+                dialogView.findViewById<Button>(R.id.button_ok_ip_address).setOnClickListener {_->
+                    it.resume(dialogView.findViewById<EditText>(R.id.edit_qb_ip_address).text
+                        .toString())
+                    dialog.dismiss()
+                }
+            }
+            if(ipAddress?.isNotEmpty()==true) loginQBee("https://${ipAddress}".toUri(),"admin","admin")
+            else ipAddress=null
+        }
+    }
 
     private fun updateUiWithUser(model: LoggedInUserView) {
         val welcome = getString(R.string.welcome)

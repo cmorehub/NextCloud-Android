@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.google.gson.annotations.SerializedName
 import com.remoteit.P2PManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -95,8 +96,17 @@ class RemoteItController(context: Context) {
             }
         }
 
+    data class ProxyConnection(
+        @SerializedName("deviceaddress") val deviceAddress:String,
+        @SerializedName("expirationsec") val expirationSeconds:Long,
+        @SerializedName("proxy") val proxy:String,
+        @SerializedName("connectionid") val id:String)
+    data class RemoteProxyInfo(val connection: ProxyConnection?, val status:Boolean)
+
+    public var currentProxyInfo : RemoteProxyInfo? = null
+
     @Throws(IOException::class)
-    public suspend fun restGetRemoteProxy(authToken: String, deviceId: String): String? =
+    public suspend fun restConnectRemoteProxy(authToken: String, deviceId: String): RemoteProxyInfo =
         withContext(Dispatchers.IO) {
             val urlConnection = restRequest("https://api.remot3.it/apv/v27/device/connect")
             urlConnection.setRequestProperty("token",authToken)
@@ -115,11 +125,24 @@ class RemoteItController(context: Context) {
                 flush()
                 close()
             }
-            return@withContext with(urlConnection.getResponseJson()) {
-                return@with if (this.get("status").asBoolean) {
-                    this.get("connection").asJsonObject.get("proxy").asString
-                } else null
+            return@withContext Gson().fromJson(urlConnection.getResponseJson(), RemoteProxyInfo::class.java)
+        }
+
+    @Throws(IOException::class)
+    public suspend fun restStopRemoteProxy(authToken: String, proxyInfo: ProxyConnection)  =
+        withContext(Dispatchers.IO) {
+            val urlConnection = restRequest("https://api.remot3.it/apv/v27/device/connect/stop")
+            urlConnection.setRequestProperty("token",authToken)
+            urlConnection.requestMethod = "POST"
+            urlConnection.doOutput = true
+            urlConnection.setRequestProperty("Content-Type", "application/json")
+            val postBody = Gson().toJson(proxyInfo)
+            urlConnection.outputStream.bufferedWriter().apply {
+                write(postBody)
+                flush()
+                close()
             }
+            return@withContext urlConnection.getResponseJson().get("status").asBoolean
         }
 
     @Throws(IOException::class)

@@ -1415,28 +1415,28 @@ public class OCFileListFragment extends ExtendedListFragment implements
     private void setTitle() {
         // set title
 
-        if (getActivity() instanceof FileDisplayActivity && currentSearchType != null) {
-            switch (currentSearchType) {
-                case FAVORITE_SEARCH:
-                    setTitle(R.string.drawer_item_favorites);
-                    break;
-                case VIDEO_SEARCH:
-                    setTitle(R.string.drawer_item_videos);
-                    break;
-                case RECENTLY_ADDED_SEARCH:
-                    setTitle(R.string.drawer_item_recently_added);
-                    break;
-                case RECENTLY_MODIFIED_SEARCH:
-                    setTitle(R.string.drawer_item_recently_modified);
-                    break;
-                case SHARED_FILTER:
-                    setTitle(R.string.drawer_item_shared);
-                    break;
-                default:
-                    setTitle(ThemeUtils.getDefaultDisplayNameForRootFolder(getContext()));
-                    break;
-            }
-        }
+//        if (getActivity() instanceof FileDisplayActivity && currentSearchType != null) {
+//            switch (currentSearchType) {
+//                case FAVORITE_SEARCH:
+//                    setTitle(R.string.drawer_item_favorites);
+//                    break;
+//                case VIDEO_SEARCH:
+//                    setTitle(R.string.drawer_item_videos);
+//                    break;
+//                case RECENTLY_ADDED_SEARCH:
+//                    setTitle(R.string.drawer_item_recently_added);
+//                    break;
+//                case RECENTLY_MODIFIED_SEARCH:
+//                    setTitle(R.string.drawer_item_recently_modified);
+//                    break;
+//                case SHARED_FILTER:
+//                    setTitle(R.string.drawer_item_shared);
+//                    break;
+//                default:
+//                    setTitle(ThemeUtils.getDefaultDisplayNameForRootFolder(getContext()));
+//                    break;
+//            }
+//        }
 
     }
 

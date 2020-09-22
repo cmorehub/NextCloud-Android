@@ -40,6 +40,7 @@ import android.util.Pair;
 
 import com.nextcloud.client.account.UserAccountManager;
 import com.askey.qbee.atv.R;
+import com.owncloud.android.MainApp;
 import com.owncloud.android.authentication.AuthenticatorActivity;
 import com.owncloud.android.datamodel.FileDataStorageManager;
 import com.owncloud.android.datamodel.OCFile;
@@ -617,8 +618,11 @@ public class FileDownloader extends Service
                     .setProgress(0, 0, false);
 
             if (needsToUpdateCredentials) {
-                configureUpdateCredentialsNotification(download.getAccount());
-
+                if(getResources().getBoolean(R.bool.is_tv_build)){
+                    dispatchCredentialsRequiresUpdate();
+                } else{
+                    configureUpdateCredentialsNotification(download.getAccount());
+                }
             } else {
                 // TODO put something smart in showDetailsIntent
                 Intent showDetailsIntent = new Intent();
@@ -657,6 +661,9 @@ public class FileDownloader extends Service
                 updateAccountCredentials, PendingIntent.FLAG_ONE_SHOT));
     }
 
+    private void dispatchCredentialsRequiresUpdate(){
+        ((MainApp) getApplication()).onAccountCredentialNeedsUpdate();
+    }
 
     /**
      * Sends a broadcast when a download finishes in order to the interested activities can

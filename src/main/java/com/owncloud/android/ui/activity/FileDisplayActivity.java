@@ -552,14 +552,8 @@ public class FileDisplayActivity extends FileActivity
                     transaction.commit();
                 } else {
                     Log_OC.d(this, "Switch to oc file search fragment");
-
-                    OCFileListFragment photoFragment = new OCFileListFragment();
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelable(OCFileListFragment.SEARCH_EVENT, Parcels.wrap(searchEvent));
-                    photoFragment.setArguments(bundle);
-                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.left_fragment_container, photoFragment, TAG_LIST_OF_FILES);
-                    transaction.commit();
+                    getListOfFilesFragment().setSearchFragment(true);
+                    getListOfFilesFragment().onMessageEvent(searchEvent);
                 }
             } else if (UsersAndGroupsSearchProvider.ACTION_SHARE_WITH.equals(intent.getAction())) {
                 Uri data = intent.getData();
@@ -826,7 +820,7 @@ public class FileDisplayActivity extends FileActivity
             @Override
             public boolean onQueryTextSubmit(String query) {
                 if (!TextUtils.isEmpty(query)){
-                    Toast.makeText(FileDisplayActivity.this, "Submit " + query, Toast.LENGTH_LONG).show();
+//                    Toast.makeText(FileDisplayActivity.this, "Submit " + query, Toast.LENGTH_LONG).show();
                     doSearchString(query);
                 }
                 return true;
@@ -875,6 +869,7 @@ public class FileDisplayActivity extends FileActivity
         searchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
+                Log.d("SEARCHVIEW", "onClose()");
                 if (TextUtils.isEmpty(searchView.getQuery().toString())) {
                     searchView.onActionViewCollapsed();
                     setDrawerIndicatorEnabled(isDrawerIndicatorAvailable()); // order matters
@@ -1255,6 +1250,8 @@ public class FileDisplayActivity extends FileActivity
             searchView.setQuery("", true);
             searchView.onActionViewCollapsed();
             setDrawerIndicatorEnabled(isDrawerIndicatorAvailable());
+            getListOfFilesFragment().setSearchFragment(false);
+            getListOfFilesFragment().refreshDirectory();
         } else if (isDrawerOpen) {
             // close drawer first
             super.onBackPressed();
@@ -2584,6 +2581,7 @@ public class FileDisplayActivity extends FileActivity
         if (onDeviceOnly) {
             setActionBarTitle(R.string.drawer_item_on_device);
         }
+        getListOfFilesFragment().setSearchFragment(false);
         getListOfFilesFragment().refreshDirectory();
     }
 

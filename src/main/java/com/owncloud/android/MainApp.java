@@ -295,6 +295,7 @@ public class MainApp extends MultiDexApplication implements HasAndroidInjector {
         CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
         return new X509Certificate[]{
             (X509Certificate) certFactory.generateCertificate(getResources().openRawResource(R.raw.qbee)),
+            (X509Certificate) certFactory.generateCertificate(getResources().openRawResource(R.raw.qbee2)),
             (X509Certificate) certFactory.generateCertificate(getResources().openRawResource(R.raw.askeyit))
         };
     }
@@ -303,6 +304,11 @@ public class MainApp extends MultiDexApplication implements HasAndroidInjector {
         for (X509Certificate certificate : getQBeeCerts()) {
             NetworkUtils.addCertToKnownServersStore(certificate, this);
         }
+    }
+
+    public void onAccountCredentialNeedsUpdate(){
+        new Exception().printStackTrace();
+        accountManager.removeAllAccounts();
     }
 
     @SuppressFBWarnings("ST")

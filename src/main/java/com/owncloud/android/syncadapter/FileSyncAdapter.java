@@ -35,6 +35,7 @@ import android.content.SyncResult;
 import android.os.Bundle;
 
 import com.askey.qbee.atv.R;
+import com.owncloud.android.MainApp;
 import com.owncloud.android.authentication.AuthenticatorActivity;
 import com.owncloud.android.datamodel.FileDataStorageManager;
 import com.owncloud.android.datamodel.OCFile;
@@ -162,7 +163,9 @@ public class FileSyncAdapter extends AbstractOwnCloudSyncAdapter {
             /// the account is unknown for the Synchronization Manager, unreachable this context,
             // or can not be authenticated; don't try this again
             mSyncResult.tooManyRetries = true;
-            notifyFailedSynchronization();
+            if (getContext().getResources().getBoolean(R.bool.is_tv_build)) {
+                dispatchFailedSynchronization();
+            } else notifyFailedSynchronization();
             return;
         }
 
@@ -418,6 +421,12 @@ public class FileSyncAdapter extends AbstractOwnCloudSyncAdapter {
         showNotification(R.string.sync_fail_ticker, notificationBuilder);
     }
 
+    /*
+        Dispatch Event instead of notifying on tv
+     */
+    private void dispatchFailedSynchronization(){
+        ((MainApp) getContext().getApplicationContext()).onAccountCredentialNeedsUpdate();
+    }
 
     /**
      * Notifies the user about conflicts and strange fails when trying to synchronize the contents
