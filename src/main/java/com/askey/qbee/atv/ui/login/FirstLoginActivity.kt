@@ -194,6 +194,7 @@ class FirstLoginActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.Main).launch {
 //            askeyDemoSetup()
 //            loginQBee("http://iottalk.cmoremap.com.tw:6325".toUri(),"iottalk","97497929")
+            setLoadingDisabled()
         }
 
         usernameEditText.afterTextChanged {

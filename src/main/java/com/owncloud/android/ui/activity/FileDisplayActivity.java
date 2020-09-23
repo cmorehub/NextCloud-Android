@@ -634,7 +634,7 @@ public class FileDisplayActivity extends FileActivity
             searchView.post(new Runnable() {
                 @Override
                 public void run() {
-                    searchView.setQuery(searchQuery, true);
+                    setSearchViewQuery(searchQuery, true);
                 }
             });
         }
@@ -808,7 +808,7 @@ public class FileDisplayActivity extends FileActivity
             public void onClick(View v) {
                 Log.d("TEST", "closeButton onClick()");
                 searchView.setIconified(true);
-                searchView.setQuery("",false);
+                setSearchViewQuery("",false);
             }
         });
 
@@ -842,6 +842,19 @@ public class FileDisplayActivity extends FileActivity
             }
         });
 
+        searchActionMenuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                onBackPressed();
+                return true;
+            }
+        });
+
         ThemeUtils.themeSearchView(searchView, true, this);
 
         // populate list of menu items to show/hide when drawer is opened/closed
@@ -857,7 +870,7 @@ public class FileDisplayActivity extends FileActivity
                 @Override
                 public void run() {
                     searchView.setIconified(false);
-                    searchView.setQuery(searchQuery, true);
+                    setSearchViewQuery(searchQuery, true);
                     searchView.clearFocus();
                 }
             });
@@ -884,7 +897,7 @@ public class FileDisplayActivity extends FileActivity
                     searchView.post(new Runnable() {
                         @Override
                         public void run() {
-                            searchView.setQuery("", true);
+                            setSearchViewQuery("", true);
                         }
                     });
                 }
@@ -922,7 +935,8 @@ public class FileDisplayActivity extends FileActivity
         switch (item.getItemId()) {
             case R.id.action_voice:
                 searchView.setIconified(false);
-                searchView.setQuery("",false);
+                searchQuery = "";
+                searchView.setQuery(searchQuery,false);
                 searchView.requestFocus();
                 Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
                 intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -1030,7 +1044,8 @@ public class FileDisplayActivity extends FileActivity
                                                                               searchText),Toast.LENGTH_LONG).show();
                         setSearchQuery(searchText);
                         searchActionMenuItem.expandActionView();
-                        searchView.setQuery(searchText, true);
+                        searchQuery = searchText;
+                        searchView.setQuery(searchQuery, true);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -1247,17 +1262,17 @@ public class FileDisplayActivity extends FileActivity
         if (isSearching || (isSearchOpen && searchView != null)) {
             isSearching = false;
             showFiles(false);
-            searchView.setQuery("", true);
+            searchQuery = "";
+            searchView.setQuery(searchQuery, true);
             searchView.onActionViewCollapsed();
             setDrawerIndicatorEnabled(isDrawerIndicatorAvailable());
             getListOfFilesFragment().setSearchFragment(false);
-            getListOfFilesFragment().refreshDirectory();
+            getListOfFilesFragment().listDirectory(getCurrentDir(),false,false);
         } else if (isDrawerOpen) {
             // close drawer first
             super.onBackPressed();
         } else {
             // all closed
-
             OCFileListFragment listOfFiles = getListOfFilesFragment();
             if (mDualPane || getSecondFragment() == null) {
                 OCFile currentDir = getCurrentDir();
@@ -2701,6 +2716,15 @@ public class FileDisplayActivity extends FileActivity
 
     public void setSearchQuery(String query) {
         searchQuery = query;
+    }
+
+    private void setSearchViewQuery(String query, boolean submit){
+        searchQuery = query;
+        searchView.setQuery(searchQuery,submit);
+    }
+
+    private void setSearchViewQuery(String query){
+        setSearchViewQuery(query,false);
     }
 
     private void handleOpenFileViaIntent(Intent intent) {
