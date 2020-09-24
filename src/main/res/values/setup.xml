@@ -62,6 +62,7 @@
     <bool name="recently_modified_enabled">false</bool>
     <bool name="shared_enabled">false</bool>
     <bool name="videos_enabled">false</bool>
+    <bool name="trashbin_enabled">false</bool>
     <bool name="show_drawer_logout">true</bool>
     <bool name="show_drawer_contacts_backup">false</bool> <!-- if false it will shown in settings -->
 
