@@ -790,7 +790,7 @@ public class OCFileListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 mFiles = filterByMimeType(mFiles, limitToMimeType);
             }
             FileSortOrder sortOrder = preferences.getSortOrderByFolder(directory);
-            mFiles = sortOrder.sortCloudFiles(mFiles);
+            mFiles = sortOrder.sortCloudFiles(new ArrayList<>(mFiles));
             mFilesAll.clear();
             mFilesAll.addAll(mFiles);
 

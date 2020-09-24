@@ -800,17 +800,24 @@ public class FileDisplayActivity extends FileActivity
 
         menu.findItem(R.id.action_select_all).setVisible(false);
         searchActionMenuItem = menu.findItem(R.id.action_search);
-        searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
 
         ImageView closeButton = (ImageView) searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
-        closeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("TEST", "closeButton onClick()");
-                searchView.setIconified(true);
-                setSearchViewQuery("",false);
-            }
-        });
+        closeButton.setEnabled(false);
+        closeButton.setImageDrawable(null);
+//        closeButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Log.d("TEST", "closeButton onClick()");
+//                searchView.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        setSearchViewQuery("");
+//                        searchView.setIconified(true);
+//                    }
+//                });
+//            }
+//        });
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
@@ -882,12 +889,11 @@ public class FileDisplayActivity extends FileActivity
         searchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
-                Log.d("SEARCHVIEW", "onClose()");
                 if (TextUtils.isEmpty(searchView.getQuery().toString())) {
                     searchView.onActionViewCollapsed();
                     setDrawerIndicatorEnabled(isDrawerIndicatorAvailable()); // order matters
                     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                    mDrawerToggle.syncState();
+                    if(mDrawerToggle!=null&&mDrawerLayout!=null) mDrawerToggle.syncState();
 
                     if (getListOfFilesFragment() != null) {
                         getListOfFilesFragment().setSearchFragment(false);
@@ -1262,9 +1268,8 @@ public class FileDisplayActivity extends FileActivity
         if (isSearching || (isSearchOpen && searchView != null)) {
             isSearching = false;
             showFiles(false);
-            searchQuery = "";
-            searchView.setQuery(searchQuery, true);
-            searchView.onActionViewCollapsed();
+            setSearchViewQuery("");
+            searchView.clearFocus();
             setDrawerIndicatorEnabled(isDrawerIndicatorAvailable());
             getListOfFilesFragment().setSearchFragment(false);
             getListOfFilesFragment().listDirectory(getCurrentDir(),false,false);
