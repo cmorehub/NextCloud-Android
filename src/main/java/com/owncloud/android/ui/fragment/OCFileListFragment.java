@@ -803,8 +803,8 @@ public class OCFileListFragment extends ExtendedListFragment implements
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
             && menu.findItem(R.id.action_create_rich_workspace) != null
             && mFile != null) {
-            menu.findItem(R.id.action_create_rich_workspace).setVisible(
-                TextUtils.isEmpty(mFile.getRichWorkspace()));
+//            menu.findItem(R.id.action_create_rich_workspace).setVisible(
+//                TextUtils.isEmpty(mFile.getRichWorkspace()));
         }
     }
 
